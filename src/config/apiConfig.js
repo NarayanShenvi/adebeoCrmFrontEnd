@@ -1,6 +1,14 @@
-const API = "https://adebeo-crm1.onrender.com";
-export default API ;
+import axios from "axios";
 
-// const API = process.env.NODE_ENV === "production"
-//   ? "https://adebeo-crm1.onrender.com"  // Production API URL
-//   : "http://localhost:5000";  // Local development API URL
+// Get the token from localStorage using the correct key "Access_Token"
+const token = localStorage.getItem("Access_Token"); 
+
+// Set default headers for Axios requests
+if (token) {
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+} else {
+  // Optionally, handle the case where no token is found
+  delete axios.defaults.headers.common["Authorization"];
+}
+
+export default axios;

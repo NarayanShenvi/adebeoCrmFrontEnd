@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import API from "../../config/apiConfig";  // Importing API from config file
+import API from "../../config/config";  // Importing API from config file
 
 //const API = "https://adebeo-crm1.onrender.com";
 
