@@ -1,4 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1&display=swap');
+.loginpage
+{   
+    position: fixed;  /* Make sure it covers the whole screen */
+    top: 0;
+    left: 0;
+    width: 100vw;  /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../assets/login_image.jpg');
+    background-size: cover;
+}
 .wrapper .logo img
 {
     width: 80px;  
@@ -18,6 +31,7 @@
     border-radius: 10px;
     padding: 10px 40px;
     font-family: "Shippori Mincho B1", "Times New Roman", serif;
+    background-size: cover;
 }
 .wrapper h1
 {

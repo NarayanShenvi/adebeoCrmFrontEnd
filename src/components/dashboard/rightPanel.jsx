@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { loadFunneldata } from '../../redux/slices/funnelSlice'; // Funnel slice
 import FunnelSection from '../../components/FunnelSection';
 import CustomerSection from '../../components/CustomerSection'; // CustomerSection import
@@ -7,12 +7,8 @@ import { resetNewCustomer } from '../../redux/slices/customerSlice'; // Action t
 
 const RightPanel = ({ selectedSection }) => {
   const dispatch = useDispatch();
-  
-  // Access loading state from redux store (with optional chaining to avoid errors)
-  const funnelLoading = useSelector((state) => state.funnel?.loading);
-  const customerLoading = useSelector((state) => state.customer?.loading);
 
-  // Trigger function to load funnel data
+  //Trigger function to load funnel data
   const getFunnel = () => {
     dispatch(loadFunneldata());
   };
@@ -26,26 +22,19 @@ const RightPanel = ({ selectedSection }) => {
   useEffect(() => {
     if (selectedSection === 'funnel') {
       getFunnel(); // Load funnel data when 'funnel' section is selected
-    } else if (selectedSection === 'customers') {
+     } else if (selectedSection === 'customers') {
       getCustomer(); // Reset new customer fields when entering customers section
     }
   }, [selectedSection, dispatch]);
 
   const renderSection = () => {
-    if (selectedSection === 'funnel' && funnelLoading) {
-      return <div>Loading Funnel Data...</div>;
-    }
-    if (selectedSection === 'customers' && customerLoading) {
-      return <div>Loading Customer Data...</div>;
-    }
-
     switch (selectedSection) {
       case 'funnel':
-        return <FunnelSection />;
+        return <FunnelSection/>;
       case 'customers':
-        return <CustomerSection />;
+       return <CustomerSection />;
       default:
-        return <div>Select a section from the menu.</div>;
+        return <div className='default_msg'>Select a section from the menu.</div>;
     }
   };
 
@@ -53,3 +42,8 @@ const RightPanel = ({ selectedSection }) => {
 };
 
 export default RightPanel;
+
+
+
+
+
