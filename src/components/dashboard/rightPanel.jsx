@@ -1,12 +1,18 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { loadFunneldata } from '../../redux/slices/funnelSlice'; // Funnel slice
 import FunnelSection from '../../components/FunnelSection';
 import CustomerSection from '../../components/CustomerSection'; // CustomerSection import
 import { resetNewCustomer } from '../../redux/slices/customerSlice'; // Action to reset new customer
 
+
 const RightPanel = ({ selectedSection }) => {
   const dispatch = useDispatch();
+
+  // Access loading state from redux store (with optional chaining to avoid errors)
+const funnelLoading = useSelector((state) => state.funnel?.loading);
+const customerLoading = useSelector((state) => state.customer?.loading);
+
 
   //Trigger function to load funnel data
   const getFunnel = () => {
