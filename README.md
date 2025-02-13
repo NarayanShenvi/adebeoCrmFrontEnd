@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-
-=======
 # adebeoCrmFrontEnd
->>>>>>> origin/vaishnavi
