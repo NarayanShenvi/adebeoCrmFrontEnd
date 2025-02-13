@@ -1,137 +1,168 @@
 import { createSlice } from '@reduxjs/toolkit';
-import API from '../../config/config'; // Your API configuration for backend calls
+import axios from "../../config/apiConfig";  // Your axios instance with token
+import API from "../../config/config";  // API path (for base URL or other configurations)
 
-// Initial state
 const initialState = {
   newCustomer: {
     companyName: '',
-    contactName: '',
-    email: '',
-    phone: '',
+    ownerName: '',
+    primaryEmail: '',
+    mobileNumber: '',
   },
-  selectedCustomer: null, // For selected customer (edit mode)
+  selectedCustomer: null,
+  customers: [],  // Stores all customers
   loading: false,
+  createLoading: false,
+  updateLoading: false,
   error: null,
+  successMessage: '',  // Success message state for success feedback
 };
 
-// Slice creation
 const customerSlice = createSlice({
-  name: 'customer',
+  name: 'customers',
   initialState,
   reducers: {
-    // Reset the newCustomer state when creating a new customer
     resetNewCustomer: (state) => {
       state.newCustomer = {
         companyName: '',
-        contactName: '',
-        email: '',
-        phone: '',
+        ownerName: '',
+        primaryEmail: '',
+        mobileNumber: '',
       };
     },
-
-    // Update specific fields in the newCustomer state
-    updateNewCustomerField: (state, action) => {
-      const { field, value } = action.payload;
-      state.newCustomer[field] = value;
-    },
-
-    // Set selected customer for editing
     setSelectedCustomer: (state, action) => {
       state.selectedCustomer = action.payload;
-      // Populate newCustomer state with selected customer data when in edit mode
-      state.newCustomer = {
-        companyName: action.payload.companyName || '',
-        contactName: action.payload.contactName || '',
-        email: action.payload.email || '',
-        phone: action.payload.phone || '',
-      };
     },
-
-    // Set loading state
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
-
-    // Set error state
+    setCreateLoading: (state, action) => {
+      state.createLoading = action.payload;
+    },
+    setUpdateLoading: (state, action) => {
+      state.updateLoading = action.payload;
+    },
     setError: (state, action) => {
       state.error = action.payload;
     },
-
-    // Create new customer - local handling (will be dispatched in async thunk)
-    createCustomer: (state, action) => {
-      // You can handle additional logic here for success or failure
+    setCustomerList: (state, action) => {
+      console.log('setCustomerList action received with data:', action.payload);
+      state.customers = [...action.payload];  // Ensure a new array reference
     },
-
-    // Update existing customer - local handling (will be dispatched in async thunk)
-    updateCustomer: (state, action) => {
-      // Action to handle customer update (in actual app, update state with response data)
+    setSuccessMessage: (state, action) => {
+      state.successMessage = action.payload;
     },
-
-    // Fetch customer data by companyName for edit mode (local handling)
-    fetchCustomer: (state, action) => {
-      // Action to set selected customer
+    clearSuccessMessage: (state) => {
+      state.successMessage = '';  // Clear success message
     },
-
-    // Fetch customer list from API (for dropdown or customer selection purposes)
-    fetchCustomerList: (state, action) => {
-      // Handle fetching list of customers
+    clearError: (state) => {
+      state.error = null;  // Clear error message
     },
   },
 });
 
-// Async Thunks for API calls
+export const {
+  resetNewCustomer,
+  setSelectedCustomer,
+  setLoading,
+  setCreateLoading,
+  setUpdateLoading,
+  setError,
+  setCustomerList,
+  setSuccessMessage,
+  clearSuccessMessage,
+  clearError,
+} = customerSlice.actions;
+
+export default customerSlice.reducer;
+
+// Async Thunks for API calls:
 
 // Create a new customer (POST)
 export const createCustomerAsync = (newCustomer) => async (dispatch) => {
-  dispatch(setLoading(true));
+  dispatch(setCreateLoading(true));  // Start loading for create
+  console.log('Creating customer:', newCustomer);  // Log the new customer data
+
   try {
-    const response = await API.post('/create_adebeo_customers', newCustomer); // Replace with your POST endpoint
-    dispatch(createCustomer(response.data));  // Assuming response returns the created customer
-    dispatch(setLoading(false));
+    const response = await axios.post(`${API}/create_adebeo_customers`, newCustomer);
+    console.log('API response:', response);  // Log the full API response
+
+    if (response && response.data) {
+      const data = response.data;
+      console.log('Response data:', data);  // Log the response data
+
+      if (data.exists) {
+        dispatch(setError(data.message));  // Handle error if email exists
+        console.error('Error: ', data.message);  // Log error message
+      } else {
+        dispatch(setCustomerList((prevCustomers) => [...prevCustomers, data]));  // Add new customer
+        dispatch(setSuccessMessage('Customer created successfully!'));
+        dispatch(resetNewCustomer());  // Reset form state after successful creation
+        console.log('Customer created successfully');  // Log success message
+      }
+    }
   } catch (error) {
-    dispatch(setError('Failed to create customer'));
-    dispatch(setLoading(false));
+    console.error('Error creating customer:', error);  // Log the error if the API call fails
+    dispatch(setError('Failed to create customer.'));
+  } finally {
+    dispatch(setCreateLoading(false));  // End loading for create
+    console.log('Finished creating customer, createLoading set to false');
   }
 };
 
-// Fetch a customer (GET)
+// Fetch customers based on company name (GET)
 export const fetchCustomerAsync = (companyName) => async (dispatch) => {
-  dispatch(setLoading(true));
+  dispatch(setLoading(true));  // Start loading
+
   try {
-    const response = await API.get(`/edit_adebeo_customer?companyName=${companyName}`); // Replace with GET endpoint
-    dispatch(setSelectedCustomer(response.data));  // Assuming response contains customer data
-    dispatch(setLoading(false));
+    const response = await axios.get(`${API}/edit_adebeo_customer`, { params: { companyName } });
+    console.log('API response:', response);  // Log the full API response
+
+    if (response && response.data && response.data.data) {
+      const customers = response.data.data;
+      console.log('Fetched Customers:', customers); // Log the customers before dispatching
+
+      if (Array.isArray(customers)) {
+        dispatch(setCustomerList(customers));  // Update Redux state
+        console.log('Customers set in Redux state:', customers);
+      } else {
+        console.error('No valid customers data:', customers);
+        dispatch(setError('No customers found.'));
+      }
+    } else {
+      console.error('Invalid response structure:', response);
+      dispatch(setError('Invalid response structure.'));
+    }
   } catch (error) {
-    dispatch(setError('Failed to fetch customer data'));
-    dispatch(setLoading(false));
+    console.error('Error fetching customers:', error);
+    dispatch(setError('Failed to fetch customers.'));
+  } finally {
+    dispatch(setLoading(false));  // End loading
+    console.log('Finished fetching customers');
   }
 };
 
 // Update an existing customer (PUT)
 export const updateCustomerAsync = (updatedCustomer) => async (dispatch) => {
-  dispatch(setLoading(true));
+  dispatch(setUpdateLoading(true));  // Start loading for update
+  console.log('Updating customer with ID:', updatedCustomer.id);  // Log customer ID
+
   try {
-    const response = await API.put(`/update_adebeo_customer/${updatedCustomer.id}`, updatedCustomer); // Replace with PUT endpoint
-    dispatch(updateCustomer(response.data));  // Assuming response contains updated customer data
-    dispatch(setLoading(false));
+    const response = await axios.put(`${API}/update_adebeo_customer/${updatedCustomer.id}`, updatedCustomer);
+    
+    if (response?.data) {
+      console.log('Customer updated successfully:', response.data);  // Log the updated customer data
+      dispatch(setSelectedCustomer(response.data));  // Update selected customer in Redux state
+      dispatch(setSuccessMessage("Customer updated successfully!"));
+    } else {
+      console.error('No data returned for the update operation.');
+      dispatch(setError('Failed to update customer.'));
+    }
   } catch (error) {
-    dispatch(setError('Failed to update customer'));
-    dispatch(setLoading(false));
+    console.error('Error updating customer:', error);
+    dispatch(setError('Failed to update customer.'));
+  } finally {
+    dispatch(setUpdateLoading(false));  // End loading for update
+    console.log('Finished updating customer, updateLoading set to false');
   }
 };
-
-// Export actions
-export const {
-  resetNewCustomer,
-  updateNewCustomerField,
-  setSelectedCustomer,
-  setLoading,
-  setError,
-  createCustomer,
-  updateCustomer,
-  fetchCustomer,
-  fetchCustomerList,
-} = customerSlice.actions;
-
-// Export reducer
-export default customerSlice.reducer;

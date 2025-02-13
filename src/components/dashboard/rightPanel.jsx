@@ -1,46 +1,5 @@
-// import React, { useEffect } from 'react';
-// import { useDispatch } from "react-redux";
-// import { loadFunneldata } from "../../redux/slices/funnelSlice"; // Adjust the path to your slice
-// import FunnelSection from "../../components/FunnelSection";  // Assuming this is your Funnel component
-// // Add other section imports as needed
-// import CustomerSection from "../../components/CustomerSection"; 
-
-// const RightPanel = ({ selectedSection }) => {
-//   const dispatch = useDispatch();
-
-//   // Trigger function to load funnel data
-//   const getFunnel = () => {
-//     dispatch(loadFunneldata());
-//   };
-
-//   // useEffect to trigger loading based on selectedSection
-//   useEffect(() => {
-//     if (selectedSection === 'funnel') {
-//       getFunnel(); // Load funnel data when 'funnel' section is selected
-//     }
-//   }, [selectedSection, dispatch]); // Only trigger when selectedSection changes
-
-//   const renderSection = () => {
-//     switch (selectedSection) {
-//       case 'funnel':
-//         return <FunnelSection />;
-//       // Add cases for other sections like 'customers', etc.
-//       default:
-//         return <div>Select a section from the menu.</div>;
-//     }
-//   };
-
-//   return (
-//     <div className="right-panel">
-//       {renderSection()}
-//     </div>
-//   );
-// };
-
-// export default RightPanel;
-
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { loadFunneldata } from '../../redux/slices/funnelSlice'; // Funnel slice
 import FunnelSection from '../../components/FunnelSection';
 import CustomerSection from '../../components/CustomerSection'; // CustomerSection import
@@ -48,6 +7,10 @@ import { resetNewCustomer } from '../../redux/slices/customerSlice'; // Action t
 
 const RightPanel = ({ selectedSection }) => {
   const dispatch = useDispatch();
+  
+  // Access loading state from redux store (with optional chaining to avoid errors)
+  const funnelLoading = useSelector((state) => state.funnel?.loading);
+  const customerLoading = useSelector((state) => state.customer?.loading);
 
   // Trigger function to load funnel data
   const getFunnel = () => {
@@ -69,6 +32,13 @@ const RightPanel = ({ selectedSection }) => {
   }, [selectedSection, dispatch]);
 
   const renderSection = () => {
+    if (selectedSection === 'funnel' && funnelLoading) {
+      return <div>Loading Funnel Data...</div>;
+    }
+    if (selectedSection === 'customers' && customerLoading) {
+      return <div>Loading Customer Data...</div>;
+    }
+
     switch (selectedSection) {
       case 'funnel':
         return <FunnelSection />;
@@ -83,8 +53,3 @@ const RightPanel = ({ selectedSection }) => {
 };
 
 export default RightPanel;
-
-
-
-
-
