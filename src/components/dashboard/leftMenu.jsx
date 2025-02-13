@@ -2,8 +2,6 @@
 import logo from "../dashboard/logo1.png";
 import React, { useState } from 'react';
 
-import { Link } from 'react-router-dom';
-
 const LeftMenu = ({ onMenuItemClick }) => {
   const [activeButton, setActiveButton] = useState(null);
 
