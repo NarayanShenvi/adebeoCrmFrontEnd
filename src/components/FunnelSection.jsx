@@ -1,15 +1,17 @@
-
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadFunneldata, loadCustomerComments, postCustomerComment } from '../redux/slices/funnelSlice';
 import { setModalState } from '../redux/slices/funnelSlice';
-import { FaEye, FaPlusSquare, FaTasks, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { FaHandHoldingDollar, FaIndianRupeeSign, FaFileCircleCheck } from "react-icons/fa6";
+import { FaEye, FaPlusSquare, FaTasks, FaChevronLeft, FaChevronRight } from "react-icons/fa"; //import statements are changed and some new imports are added
+import { FaHandHoldingDollar, FaIndianRupeeSign, FaFileCircleCheck, FaFaceMeh  } from "react-icons/fa6";
 import './dashboard/Dashboard.css'; // Import the CSS fil
+import { MdOutlineCancel } from "react-icons/md";
+import { HiSave } from "react-icons/hi";
+
 
 const FunnelSection = () => {
   const dispatch = useDispatch();
+  
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -105,25 +107,25 @@ const FunnelSection = () => {
       alert('Please select a customer and enter a comment.');
     }
   };
-
-  if (loading) return <div>Loading funnel data...</div>;
-  if (error) return <div>Error: {error}</div>;
+  
+  if (loading) return <div className='loading'>Loading funnel data...</div>;//changes made.. classnames were added
+  if (error) return <div className='error'>Error: {error}</div>;//changes made
 
   return (
+    
     <div className="funnel-container">
-      <h3>Funnel Data</h3>
-      {/* Search input */}
-      <div>
-        <input
+      <h3>My Funnel</h3>
+      <br></br>
+      <input
           type="text"
           placeholder="Search by Company Name"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+          className='search_company'/>  
+          {/* changes made--searchbar classname */}
 
-      {/* Funnel Data Table */}
       {funnelData && funnelData.length > 0 ? (
+        
      <div className='right-pannel'>
      <table className="funnel-table">
        <thead>
@@ -151,8 +153,10 @@ const FunnelSection = () => {
    <td>{item.products}</td>
    <td>{Array.isArray(item.comments) ? 
      <span className="icon-container">
-     <FaEye title="View Comments" className="action-icon"/>
-     <FaPlusSquare title="Add Comments" className="action-icon"/>
+      {/* changes made--icons */}
+    <FaEye onClick={() => handleShowComments(item._id)} title="View Comments" className="action-icon" />
+    <FaPlusSquare onClick={() => handleAddComment(item._id)} title="Add Comment" className="action-icon" />
+
      <FaTasks title="View Tasks" className="action-icon"/>
      <span className="icon-gap"></span> {/* Gap between groups */}
      <FaHandHoldingDollar title="Quotes" className="action-icon"/>
@@ -165,7 +169,7 @@ const FunnelSection = () => {
 ))}
 </tbody>
      </table>
-      ){/* Pagination Controls */}
+      {/* Pagination Controls */}
        <div className="pagination">
             <button onClick={handlePrevPage} disabled={currentPage === 1}>
               <FaChevronLeft />
@@ -178,25 +182,36 @@ const FunnelSection = () => {
         </div>
         
       ) : (
-        <p className="no-data">No data available</p>
+        // changes made -- classname added
+        <p className="no-data">No data available</p> 
+        
       )}
 
       {/* Show Comments Modal */}
-      {modalState.showComments && Array.isArray(customerComments) && customerComments.length > 0 && (
-        <div className="comments-modal">
-          <h4>Customer Comments</h4>
-          <p>Displaying {customerComments.length} comments</p>
-          <textarea
-            readOnly
-            rows={5}
-            value={customerComments.map((comment) => (
-              `${comment.name}: ${comment.text}\nDate: ${new Date(comment.date).toLocaleString()}\n`
-            )).join("\n")}
-            style={{ width: '100%', fontFamily: 'Arial, sans-serif', fontSize: '14px' }}
-          />
-          <button onClick={handleCloseCommentsModal}>Close</button>
-        </div>
-      )}
+      {/* Show Comments Modal changed  to show no data msg */}
+{modalState.showComments && (
+  <div className="comments-modal">
+    <h4>Customer Comments</h4>
+    
+    {Array.isArray(customerComments) && customerComments.length > 0 ? (
+      <>
+        <p className='displaycomments'>Displaying {customerComments.length} comments</p>
+        <textarea
+          readOnly
+          rows={5}
+          value={customerComments.map((comment) => (
+            `${comment.name}: ${comment.text}\nDate: ${new Date(comment.date).toLocaleString()}\n`
+          )).join("\n")} 
+        />
+      </>
+    ) : (
+      <p className='nocomments'>No comments available... <FaFaceMeh /></p>
+       // Message when no comments exist
+    )}<div className='cancel'>
+    <MdOutlineCancel onClick={handleCloseCommentsModal} title='Cancel' className='cancelcomment'/>
+    </div>
+  </div>
+)}
 
       {/* Add Comment Modal */}
       {modalState.addComment && (
@@ -209,9 +224,10 @@ const FunnelSection = () => {
             rows="5"
           />
           <div>
-            <button onClick={handleSubmitComment}>Submit Comment</button>
-            <button onClick={handleCloseAddCommentModal}>Cancel</button>
+          <MdOutlineCancel onClick={handleCloseAddCommentModal} title='Cancel' className='cancelcomment'/>{/* changes made--icons are added */}
+          <HiSave onClick={handleSubmitComment} title='Submit' className='submitcomment'/>            
           </div>
+          <p className="alert-box">Comment saved successfully! ✅</p>{/* changes made-- alertbox to show successfull submit */}
         </div>
       )}
     </div>
@@ -219,32 +235,5 @@ const FunnelSection = () => {
 };
 
 export default FunnelSection;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
