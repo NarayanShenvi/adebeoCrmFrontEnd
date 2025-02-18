@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
+import {
   createCustomerAsync,
   setSelectedCustomer,
   fetchCustomerAsync,
   clearSuccessMessage,
-  updateCustomerAsync
+  updateCustomerAsync,
+  resetSelectedCustomer,
+  clearCustomers
 } from '../redux/slices/customerSlice';
 import { Form } from 'react-bootstrap';
 import { debounce } from 'lodash';
@@ -16,7 +18,8 @@ import { FaUserEdit } from "react-icons/fa";
 import { ImUserCheck } from "react-icons/im";
 import { FaSpinner } from 'react-icons/fa';
 import { HiSave } from "react-icons/hi";
-
+import { fetchProductsAsync } from '../redux/slices/productSlice'; // Import fetchProductsAsync
+import Select from 'react-select'; // Import react-select
 
 
 
@@ -51,6 +54,33 @@ const CustomerSection = () => {
     state: '',
     website: ''
   });
+  //--------------------Products Section update ------------------------
+  // Accessing products state from Redux
+  const products = useSelector((state) => state.products?.products || []);
+  const loadingProducts = useSelector((state) => state.products?.loading || false);
+  const errorProducts = useSelector((state) => state.products?.error || null);
+
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  // Fetch products on component mount
+  useEffect(() => {
+    dispatch(fetchProductsAsync());
+  }, [dispatch]);
+
+  const handleProductSelect = (selectedOptions) => {
+    const selectedIds = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    setSelectedProducts(selectedIds);  // Update `selectedProducts` correctly
+  };
+
+  const selectRef = useRef(null);
+
+  useEffect(() => {
+    if (selectRef.current) {
+      selectRef.current.clearValue();
+    }
+  }, [selectedCustomer]);
+
+  //--------------------Products Section update ------------------------
 
   // Search debounce for filtering customers
   const debouncedSearch = useCallback(
@@ -62,9 +92,24 @@ const CustomerSection = () => {
     []
   );
 
+  // Watch for changes to selectedCustomer in the Redux state
+  useEffect(() => {
+    if (selectedCustomer) {
+      // Perform some action or side effect after selectedCustomer is updated
+      console.log("Selected customer updated:", selectedCustomer);
+      // You can add more logic like redirecting, showing a success message, etc.
+    }
+  }, [selectedCustomer]); // Dependency array ensures it runs when selectedCustomer changes
+
   // Update state when selectedCustomer changes (for Edit mode)
   useEffect(() => {
     if (isEditMode && selectedCustomer) {
+      console.log("Selected Customer for Edit Mode:", selectedCustomer);
+
+      // Reset selected products when changing the customer
+      setSelectedProducts([]); // Clear previously selected products
+
+      // Set state for customer details
       setState({
         companyName: selectedCustomer.companyName || '',
         ownerName: selectedCustomer.ownerName || '',
@@ -84,6 +129,11 @@ const CustomerSection = () => {
         state: selectedCustomer.state || '',
         website: selectedCustomer.website || ''
       });
+
+      // Directly use the `products` array, which is already an array of product IDs (strings)
+      if (selectedCustomer.products && Array.isArray(selectedCustomer.products)) {
+        setSelectedProducts(selectedCustomer.products); // Set selected products for editing
+      }
     }
   }, [isEditMode, selectedCustomer]);
 
@@ -92,45 +142,94 @@ const CustomerSection = () => {
     setSearchQuery(e.target.value);
   };
 
+  const handleFocus = () => {
+    // Manually reset the selected products when the select is focused
+    setSelectedProducts([]);
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isEditMode && selectedCustomer) {
-      // Edit an existing customer
-      const updatedCustomer = { ...state, id: selectedCustomer._id };
-      await dispatch(updateCustomerAsync(updatedCustomer));  // PUT request to update
-    } else {
-      // Create a new customer
-      await dispatch(createCustomerAsync(state));  // POST request to create
-      setState({
-        companyName: '',
-        ownerName: '',
-        primaryEmail: '',
-        mobileNumber: '',
-        address: '',
-        altemail: '',
-        city: '',
-        comments: [],
-        gstin: '',
-        funnelType: '',
-        insta: '',
-        linkedin: '',
-        pincode: '',
-        primaryLocality: '',
-        secondaryLocality: '',
-        state: '',
-        website: ''
-      }); // Clear the form after creation
-    }
-  };
+    const customerData = { ...state, products: selectedProducts };
 
-  // Toggle between Edit and Create mode
-  const handleToggleEditMode = () => {
-    setIsEditMode((prevMode) => {
-      const newMode = !prevMode;
-      if (!newMode) {
-        // Reset state when switching to create mode
+    if (isEditMode && selectedCustomer) {
+      // Editing an existing customer
+      const updatedCustomer = { ...customerData, id: selectedCustomer._id };
+
+      console.log("Updated Customer Payload:", updatedCustomer);
+
+      try {
+        const resultAction = await dispatch(updateCustomerAsync(updatedCustomer));
+        
+        if (resultAction && resultAction.id) {
+          const updatedCustomerData = resultAction;
+          console.log("Updated Customer Data:", updatedCustomerData);
+
+          // Update Redux state with the updated customer
+          dispatch(setSelectedCustomer(updatedCustomerData));
+
+          // Update local state with the latest customer data
+          setState({
+            companyName: updatedCustomerData.companyName || '',
+            ownerName: updatedCustomerData.ownerName || '',
+            primaryEmail: updatedCustomerData.primaryEmail || '',
+            mobileNumber: updatedCustomerData.mobileNumber || '',
+            address: updatedCustomerData.address || '',
+            altemail: updatedCustomerData.altemail || '',
+            city: updatedCustomerData.city || '',
+            comments: updatedCustomerData.comments || [],
+            gstin: updatedCustomerData.gstin || '',
+            funnelType: updatedCustomerData.funnelType || '',
+            insta: updatedCustomerData.insta || '',
+            linkedin: updatedCustomerData.linkedin || '',
+            pincode: updatedCustomerData.pincode || '',
+            primaryLocality: updatedCustomerData.primaryLocality || '',
+            secondaryLocality: updatedCustomerData.secondaryLocality || '',
+            state: updatedCustomerData.state || '',
+            website: updatedCustomerData.website || ''
+          });
+
+          // Clear form only after successful update
+          setState({
+            companyName: '',
+            ownerName: '',
+            primaryEmail: '',
+            mobileNumber: '',
+            address: '',
+            altemail: '',
+            city: '',
+            comments: [],
+            gstin: '',
+            funnelType: '',
+            insta: '',
+            linkedin: '',
+            pincode: '',
+            primaryLocality: '',
+            secondaryLocality: '',
+            state: '',
+            website: ''
+          });
+
+          // Optionally reset selected products
+          setSelectedProducts([]);
+        } else {
+          console.log("Error in resultAction:", resultAction);
+          console.error("Error updating customer:", resultAction?.error || "Unknown error");
+        }
+      } catch (err) {
+        console.error("Error submitting customer data:", err);
+      }
+    } else {
+      // Creating a new customer
+      const customerPayload = { ...customerData, products: selectedProducts || [] };
+
+      console.log("Create Customer Payload:", customerPayload);
+
+      try {
+        await dispatch(createCustomerAsync(customerPayload));
+
+        // Clear form after successful creation
         setState({
           companyName: '',
           ownerName: '',
@@ -150,11 +249,58 @@ const CustomerSection = () => {
           state: '',
           website: ''
         });
+
+        // Optionally reset selected products after creation
+        setSelectedProducts([]);
+      } catch (err) {
+        console.error("Error creating customer:", err);
+      }
+    }
+  };
+
+  // Toggle between Edit and Create mode
+  const handleToggleEditMode = () => {
+    setIsEditMode((prevMode) => {
+      const newMode = !prevMode;
+      if (!newMode) {
+        // Reset state and products only when creating a new customer
+        setState({
+          companyName: '',
+          ownerName: '',
+          primaryEmail: '',
+          mobileNumber: '',
+          address: '',
+          altemail: '',
+          city: '',
+          comments: [],
+          gstin: '',
+          funnelType: '',
+          insta: '',
+          linkedin: '',
+          pincode: '',
+          primaryLocality: '',
+          secondaryLocality: '',
+          state: '',
+          website: ''
+        });
+
+        // Clear selected products when switching to create mode
+        setSelectedProducts([]); // Reset selected products
+        dispatch(clearCustomers());
+
+         // Dispatch action to clear the selected customer in Redux state
+        //dispatch(resetSelectedCustomer());
+
+      // Clear the search query and reset the customer list
+      //setSearchQuery('');
+      //dispatch(fetchCustomerAsync(''));  // Dispatch with empty string to reset the customer list
       }
       return newMode;
     });
-    setSearchQuery(''); // Clear search when toggling modes
-    dispatch(clearSuccessMessage()); // Clear any success messages
+
+    // Clear search query and reset success message on toggle
+    setSearchQuery('');
+    dispatch(clearSuccessMessage());
   };
 
   useEffect(() => {
@@ -432,14 +578,34 @@ const CustomerSection = () => {
       <Row className="g-5">   
         <Col md={6}>
         <Form.Group className="form-group">
-      <Form.Label>Products</Form.Label>
-      <Form.Select value={selected} onChange={(e) => setSelected(e.target.value)} >
-        <option value="">-- Select --</option>
-        <option >Technology</option>
-        <option >Health</option>
-        <option >Finance</option>
-      </Form.Select>
-    </Form.Group>
+          <Form.Label>Choose Products</Form.Label>
+          {loadingProducts ? (
+            <p>Loading Products...</p>
+          ) : errorProducts ? (
+            <p style={{ color: 'red' }}>{errorProducts}</p>
+          ) : (
+            <Select
+              key={selectedCustomer ? selectedCustomer._id : 'new'} // Unique key to force reset on customer change
+              isMulti
+              name="products"
+              options={products.map(product => ({
+                label: `${product.productName} - ${product.productCode}`,
+                value: product._id
+              }))}
+              value={products
+                .filter(product => selectedProducts.includes(product._id))
+                .map(product => ({
+                  label: `${product.productName} - ${product.productCode}`,
+                  value: product._id
+                }))}
+              onChange={handleProductSelect}
+              getOptionLabel={(e) => e.label}
+              getOptionValue={(e) => e.value}
+              className="basic-multi-select"
+              classNamePrefix="select"
+            />
+          )}
+        </Form.Group>
         </Col>
         <Col md={6}>
         <Form.Group className="form-group">

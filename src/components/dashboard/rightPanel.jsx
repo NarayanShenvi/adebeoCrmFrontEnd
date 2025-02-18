@@ -4,6 +4,8 @@ import { loadFunneldata } from '../../redux/slices/funnelSlice'; // Funnel slice
 import FunnelSection from '../../components/FunnelSection';
 import CustomerSection from '../../components/CustomerSection'; // CustomerSection import
 import { resetNewCustomer } from '../../redux/slices/customerSlice'; // Action to reset new customer
+import ProductSection from '../../components/ProductSection'
+import { fetchProductsAsync } from '../../redux/slices/productSlice';  // Adjust the path accordingly
 
 
 const RightPanel = ({ selectedSection }) => {
@@ -19,6 +21,10 @@ const customerLoading = useSelector((state) => state.customer?.loading);
     dispatch(loadFunneldata());
   };
 
+  const getProducts = async () => {
+    dispatch(fetchProductsAsync());
+  };
+  
   // Trigger function to load customer data (reset to new customer)
   const getCustomer = () => {
     dispatch(resetNewCustomer());  // Reset new customer state to initial empty fields
@@ -30,6 +36,8 @@ const customerLoading = useSelector((state) => state.customer?.loading);
       getFunnel(); // Load funnel data when 'funnel' section is selected
      } else if (selectedSection === 'customers') {
       getCustomer(); // Reset new customer fields when entering customers section
+    } else if (selectedSection === 'products') {
+      getProducts();
     }
   }, [selectedSection, dispatch]);
 
@@ -39,6 +47,8 @@ const customerLoading = useSelector((state) => state.customer?.loading);
         return <FunnelSection/>;
       case 'customers':
        return <CustomerSection />;
+      case 'products':
+        return <ProductSection />;
       default:
         return <div className='default_msg'>Select a section from the menu.</div>;
     }

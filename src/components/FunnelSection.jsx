@@ -16,36 +16,53 @@ const FunnelSection = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [newComment, setNewComment] = useState('');
+  const [rowsPerPage, setRowsPerPage] = useState(8); // Set default rows per page to 5
+  const [currentPage, setCurrentPage] = useState(1);
 
   const funnelData = useSelector((state) => state.funnel.funnelData);
   const loading = useSelector((state) => state.funnel.loading);
   const error = useSelector((state) => state.funnel.error);
   const customerComments = useSelector((state) => state.funnel.customerComments);
   const modalState = useSelector((state) => state.funnel.modalState);
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5;
+
   const [totalPages, setTotalPages] = useState(1);
+
+  // Calculate page boundaries based on rows per page
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = funnelData.slice(indexOfFirstRow, indexOfLastRow);
 
+  // Handle pagination changes
   const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
   const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
+  // Recalculate total pages based on rows per page
   useEffect(() => {
     setTotalPages(Math.ceil(funnelData.length / rowsPerPage));
   }, [funnelData, rowsPerPage]);
 
+  // Update page if the currentPage exceeds totalPages
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(1);
     }
   }, [totalPages, currentPage]);
+
+  // Handle rows per page change
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(Number(event.target.value)); // Set the new value for rowsPerPage
+    setCurrentPage(1); // Reset to the first page when changing rows per page
+  };
+
   // Debounced search term effect
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -58,9 +75,9 @@ const FunnelSection = () => {
   // Fetch funnel data when searchTerm changes
   useEffect(() => {
     if (debouncedSearchTerm.trim() !== '') {
-      dispatch(loadFunneldata(1, 5, debouncedSearchTerm));
+      dispatch(loadFunneldata(1, rowsPerPage, debouncedSearchTerm));
     }
-  }, [debouncedSearchTerm, dispatch]);
+  }, [debouncedSearchTerm, dispatch, rowsPerPage]);
 
   // Fetch customer comments only if they haven't been fetched already
   const fetchCommentsIfNeeded = (customerId) => {
@@ -74,8 +91,6 @@ const FunnelSection = () => {
 
   const handleShowComments = (customerId) => {
     dispatch(setModalState({ selectedShowCommentsCustomerId: customerId, showComments: true }));
-
-    // Fetch comments only if they haven't been fetched yet
     fetchCommentsIfNeeded(customerId);
   };
 
@@ -180,7 +195,6 @@ const FunnelSection = () => {
             </button>
           </div>
         </div>
-        
       ) : (
         // changes made -- classname added
         <p className="no-data">No data available</p> 
@@ -235,5 +249,4 @@ const FunnelSection = () => {
 };
 
 export default FunnelSection;
-
 

@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axios from "../../config/apiConfig";  // Your axios instance with token
 import API from "../../config/config";  // API path (for base URL or other configurations)
+//import { fetchProductsAsync } from './productSlice';  // Import from the productSlice where you fetch the data
 
 const initialState = {
   newCustomer: {
@@ -16,6 +17,7 @@ const initialState = {
   updateLoading: false,
   error: null,
   successMessage: '',  // Success message state for success feedback
+  productCodes: []  // Array to store only the product codes
 };
 
 const customerSlice = createSlice({
@@ -29,6 +31,9 @@ const customerSlice = createSlice({
         primaryEmail: '',
         mobileNumber: '',
       };
+    },
+    setProductCodes: (state, action) => {
+      state.productCodes = action.payload;  // Set productCodes from fetched products
     },
     setSelectedCustomer: (state, action) => {
       state.selectedCustomer = action.payload;
@@ -58,6 +63,32 @@ const customerSlice = createSlice({
     clearError: (state) => {
       state.error = null;  // Clear error message
     },
+    resetSelectedCustomer: (state) => {
+      state.selectedCustomer = null;  // Reset customer when toggling mode
+    },
+    clearCustomers(state) {
+      state.customers = [];  // Clears the customers list
+    },
+    extraReducers: (builder) => {
+      builder
+        .addCase(updateCustomerAsync.pending, (state) => {
+          state.createLoading = true;
+          state.error = null;
+        })
+        .addCase(updateCustomerAsync.fulfilled, (state, action) => {
+          state.createLoading = false;
+          state.selectedCustomer = action.payload;  // Update selectedCustomer with updated data
+          state.successMessage = action.payload.message;
+        })
+        .addCase(updateCustomerAsync.rejected, (state, action) => {
+          state.createLoading = false;
+          state.error = action.payload || 'Unknown error';
+          
+          // Ensure the error doesn't reset selectedCustomer or form state.
+          console.error("Error during update:", action.payload || 'Unknown error');
+        });
+    }  
+    // other reducers
   },
 });
 
@@ -72,6 +103,8 @@ export const {
   setSuccessMessage,
   clearSuccessMessage,
   clearError,
+  setProductCodes,
+  resetSelectedCustomer,clearCustomers
 } = customerSlice.actions;
 
 export default customerSlice.reducer;
@@ -149,13 +182,23 @@ export const updateCustomerAsync = (updatedCustomer) => async (dispatch) => {
 
   try {
     const response = await axios.put(`${API}/update_adebeo_customer/${updatedCustomer.id}`, updatedCustomer);
-    
-    if (response?.data) {
-      console.log('Customer updated successfully:', response.data);  // Log the updated customer data
-      dispatch(setSelectedCustomer(response.data));  // Update selected customer in Redux state
-      dispatch(setSuccessMessage("Customer updated successfully!"));
+    console.log('Updating response:', response);
+
+    // Check if the response contains a message field
+    if (response?.data?.message) {
+      // Case when only a success message is returned
+      console.log('Customer update successful:', response.data.message);
+      
+      // Since we don't have updated customer data, we set the success message
+      dispatch(setSuccessMessage(response.data.message));
+      
+      // Optionally, you may want to update the selected customer with the latest known data (if not changing)
+      //dispatch(setSelectedCustomer(updatedCustomer));
+      return  response.data;
+      
     } else {
-      console.error('No data returned for the update operation.');
+      // If no message or customer data is returned, we treat it as a failure
+      console.error('No valid response data returned');
       dispatch(setError('Failed to update customer.'));
     }
   } catch (error) {
@@ -164,5 +207,22 @@ export const updateCustomerAsync = (updatedCustomer) => async (dispatch) => {
   } finally {
     dispatch(setUpdateLoading(false));  // End loading for update
     console.log('Finished updating customer, updateLoading set to false');
+  }
+};
+
+
+// Async Thunk to process product codes
+export const fetchProductsAsync = () => async (dispatch) => {
+  dispatch(setLoading(true));  // This shows the loading indicator
+  try {
+    const response = await axios.get(`${API}/getAll_adebeo_products`);
+    if (response && response.data && response.data.data) {
+      const productCodes = response.data.data.map(product => product.productCode);  // Extract only productCode from each product
+      dispatch(setProductCodes(productCodes));  // Dispatch only product codes to the Redux state
+    }
+  } catch (error) {
+    dispatch(setError('Failed to fetch products.'));
+  } finally {
+    dispatch(setLoading(false));  // This hides the loading indicator
   }
 };
