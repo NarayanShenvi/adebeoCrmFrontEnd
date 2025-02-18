@@ -9,10 +9,20 @@ import {
 } from '../redux/slices/customerSlice';
 import { Form } from 'react-bootstrap';
 import { debounce } from 'lodash';
+import './dashboard/Dashboard.css'; // changes made --Import the CSS fil
+import { Row, Col } from 'react-bootstrap';
+import { HiMiniUserPlus } from "react-icons/hi2";
+import { FaUserEdit } from "react-icons/fa";
+import { ImUserCheck } from "react-icons/im";
+import { FaSpinner } from 'react-icons/fa';
+import { HiSave } from "react-icons/hi";
+
+
+
 
 const CustomerSection = () => {
   const dispatch = useDispatch();
-
+  const [selected, setSelected] = useState("");//changes made--for company type
   // Accessing customers and selectedCustomer state from Redux
   const customers = useSelector((state) => state.customers?.customers || []);
   const loading = useSelector((state) => state.customers?.createLoading || false);
@@ -156,81 +166,36 @@ const CustomerSection = () => {
   }, [customers]);
 
   return (
-    <div>
-      <h3>{isEditMode ? 'Edit Customer' : 'Create New Customer'}</h3>
-      <button onClick={handleToggleEditMode}>
-        Switch to {isEditMode ? 'Create New' : 'Edit Existing'}
-      </button>
+<div className="customer-section">
+      <h3>{isEditMode ? 'Edit Existing Customer' : 'Create New Customer'}</h3>
+      
+      <div onClick={handleToggleEditMode}>
+       {isEditMode ? (
+        // When in edit mode, show the "create new" icon
+        <HiMiniUserPlus  title="Switch to Create New" className="toggle-icon"/>
+      ) : (
+        // When in create mode, show the "edit existing" icon
+        <FaUserEdit title="Switch to Edit Existing" className="toggle-icon" />
+      )}
+      </div>
 
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-
-      {/* The Form is always visible in both modes */}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group>
-          <Form.Label>Company Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter company name"
-            name="companyName"
-            value={state.companyName}
-            onChange={(e) => setState({ ...state, companyName: e.target.value })}
-            disabled={loading}
-          />
-        </Form.Group>
-
-        <Form.Group>
-          <Form.Label>Contact Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter contact name"
-            name="ownerName"
-            value={state.ownerName}
-            onChange={(e) => setState({ ...state, ownerName: e.target.value })}
-            disabled={loading}
-          />
-        </Form.Group>
-
-        <Form.Group>
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email"
-            name="primaryEmail"
-            value={state.primaryEmail}
-            onChange={(e) => setState({ ...state, primaryEmail: e.target.value })}
-            disabled={loading}
-          />
-        </Form.Group>
-
-        <Form.Group>
-          <Form.Label>Phone</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter phone number"
-            name="mobileNumber"
-            value={state.mobileNumber}
-            onChange={(e) => setState({ ...state, mobileNumber: e.target.value })}
-            disabled={loading}
-          />
-        </Form.Group>
-
-        {/* Add other form fields similarly */}
-
-        {/* Search field for Edit mode */}
-        {isEditMode && (
-          <div>
-            <label>Search for Customer:</label>
+      {successMessage && <p className="success">{successMessage}</p>}
+      {error && <p className="error1">{error}</p>}
+           {/* Search field for Edit mode */}
+           {isEditMode && (
+          <div >
+            
             <input
               type="text"
+              className='search-field'
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Search by company name"
               disabled={loading}
             />
-            <div>
+            <div className='search-field1'>
               {loading ? (
-                <p>Loading...</p>
+                <p className='CustomerLoading'>Loading...</p>
               ) : customers.length > 0 ? (
                 <select
                   onChange={(e) => {
@@ -240,7 +205,7 @@ const CustomerSection = () => {
                     dispatch(setSelectedCustomer(selectedCustomer));
                   }}
                   value={selectedCustomer?._id || ''}
-                  style={{ width: '100%' }}
+
                 >
                   <option value="" disabled>Select a customer</option>
                   {customers.map((customer) => (
@@ -250,15 +215,308 @@ const CustomerSection = () => {
                   ))}
                 </select>
               ) : (
-                <p>No customers found</p>
+                <p className='NoCustomerssFound'>No customers found...</p>
               )}
             </div>
           </div>
         )}
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Submitting...' : isEditMode ? 'Update Customer' : 'Create Customer'}
-        </button>
+     
+      {/* The Form is always visible in both modes */}
+      <Form onSubmit={handleSubmit} className='customer-form'>
+        <Row className="g-5">
+          <Col md={6}>
+        <Form.Group className="form-group">
+          <Form.Label>Company Name</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter company name"
+            name="companyName"
+            value={state.companyName}
+            onChange={(e) => setState({ ...state, companyName: e.target.value })}
+            disabled={loading} required
+          />
+        </Form.Group>
+        </Col>
+        <Col md={6}>
+        <Form.Group className="form-group">
+        <Form.Label>Address</Form.Label>
+        <Form.Control as="textarea" rows={1} placeholder="Enter address" 
+        name="address"
+        value={state.address}
+        onChange={(e) => setState({ ...state, address: e.target.value })}
+        disabled={loading} /> 
+        </Form.Group>
+    </Col>
+    </Row>
+    <Row className="g-5">
+  <Col md={6}>
+    <Form.Group className="form-group">
+      <Form.Label>Company Type</Form.Label>
+      <Form.Select
+        value={selected}
+        onChange={(e) => setSelected(e.target.value)}
+      
+      >
+        <option value="">-- Select --</option>
+        <option>Technology</option>
+        <option>Health</option>
+        <option>Finance</option>
+      </Form.Select>
+    </Form.Group>
+  </Col>
+  <Col md={6}>
+    {/* Nested row for Sub Area and Area with a smaller gap */}
+    <Row className="g-2">
+      <Col md={6}>
+        <Form.Group className="form-group">
+          <Form.Label>Sub Area</Form.Label>
+          <Form.Select
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+            
+          >
+            <option value="">Sub area</option>
+            <option>Technology</option>
+            <option>Health</option>
+            <option>Finance</option>
+          </Form.Select>
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="form-group">
+          <Form.Label>Area</Form.Label>
+          <Form.Select
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+            
+          >
+            <option value="">Area</option>
+            <option>Technology</option>
+            <option>Health</option>
+            <option>Finance</option>
+          </Form.Select>
+        </Form.Group>
+      </Col>
+    </Row>
+  </Col>
+</Row>
+
+    <Row className="g-5">
+  <Col md={6}>
+    <Form.Group className="form-group">
+      <Form.Label>Owner Name</Form.Label>
+      <Form.Control
+        type="text"
+        placeholder="Enter owner name"
+        name="ownerName"
+        value={state.ownerName}
+        onChange={(e) => setState({ ...state, ownerName: e.target.value })}
+        disabled={loading}
+        
+      />
+    </Form.Group>
+  </Col>
+
+  {/* Wrap City, State, and Pincode inside a nested Row with a smaller gap */}
+  <Col md={6}>
+    <Row className="g-2"> {/* Adjust g-1 to a smaller gap; try g-0, g-1, g-2 as needed */}
+      <Col md={4}>
+        <Form.Group className="form-group">
+          <Form.Label>City</Form.Label>
+          <Form.Select
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+            
+          >
+            <option>City</option>
+            <option>Technology</option>
+            <option>Health</option>
+            <option>Finance</option>
+          </Form.Select>
+        </Form.Group>
+      </Col>
+      <Col md={4}>
+        <Form.Group className="form-group">
+          <Form.Label>State</Form.Label>
+          <Form.Select
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+            
+          >
+            <option value="">State</option>
+            <option>Technology</option>
+            <option>Health</option>
+            <option>Finance</option>
+          </Form.Select>
+        </Form.Group>
+      </Col>
+      <Col md={4}>
+        <Form.Group className="form-group">
+          <Form.Label>Pincode</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Pincode"
+            name="pincode"
+            value={state.pincode}
+            onChange={(e) => setState({ ...state, pincode: e.target.value })}
+            disabled={loading}
+            
+          />
+        </Form.Group>
+      </Col>
+    </Row>
+  </Col>
+</Row>
+
+        {/* Primary Email */}
+        <Row className="g-5">
+  <Col md={6}>
+   
+        <Form.Group className="form-group">
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type="email"
+            placeholder="Enter primary email address"
+            name="primaryEmail"
+            value={state.primaryEmail}
+            onChange={(e) => setState({ ...state, primaryEmail: e.target.value })}
+            disabled={loading} required
+          />
+        </Form.Group>
+    
+    </Col>  
+    <Col md={6}>
+        <Form.Group className="form-group">
+          <Form.Label>Alt Email</Form.Label>
+          <Form.Control
+            type="email"
+            placeholder="Enter alternative email address"
+            name="altEmail"
+            value={state.altEmail}
+            onChange={(e) => setState({ ...state, altEmail: e.target.value })}
+            disabled={loading} 
+          />
+        </Form.Group>
+        </Col>
+        </Row> 
+<Row className="g-5">   
+        <Col md={6}>
+        <Form.Group className="form-group">
+          <Form.Label>Phone</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter phone number"
+            name="mobileNumber"
+            value={state.mobileNumber}
+            onChange={(e) => setState({ ...state, mobileNumber: e.target.value })}
+            disabled={loading} required
+          />
+        </Form.Group>
+        </Col>
+        <Col md={6}>
+        <Form.Group className="form-group">
+          <Form.Label>GSTIN</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter gstin"
+            name="gstin"
+            value={state.gstin}
+            onChange={(e) => setState({ ...state, gstin: e.target.value })}
+            disabled={loading} 
+          />
+        </Form.Group>
+        
+        </Col>
+      </Row>
+      <Row className="g-5">   
+        <Col md={6}>
+        <Form.Group className="form-group">
+      <Form.Label>Products</Form.Label>
+      <Form.Select value={selected} onChange={(e) => setSelected(e.target.value)} >
+        <option value="">-- Select --</option>
+        <option >Technology</option>
+        <option >Health</option>
+        <option >Finance</option>
+      </Form.Select>
+    </Form.Group>
+        </Col>
+        <Col md={6}>
+        <Form.Group className="form-group">
+          <Form.Label>Website</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter website"
+            name="website"
+            value={state.website}
+            onChange={(e) => setState({ ...state, website: e.target.value })}
+            disabled={loading} 
+          />
+        </Form.Group>
+        </Col>
+      </Row>
+      <Row className="g-5">   
+        <Col md={6}>
+        <Form.Group className="form-group">
+          <Form.Label>Linkedin</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter Linkedin ID"
+            name="linkedin"
+            value={state.linkedin}
+            onChange={(e) => setState({ ...state, linkedin: e.target.value })}
+            disabled={loading} 
+          />
+        </Form.Group>
+        </Col>
+        <Col md={6}>
+        <Form.Group className="form-group">
+          <Form.Label>Insta ID</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter Insta ID"
+            name="insta"
+            value={state.insta}
+            onChange={(e) => setState({ ...state, insta: e.target.value })}
+            disabled={loading} 
+          />
+        </Form.Group>
+        </Col>
+      </Row>
+       {/* Read-Only Field */}
+       <Form.Group className="form-group">
+          <Form.Label>Funnel Status</Form.Label>
+          <Form.Select
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+            
+          >
+            <option value="">State</option>
+            <option>Current</option>
+            <option>Future</option>
+            <option>Not Interested</option>
+          </Form.Select>
+        </Form.Group>
+
+        {/* Add other form fields similarly */}
+
+   
+<button type="submit" disabled={loading} className="submit-button">
+  {loading ? (
+    <>
+      <FaSpinner className="spinner" size={20} title='Submitting...'/>
+    </>
+  ) : isEditMode ? (
+    <>
+      <ImUserCheck size={24} title='Save Update'className='SaveUpdate'/>
+    </>
+  ) : (
+    <>
+      <HiSave  size={24} title='Save New Customer...' className='NewCustomer'/>
+    </>
+  )}
+</button>
+
       </Form>
     </div>
   );

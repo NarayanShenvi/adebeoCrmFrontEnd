@@ -50,7 +50,7 @@ const FunnelSection = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 600);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
@@ -118,7 +118,7 @@ const FunnelSection = () => {
       <br></br>
       <input
           type="text"
-          placeholder="Search by Company Name"
+          placeholder="Search by Customer Name"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className='search_company'/>  
