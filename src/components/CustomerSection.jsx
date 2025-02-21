@@ -17,13 +17,16 @@ import { HiMiniUserPlus } from "react-icons/hi2";
 import { FaUserEdit } from "react-icons/fa";
 import { ImUserCheck } from "react-icons/im";
 import { FaSpinner } from 'react-icons/fa';
-import { HiSave } from "react-icons/hi";
-import { fetchProductsAsync } from '../redux/slices/productSlice'; // Import fetchProductsAsync
+import { loadCustomerComments, postCustomerComment } from "../redux/slices/customerSlice";
+import { setModalState } from "../redux/slices/customerSlice";
+import { FaEye, FaPlusSquare } from "react-icons/fa";
+import { MdOutlineCancel } from "react-icons/md";
+import { HiSave } from "react-icons/hi";import { fetchProductsAsync } from '../redux/slices/productSlice'; // Import fetchProductsAsync
 import Select from 'react-select'; // Import react-select
 
 
 
-const CustomerSection = () => {
+const CustomerSection = ({ customer}) => {
   const dispatch = useDispatch();
   const [selected, setSelected] = useState("");//changes made--for company type
   // Accessing customers and selectedCustomer state from Redux
@@ -311,6 +314,71 @@ const CustomerSection = () => {
     console.log("Updated Customer List:", customers);
   }, [customers]);
 
+  const customerComments = useSelector((state) => state.customers?.customerComments || []);
+  const modalState = useSelector((state) => state.customers?.modalState);
+
+const [newComment, setNewComment] = useState("");
+const fetchCommentsIfNeeded = (customerId) => {
+  const existingComments = customerComments.find(comment => comment.customerId === customerId);
+  if (!existingComments) {
+      dispatch(loadCustomerComments(customerId));
+  }
+};
+
+const handleShowComments = (customerId) => {
+  dispatch(setModalState({ selectedShowCommentsCustomerId: customerId, showComments: true }));
+  fetchCommentsIfNeeded(customerId);
+};
+const handleAddComment = (customerId) => {
+  dispatch(setModalState({
+      addComment: true,  // Open the Add Comment modal
+      selectedAddCommentCustomerId: customerId, // Store the selected customer ID
+  }));
+};
+
+
+const handleCloseCommentsModal = () => {
+  dispatch(setModalState({ showComments: false }));
+};
+
+const handleCloseAddCommentModal = () => {
+  dispatch(setModalState({ addComment: false }));
+};
+
+const handleCommentChange = (e) => {
+  setNewComment(e.target.value);
+};
+
+const handleSubmitComment = () => {
+  // Check if modalState is defined and has the required properties
+  if (!modalState || !modalState.selectedAddCommentCustomerId) {
+      alert("Error: No customer selected.");
+      return;
+  }
+
+  // Ensure the comment is not empty
+  if (!newComment.trim()) {
+      alert("Please enter a comment.");
+      return;
+  }
+
+  // Dispatch the comment post action
+  dispatch(postCustomerComment(modalState.selectedAddCommentCustomerId, newComment))
+      .then(() => {
+          // Clear the input field after successful submission
+          setNewComment('');
+
+          // Close the comment modal
+          dispatch(setModalState({ addComment: false }));
+      })
+      .catch((error) => {
+          console.error("Error submitting comment:", error);
+          alert("Failed to submit comment. Please try again.");
+      });
+};
+
+
+
   return (
 <div className="customer-section">
       <h3>{isEditMode ? 'Edit Existing Customer' : 'Create New Customer'}</h3>
@@ -360,6 +428,7 @@ const CustomerSection = () => {
                     </option>
                   ))}
                 </select>
+                
               ) : (
                 <p className='NoCustomerssFound'>No customers found...</p>
               )}
@@ -373,7 +442,7 @@ const CustomerSection = () => {
         <Row className="g-5">
           <Col md={6}>
         <Form.Group className="form-group">
-          <Form.Label>Company Name</Form.Label>
+          <Form.Label className="required-label">Company Name</Form.Label>
           <Form.Control
             type="text"
             placeholder="Enter company name"
@@ -404,10 +473,8 @@ const CustomerSection = () => {
         onChange={(e) => setSelected(e.target.value)}
       
       >
-        <option value="">-- Select --</option>
-        <option>Technology</option>
-        <option>Health</option>
-        <option>Finance</option>
+        <option value="">-- Test Type --</option>
+        
       </Form.Select>
     </Form.Group>
   </Col>
@@ -422,10 +489,8 @@ const CustomerSection = () => {
             onChange={(e) => setSelected(e.target.value)}
             
           >
-            <option value="">Sub area</option>
-            <option>Technology</option>
-            <option>Health</option>
-            <option>Finance</option>
+            <option value="">-- Test Sub Area --</option>
+            
           </Form.Select>
         </Form.Group>
       </Col>
@@ -437,10 +502,8 @@ const CustomerSection = () => {
             onChange={(e) => setSelected(e.target.value)}
             
           >
-            <option value="">Area</option>
-            <option>Technology</option>
-            <option>Health</option>
-            <option>Finance</option>
+            <option value="">-- Test Area --</option>
+      
           </Form.Select>
         </Form.Group>
       </Col>
@@ -475,10 +538,7 @@ const CustomerSection = () => {
             onChange={(e) => setSelected(e.target.value)}
             
           >
-            <option>City</option>
-            <option>Technology</option>
-            <option>Health</option>
-            <option>Finance</option>
+<option value="">--Test City --</option>            
           </Form.Select>
         </Form.Group>
       </Col>
@@ -490,10 +550,7 @@ const CustomerSection = () => {
             onChange={(e) => setSelected(e.target.value)}
             
           >
-            <option value="">State</option>
-            <option>Technology</option>
-            <option>Health</option>
-            <option>Finance</option>
+<option value="">--Test State --</option>            
           </Form.Select>
         </Form.Group>
       </Col>
@@ -502,12 +559,12 @@ const CustomerSection = () => {
           <Form.Label>Pincode</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Pincode"
+            placeholder="--Test Pincode--"
             name="pincode"
             value={state.pincode}
             onChange={(e) => setState({ ...state, pincode: e.target.value })}
             disabled={loading}
-            
+            readOnly
           />
         </Form.Group>
       </Col>
@@ -520,7 +577,7 @@ const CustomerSection = () => {
   <Col md={6}>
    
         <Form.Group className="form-group">
-          <Form.Label>Email</Form.Label>
+          <Form.Label className="required-label">Email</Form.Label>
           <Form.Control
             type="email"
             placeholder="Enter primary email address"
@@ -549,7 +606,7 @@ const CustomerSection = () => {
 <Row className="g-5">   
         <Col md={6}>
         <Form.Group className="form-group">
-          <Form.Label>Phone</Form.Label>
+          <Form.Label className="required-label">Phone</Form.Label>
           <Form.Control
             type="text"
             placeholder="Enter phone number"
@@ -584,7 +641,7 @@ const CustomerSection = () => {
           ) : errorProducts ? (
             <p style={{ color: 'red' }}>{errorProducts}</p>
           ) : (
-            <Select
+            <Select 
               key={selectedCustomer ? selectedCustomer._id : 'new'} // Unique key to force reset on customer change
               isMulti
               name="products"
@@ -664,6 +721,7 @@ const CustomerSection = () => {
           </Form.Select>
         </Form.Group>
 
+       
         {/* Add other form fields similarly */}
 
    
@@ -682,8 +740,75 @@ const CustomerSection = () => {
     </>
   )}
 </button>
-
+{isEditMode && (
+    <span className="icon-container-customer">
+        <FaEye 
+            onClick={() => handleShowComments(customer?._id)} 
+            title="View Comments" 
+            className="action-icon-customer"
+        />
+        <FaPlusSquare 
+            onClick={() => handleAddComment(customer?._id)} 
+            title="Add Comment" 
+            className="action-icon-customer"
+        />
+    </span>
+)}
       </Form>
+      
+
+   {/* Show Comments Modal */}
+{modalState.showComments && (
+    <div className="comments-modal-customer">
+        <h4>Customer Comments</h4>
+        {Array.isArray(customerComments) && customerComments.length > 0 ? (
+            <>
+                <p className='displaycomments-customer'>Displaying {customerComments.length} comments</p>
+                <textarea
+                    readOnly
+                    rows={5}
+                    value={customerComments.map(comment => (
+                        `${comment.name}: ${comment.text}\nDate: ${new Date(comment.date).toLocaleString()}\n`
+                    )).join("\n")} 
+                />
+            </>
+        ) : (
+            <p className='nocomments-customer'>No comments available...</p>
+        )}
+        <MdOutlineCancel 
+            onClick={handleCloseCommentsModal} 
+            title='Cancel' 
+            className='cancelcomment-customer'
+        />
+    </div>
+)}
+
+{/* Add Comment Modal */}
+{modalState.addComment && (
+    <div className="comment-edit-modal-customer">
+        <h4>Add Comment</h4>
+        <textarea
+            value={newComment}
+            onChange={handleCommentChange}
+            placeholder="Enter your comment here..."
+            rows="5"
+        />
+        <div>
+            <MdOutlineCancel 
+                onClick={handleCloseAddCommentModal} 
+                title='Cancel' 
+                className='cancelcomment-customer'
+            />
+            <HiSave 
+                onClick={handleSubmitComment} 
+                title='Submit' 
+                className='submitcomment-customer'
+            />
+        </div>
+    </div>
+)}
+
+
     </div>
   );
 };

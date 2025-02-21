@@ -9,10 +9,16 @@ const initialState = {
     ownerName: '',
     primaryEmail: '',
     mobileNumber: '',
-  },
+  },   
   selectedCustomer: null,
   customers: [],  // Stores all customers
-  loading: false,
+  customerComments: [], // Ensure this exists
+    modalState: {
+    showComments: false,
+    addComment: false,
+    selectedShowCommentsCustomerId: null,
+    selectedAddCommentCustomerId: null,
+  },  loading: false,
   createLoading: false,
   updateLoading: false,
   error: null,
@@ -31,6 +37,18 @@ const customerSlice = createSlice({
         primaryEmail: '',
         mobileNumber: '',
       };
+    },
+    setModalState: (state, action) => {
+      state.modalState = { ...state.modalState, ...action.payload };
+    },
+    setCustomerComments: (state, action) => {
+      state.customerComments = action.payload;  // Store fetched comments
+    },
+    addCustomerComment: (state, action) => {
+      state.customerComments.push(action.payload);  // Append new comment
+    },
+    clearCustomerComments: (state) => {
+      state.customerComments = [];  // Clear comments when switching customers
     },
     setProductCodes: (state, action) => {
       state.productCodes = action.payload;  // Set productCodes from fetched products
@@ -93,6 +111,10 @@ const customerSlice = createSlice({
 });
 
 export const {
+  setCustomerComments,
+  addCustomerComment,
+  clearCustomerComments,
+  setModalState,
   resetNewCustomer,
   setSelectedCustomer,
   setLoading,
@@ -225,4 +247,42 @@ export const fetchProductsAsync = () => async (dispatch) => {
   } finally {
     dispatch(setLoading(false));  // This hides the loading indicator
   }
+};
+export const loadCustomerComments = (customerId) => {
+  return async (dispatch) => {
+    dispatch(setLoading(true));
+    try {
+      const response = await axios.get(`${API}/get_adebeo_customer_comments/${customerId}`);
+      if (response.data && response.data.comments) {
+        const mappedComments = response.data.comments.map((comment) => ({
+          text: comment.comment,
+          date: comment.date,
+          name: comment.name,
+        }));
+        dispatch(setCustomerComments(mappedComments));
+      }
+    } catch (err) {
+      dispatch(setError(err.message || "Error loading comments"));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+};
+
+// Post a customer comment
+export const postCustomerComment = (customerId, commentText) => {
+  return async (dispatch) => {
+    dispatch(setLoading(true));
+    try {
+      const payload = { comment: commentText, customer_id: customerId };
+      const response = await axios.post(`${API}/create_adebeo_customer_comments`, payload);
+      if (response.data && response.data.comment) {
+        dispatch(addCustomerComment(response.data.comment));
+      }
+    } catch (err) {
+      dispatch(setError(err.message || "Error posting comment"));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 };

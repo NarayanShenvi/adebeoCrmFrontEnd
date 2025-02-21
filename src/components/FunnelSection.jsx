@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadFunneldata, loadCustomerComments, postCustomerComment } from '../redux/slices/funnelSlice';
 import { setModalState } from '../redux/slices/funnelSlice';
@@ -7,6 +7,8 @@ import { FaHandHoldingDollar, FaIndianRupeeSign, FaFileCircleCheck, FaFaceMeh  }
 import './dashboard/Dashboard.css'; // Import the CSS fil
 import { MdOutlineCancel } from "react-icons/md";
 import { HiSave } from "react-icons/hi";
+import QuoteSlider from './QuoteSlider'; // Adjust the path if needed
+
 
 
 const FunnelSection = () => {
@@ -18,6 +20,10 @@ const FunnelSection = () => {
   const [newComment, setNewComment] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(8); // Set default rows per page to 5
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [showQuoteSlider, setShowQuoteSlider] = useState(false);
+  const sliderRef = useRef(null); // Create a ref for the slider
+
 
   const funnelData = useSelector((state) => state.funnel.funnelData);
   const loading = useSelector((state) => state.funnel.loading);
@@ -123,6 +129,42 @@ const FunnelSection = () => {
     }
   };
   
+  const handleShowQuotes = (customerId) => {
+    dispatch(setModalState({
+      showQuoteSlider: true,
+      selectedQuoteCustomerId: customerId
+    }));
+  };
+  
+  
+  
+  const handleCloseQuotes = () => {
+    dispatch(setModalState({
+      showQuoteSlider: false,
+      selectedQuoteCustomerId: null
+    }));
+  };
+  
+  
+
+  // Close slider when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sliderRef.current && !sliderRef.current.contains(event.target)) {
+        dispatch(setModalState({ showQuoteSlider: false, selectedQuoteCustomerId: null }));
+      }
+    };
+  
+    if (modalState.showQuoteSlider) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+  
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [modalState.showQuoteSlider, dispatch]);
+  
+  
   if (loading) return <div className='loading'>Loading funnel data...</div>;//changes made.. classnames were added
   if (error) return <div className='error'>Error: {error}</div>;//changes made
 
@@ -174,7 +216,11 @@ const FunnelSection = () => {
 
      <FaTasks title="View Tasks" className="action-icon"/>
      <span className="icon-gap"></span> {/* Gap between groups */}
-     <FaHandHoldingDollar title="Quotes" className="action-icon"/>
+     <FaHandHoldingDollar 
+  title="Quotes" 
+  className="action-icon" 
+  onClick={() => handleShowQuotes(item._id)} // Pass customer ID
+/>
      <FaFileCircleCheck  title="PO Invoice" className="action-icon"/>
      <FaIndianRupeeSign title="Invoice" className="action-icon"/>
      </span> : item.comments}
@@ -244,6 +290,17 @@ const FunnelSection = () => {
           <p className="alert-box">Comment saved successfully! ✅</p>{/* changes made-- alertbox to show successfull submit */}
         </div>
       )}
+
+
+    {modalState.showQuoteSlider && modalState.selectedQuoteCustomerId && (
+  <QuoteSlider 
+    customerId={modalState.selectedQuoteCustomerId} 
+    onClose={handleCloseQuotes} 
+  />
+)}
+
+
+
     </div>
   );
 };
