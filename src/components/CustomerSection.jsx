@@ -21,7 +21,8 @@ import { loadCustomerComments, postCustomerComment } from "../redux/slices/custo
 import { setModalState } from "../redux/slices/customerSlice";
 import { FaEye, FaPlusSquare } from "react-icons/fa";
 import { MdOutlineCancel } from "react-icons/md";
-import { HiSave } from "react-icons/hi";import { fetchProductsAsync } from '../redux/slices/productSlice'; // Import fetchProductsAsync
+import { HiSave } from "react-icons/hi";
+import { fetchProductsAsync } from '../redux/slices/productSlice'; // Import fetchProductsAsync
 import Select from 'react-select'; // Import react-select
 
 
@@ -643,7 +644,7 @@ const handleSubmitComment = () => {
           ) : (
             <Select 
               key={selectedCustomer ? selectedCustomer._id : 'new'} // Unique key to force reset on customer change
-              isMulti
+              isMulti 
               name="products"
               options={products.map(product => ({
                 label: `${product.productName} - ${product.productCode}`,

@@ -909,7 +909,8 @@ html, body {
   color: #35dc4b;
   font-size: 14px;
   text-align: center;
-  margin-top: -43px;
+  margin-top: -48px;
+  margin-bottom: 30px;
   margin-left:63%;
   font-weight: bold;
   background-color: #d7f8da; /* Light red background */
@@ -926,7 +927,8 @@ html, body {
 .customer-section p.error1 {
   color: #dc3545;
   font-size: 14px;
-  margin-top: -43px;
+  margin-top: -48px;
+  margin-bottom: 30px;
   text-align: center;
   margin-left: 63%;
   font-weight: bold;
@@ -1453,3 +1455,411 @@ html, body {
   }
 }
 
+
+/* Product Section Container */
+.product-section {
+  flex-grow: 1;
+  padding: 20px;
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
+  background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
+  margin-left: 250px;
+}
+
+/* Make Form Take Full Width */
+.product-form {
+  background-color: rgba(217, 217, 217, 0.15);
+  background-color: rgba(217, 217, 217, 0.15);
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 900px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+/* Heading */
+.product-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+}
+
+/* Toggle Mode Button */
+.product-section .toggle-icon-prod {
+  display: block;
+  color: #069696;
+  font-size: 26px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 85%;
+  margin-top: 20px; 
+  margin-bottom: 20px;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.product-section .toggle-icon-prod:hover
+{
+  color: #218838;
+  transform: scale(1.2);
+}
+/* Success and Error Messages */
+.product-section p.success-prod {
+  color: #35dc4b;
+  font-size: 14px;
+  text-align: center;
+  margin-top: -48px;
+  margin-bottom: 30px;
+  margin-left:63%;
+  font-weight: bold;
+  background-color: #d7f8da; /* Light red background */
+  border: 1px solid #c6f5d2;
+  border-radius: 5px;
+  max-width: 270px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  width: 100%;
+  word-spacing: 2px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.product-section p.error-prod {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: -48px;
+  margin-bottom: 30px;
+  text-align: center;
+  margin-left: 63%;
+  font-weight: bold;
+  background-color: #f8d7da; /* Light red background */
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+  max-width: 270px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  width: 100%;
+  word-spacing: 2px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+
+/* Form Group */
+.product-section .form-group-prod {
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+}
+
+/* Labels */
+.product-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+/* This targets all labels for required fields and adds the asterisk */
+.required-label::after {
+  content: " *"; /* Adds the asterisk after the label text */
+  color: rgb(223, 3, 3);    /* Makes the asterisk red */
+  font-weight: 800;
+}
+
+
+/* Style for all input fields (text, email, etc.) within the customer form */
+.product-form .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+/* Focus state for input fields */
+.product-form .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+.product-form .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+.product-form .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+/* Focus state for select fields */
+.product-form .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.product-form .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+/* Custom Checkbox Container */
+.custom-checkbox {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #069696; /* Default border color */
+  border-radius: 1px;
+  background-color: white; /* Default background */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Checkbox Checked State */
+.custom-checkbox input[type="checkbox"]:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+/* Checkbox Checkmark */
+.custom-checkbox input[type="checkbox"]::after {
+  content: "";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Show Checkmark When Checked */
+.custom-checkbox input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkbox Hover Effect */
+.custom-checkbox input[type="checkbox"]:hover {
+  border-color: #06b4b4; /* Darker blue */
+}
+
+/* Checkbox Label */
+.custom-checkbox label {
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+}
+
+/* Change Label Color on Checked */
+.custom-checkbox input[type="checkbox"]:checked + label {
+  color: #28a745;
+}
+
+
+/* Search Field (for Edit Mode) */
+.product-section .search-field-prod {
+  width: 100%;
+  max-width: 340px;
+  height: 30px;
+  background: rgba(195, 237, 243, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  color: rgb(7, 94, 121); /* Change input text color */
+  margin-bottom: 5px;
+  margin-top: -42px;
+  margin-left: 10%;
+}
+.product-section .search-field-prod:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-prod .NoProductsFound
+{
+  text-align: left;
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 10%;
+}
+.search-field1-prod .ProductsLoading 
+{
+  text-align: left;
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 10%;
+}
+.search-field1-prod select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 174px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 10%;
+  display: block;
+} 
+.search-field1-prod select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-prod option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+.product-section form button[type="submit"]:hover {
+  color: #218838;
+  transform: scale(1.4);
+  background: transparent;
+}
+.submit-button-prod {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px; /* Adjust gap between icon and text */
+  width: 100%;
+  max-width: 25px;
+  display: block;
+  color: #069696;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 30px; 
+  margin-left: 94%;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.submit-button-prod:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.submit-button-prod:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+/* Responsive Design for product */
+@media (max-width: 1200px) {
+  .product-form {
+    width: 95%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .product-form {
+    width: 90%;
+  }
+
+  .search-field1-prod select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-section {
+    margin-left: 0;
+    padding: 10px;
+  }
+
+  .product-form {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .search-field1-prod select {
+    max-width: 100%;
+  }
+
+  .submit-button-prod {
+    max-width: 100%;
+  }
+
+  .product-section .toggle-icon-prod {
+    margin-left: 90%;
+  }
+
+  .product-section p.success-prod,
+  .product-section p.error-prod {
+    font-size: 12px;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-section h3 {
+    font-size: 18px;
+  }
+
+  .search-field-prod {
+    width: 100%;
+  }
+
+  .search-field1-prod select {
+    width: 100%;
+  }
+
+  .submit-button-prod {
+    width: 100%;
+  }
+}

@@ -3,10 +3,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setProductToEdit, updateProductAsync, fetchProductsAsync, addProductAsync } from '../redux/slices/productSlice';
 import axios from "../config/apiConfig"; // Axios instance
 import API from "../config/config"; // API URL
+import { Form } from "react-bootstrap";//changed from here
+import { Row, Col } from 'react-bootstrap';
+import { FaCheckToSlot } from "react-icons/fa6";
+import { HiSave } from "react-icons/hi";
+import { FaSpinner } from 'react-icons/fa';
+import { BiSolidMessageSquareEdit } from "react-icons/bi";
+import { HiSquaresPlus } from "react-icons/hi2";//to here
 
 const ProductSection = () => {
   const dispatch = useDispatch();
   const { products, productToEdit, loading, error } = useSelector((state) => state.products);
+  const successMessage = useSelector((state) => state.products?.successMessage || ''); // chenges --added just to check whether it works or not
   
   const [mode, setMode] = useState('add');  // Mode: 'add' or 'edit'
   const [formData, setFormData] = useState({
@@ -26,6 +34,7 @@ const ProductSection = () => {
     salesCode: '',
     purchaseCost: '',
     salesCost: '',
+    drStatus: '',  // ✅ Added this
     maxDiscount: '',
     prodisEnabled: false,
   });
@@ -54,6 +63,7 @@ const ProductSection = () => {
         salesCode: '',
         purchaseCost: '',
         salesCost: '',
+        drStatus: '',  // ✅ Added this
         maxDiscount: '',
         prodisEnabled: false,
       });
@@ -105,24 +115,33 @@ const ProductSection = () => {
   };
 
   return (
-    <div>
-      <h2>{mode === 'add' ? 'Add New Product' : 'Edit Product'}</h2>
+<div className="product-section">
+<h3>{mode === 'add' ? 'Add New Product' : 'Edit Product'}</h3>
       
-      <div>
-        <button onClick={() => setMode('add')}>Add Mode</button>
-        <button onClick={() => setMode('edit')}>Edit Mode</button>
-      </div>
+<div onClick={() => setMode(mode === 'add' ? 'edit' : 'add')}>
+  {mode === 'add' ? (
+    <BiSolidMessageSquareEdit title="Switch to Edit Products" className="toggle-icon-prod" />
+  ) : (
+    <HiSquaresPlus title="Switch to Add Products" className="toggle-icon-prod" />
+  )}
+</div>
+{successMessage && <p className="success-prod">{successMessage}</p>}
+      {error && <p className="error-prod">{error}</p>}
 
       {/* Show search input and dropdown if in Edit mode */}
       {mode === 'edit' && (
         <div>
           <input
+            className='search-field-prod'
             type="text"
             placeholder="Search by Product Name"
             value={formData.productName}
             onChange={handleSearchChange}
           />
-          {searchResults.length > 0 && (
+                      <div className='search-field1-prod'>
+                      {loading ? (
+                <p className='ProductsLoading'>Loading...</p>
+              ) : searchResults.length > 0 ?  (
             <select onChange={handleSelectProduct} value={formData._id || ''}>
               <option value="" disabled>Select a product</option>
               {searchResults.map((product) => (
@@ -131,182 +150,296 @@ const ProductSection = () => {
                 </option>
               ))}
             </select>
-          )}
+            
+          ) : (
+            <p className='NoProductsFound'>No products found...</p>
+          )}</div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Product Name:</label>
-          <input
-            type="text"
-            name="productName"
-            value={formData.productName}
-            onChange={handleChange}
-            disabled={mode === 'edit'}  // Disable editing productName in Edit mode
-          />
-        </div>
-        <div>
-          <label>Product Code:</label>
-          <input
-            type="text"
-            name="productCode"
-            value={formData.productCode}
-            onChange={handleChange}
-            disabled={mode === 'edit'}  // Disable editing productCode in Edit mode
-          />
-        </div>
-        <div>
-          <label>Product Display Name:</label>
-          <input
-            type="text"
-            name="ProductDisplay"
-            value={formData.ProductDisplay}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Product Company Name:</label>
-          <input
-            type="text"
-            name="ProductCompanyName"
-            value={formData.ProductCompanyName}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Contact Person:</label>
-          <input
-            type="text"
-            name="Contact"
-            value={formData.Contact}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Address:</label>
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Company GSTIN:</label>
-          <input
-            type="text"
-            name="companyGstin"
-            value={formData.companyGstin}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Primary Locality:</label>
-          <input
+      <Form onSubmit={handleSubmit}className='product-form'>
+      <Row className="g-5">
+      <Col md={6}>
+      <Form.Group className="form-group-prod">
+  <Form.Label>Product Name:</Form.Label>
+  <Form.Control
+    type="text"
+    name="productName"
+    value={formData.productName}
+    onChange={handleChange}
+    disabled={mode === "edit"} // Disable editing in Edit mode
+    placeholder='Enter product name'
+  />
+</Form.Group>
+</Col>
+<Col md={6}>
+<Form.Group className="form-group-prod">
+          <Form.Label>Address:</Form.Label>
+        <Form.Control as="textarea" rows={1} placeholder="Enter address" 
+        name="address"
+        value={formData.address}
+        onChange={handleChange}
+        /> 
+        </Form.Group>
+        </Col>
+        </Row>
+
+        <Row className="g-5">
+  <Col md={6}>
+  <Form.Group className="form-group-prod"> 
+     <Form.Label className="required-label">Product Code:</Form.Label>
+  <Form.Control
+    type="text"
+    name="productCode"
+    value={formData.productCode}
+    onChange={handleChange}
+    disabled={mode === "edit"} // Disable editing in Edit mode
+    placeholder='Enter product code'
+    required
+  />
+</Form.Group>
+  </Col>
+  <Col md={6}>
+    {/* Nested row for Sub Area and Area with a smaller gap */}
+    <Row className="g-2">
+      <Col md={6}>
+      <Form.Group className="form-group-prod">       
+           <Form.Label>Sub Area:</Form.Label>
+          <Form.Control
             type="text"
             name="primaryLocality"
             value={formData.primaryLocality}
             onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Secondary Locality:</label>
-          <input
-            type="text"
-            name="secondaryLocality"
-            value={formData.secondaryLocality}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>City:</label>
-          <input
-            type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>State:</label>
-          <input
-            type="text"
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Pincode:</label>
-          <input
-            type="text"
-            name="pincode"
-            value={formData.pincode}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Sales Code:</label>
-          <input
-            type="text"
-            name="salesCode"
-            value={formData.salesCode}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Purchase Cost:</label>
-          <input
-            type="number"
-            name="purchaseCost"
-            value={formData.purchaseCost}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Sales Cost:</label>
-          <input
-            type="number"
-            name="salesCost"
-            value={formData.salesCost}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Max Discount:</label>
-          <input
-            type="number"
-            name="maxDiscount"
-            value={formData.maxDiscount}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Product Enabled:</label>
-          <input
-            type="checkbox"
-            name="prodisEnabled"
-            checked={formData.prodisEnabled}
-            onChange={handleChange}
-          />
-        </div>
+            placeholder='--Test Sub Area--'
+            readOnly
+            />
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+      <Form.Group className="form-group-prod">      
+            <Form.Label>Area:</Form.Label>
+          <Form.Control
+    type="text"
+    name="secondaryLocality"
+    value={formData.secondaryLocality}
+    onChange={handleChange}
+    placeholder='--Test Area--'
+            readOnly
+            />
+        </Form.Group>
+      </Col>
+    </Row>
+  </Col>
+</Row>
 
-        <button type="submit" disabled={loading}>
-          {mode === 'edit' ? 'Update Product' : 'Add Product'}
+      <Row className="g-5">
+     <Col md={6}>
+     <Form.Group className="form-group-prod">
+        <Form.Label>Product Display Name:</Form.Label>
+  <Form.Control
+    type="text"
+    name="ProductDisplay"
+    value={formData.ProductDisplay}
+    onChange={handleChange}
+    placeholder='Enter product display name'
+  />
+</Form.Group>
+
+     </Col>
+   
+     {/* Wrap City, State, and Pincode inside a nested Row with a smaller gap */}
+     <Col md={6}>
+       <Row className="g-2"> {/* Adjust g-1 to a smaller gap; try g-0, g-1, g-2 as needed */}
+         <Col md={4}>
+         <Form.Group className="form-group-prod">
+            <Form.Label>City:</Form.Label>
+  <Form.Control
+    type="text"
+    name="city"
+    value={formData.city}
+    onChange={handleChange}
+    placeholder='--Test City--'
+    readOnly
+    />
+</Form.Group>
+         </Col>
+         <Col md={4}>
+         <Form.Group className="form-group-prod">
+            <Form.Label>State:</Form.Label>
+  <Form.Control
+    type="text"
+    name="state"
+    value={formData.state}
+    onChange={handleChange}
+    placeholder='--Test State--'
+    readOnly
+    />
+           </Form.Group>
+         </Col>
+         <Col md={4}>
+         <Form.Group className="form-group-prod">
+            <Form.Label>Pincode:</Form.Label>
+  <Form.Control
+    type="text"
+    name="pincode"
+    value={formData.pincode}
+    onChange={handleChange}
+    placeholder='--Test Pincode--'
+    readOnly
+    />
+           </Form.Group>
+         </Col>
+       </Row>
+     </Col>
+   </Row>     
+         <Row className="g-5">
+          <Col md={6}>
+           
+          <Form.Group className="form-group-prod">
+              <Form.Label>Product Company Name:</Form.Label>
+  <Form.Control
+    type="text"
+    name="ProductCompanyName"
+    value={formData.ProductCompanyName}
+    onChange={handleChange}
+    placeholder='Enter product company name'
+                    />
+                </Form.Group>
+            
+            </Col>  
+            <Col md={6}>
+            <Form.Group className="form-group-prod">
+                <Form.Label>Sales Code:</Form.Label>
+  <Form.Control
+    type="text"
+    name="salesCode"
+    value={formData.salesCode}
+    onChange={handleChange}
+    placeholder='Enter sales code'
+
+  />
+</Form.Group>
+
+                </Col>
+                </Row> 
+        
+   <Row className="g-5">   
+           <Col md={6}>
+           <Form.Group className="form-group-prod">
+              <Form.Label>Company GSTIN:</Form.Label>
+  <Form.Control
+    type="text"
+    name="companyGstin"
+    value={formData.companyGstin}
+    onChange={handleChange}
+    placeholder='Enter company GSTIN'
+  />
+</Form.Group>
+
+           </Col>
+           <Col md={6}>
+           <Form.Group className="form-group-prod">
+              <Form.Label>Purchase Cost:</Form.Label>
+  <Form.Control
+    type="number"
+    name="purchaseCost"
+    value={formData.purchaseCost}
+    onChange={handleChange}
+placeholder='Enter purchase cost'
+  />
+</Form.Group>
+
+           </Col>
+         </Row>     
+         <Row className="g-5">   
+           <Col md={6}>
+           <Form.Group className="form-group-prod">
+              <Form.Label>Email:</Form.Label>
+  <Form.Control
+    type="email"
+    name="email"
+    value={formData.email}
+    onChange={handleChange}
+placeholder='Enter email address'
+  />
+</Form.Group>
+
+           </Col>
+           <Col md={6}>
+           <Form.Group className="form-group-prod">
+              <Form.Label>Sales Cost:</Form.Label>
+  <Form.Control
+    type="number"
+    name="salesCost"
+    value={formData.salesCost}
+    onChange={handleChange}
+placeholder='Enter sales cost'
+  />
+</Form.Group>
+
+         
+           </Col>
+         </Row>     
+         <Row className="g-5">   
+           <Col md={6}>
+           <Form.Group className="form-group-prod">
+  <Form.Label>DR Status:</Form.Label>
+  <Form.Select
+    name="drStatus"
+    value={formData.drStatus}
+    onChange={handleChange}
+  >
+    <option value="">Select Status</option>
+    <option value="pending">Approved</option>
+    <option value="rejected">Pending</option>
+    <option value="approved">Rejected</option>
+  </Form.Select>
+</Form.Group>
+
+           </Col>
+           <Col md={6}>
+           <Form.Group className="form-group-prod">
+  <Form.Label>Max Discount:</Form.Label>
+  <Form.Control
+    type="number"
+    name="maxDiscount"
+    value={formData.maxDiscount}
+    onChange={handleChange}
+placeholder='Enter maximum discount'
+  />
+</Form.Group>
+
+           </Col>
+         </Row>         
+         <Form.Group className="form-group-prod mt-4 custom-checkbox" controlId="productEnabled">
+  <Form.Check
+    type="checkbox"
+    label="Product Enabled"
+    name="prodisEnabled"
+    checked={formData.prodisEnabled}
+    onChange={handleChange}
+
+  />
+</Form.Group>   
+        <button type="submit" disabled={loading} className="submit-button-prod">
+          {loading ? (
+            <>
+              <FaSpinner className="spinner" size={20} title='Submitting...'/>
+            </>
+          ) : mode === 'edit' ? (
+            <>
+              <FaCheckToSlot size={24} title='Save Update'className='SaveUpdateProd'/>
+            </>
+          ) : (
+            <>
+              <HiSave  size={24} title='Save New Product...' className='NewProduct'/>
+            </>
+          )}
         </button>
-      </form>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      </Form>
+      
+      
     </div>
   );
 };
