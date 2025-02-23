@@ -287,10 +287,14 @@ const QuoteSlider = ({ customerId, onClose }) => {
 
   useEffect(() => {
     // Fetch products from the backend when the component mounts
-    dispatch(fetchProductsAsync()); 
-    // Fetch quotes on page load
-    dispatch(fetchQuotesAsync({ page: currentPageState }));
-  }, [dispatch, currentPageState]);
+    dispatch(fetchProductsAsync());
+  
+    // Fetch quotes for the specific customer with the current page
+    if (customerId) {  // Make sure the customerId is provided
+      dispatch(fetchQuotesAsync({ page: currentPageState, customer_id: customerId }));
+    }
+  }, [dispatch, currentPageState, customerId]);
+  
 
   const handleLineChange = (index, field, value) => {
     const newQuoteLines = [...quoteLines];

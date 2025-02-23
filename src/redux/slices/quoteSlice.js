@@ -78,17 +78,21 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from "../../config/apiConfig";  // Import the Axios instance
 import API from "../../config/config";  // Import the API URL
 
-// Async action to fetch available quotes with pagination
-export const fetchQuotesAsync = createAsyncThunk('quote/fetchQuotes', async ({ page, per_page }) => {
+// Async action to fetch available quotes with pagination and customer_id
+export const fetchQuotesAsync = createAsyncThunk('quote/fetchQuotes', async ({ page, per_page, customer_id }) => {
   try {
+    // Include the customer_id along with page and per_page as query parameters
     const response = await axios.get(`${API}/get_quotes`, {
-      params: { page, per_page },
+      params: { page, per_page, customer_id }, // Pass customer_id as a query param
     });
+    
     return response.data; // Assuming the response contains quotes, totalPages, etc.
   } catch (error) {
+    // Handle any errors, including error response data if available
     throw new Error(error.response ? error.response.data.message : error.message);
   }
 });
+
 
 // Define an async action for creating a quote
 export const createQuote = createAsyncThunk('quote/createQuote', async (quoteData) => {
