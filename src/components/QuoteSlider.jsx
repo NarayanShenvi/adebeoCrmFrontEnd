@@ -502,7 +502,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
                     </td> {/* Display total price */}
                     <td>
                       {/* Display PDF link */}
-                      <a href={quoteItem.pdf_link} target="_blank" rel="noopener noreferrer">
+                      <a href={`${quoteItem.base_url}${quoteItem.pdf_link}`} target="_blank" rel="noopener noreferrer">
                         Download PDF
                       </a>
                     </td>
