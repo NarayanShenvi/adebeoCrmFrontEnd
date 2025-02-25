@@ -1,16 +1,16 @@
 import React from 'react';
 import { MdOutlineCancel } from "react-icons/md";
 
-const POInvoiceSlider = ({ customerId, onClose }) => {
+const CustomerInformationSlider = ({ customerId, onClose }) => {
   if (!customerId) return null; // Prevent rendering if no customer selected
 
   return (
-    <div className="POinvoice-slider-overlay">
-      <div className="POinvoice-slider-container">
+    <div className="customerinformation-slider-overlay">
+      <div className="customerinformation-slider-container">
         <button className="close-btn" onClick={onClose}>
           <MdOutlineCancel />
         </button>
-        <h3>PO Invoice Details</h3>
+        <h3>Customer Information</h3>
         <p>Customer ID: {customerId}</p>
         {/* Add invoice details here */}
       </div>
@@ -18,4 +18,4 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
   );
 };
 
-export default POInvoiceSlider;
+export default CustomerInformationSlider;

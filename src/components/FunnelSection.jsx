@@ -9,27 +9,15 @@ import { MdOutlineCancel } from "react-icons/md";
 import { HiSave } from "react-icons/hi";
 import QuoteSlider from './QuoteSlider'; // Adjust the path if needed
 import InvoiceSlider from './InvoiceSlider'; // Adjust the path if needed
-import POInvoiceSlider from './POInvoiceSlider'; // Adjust the path if needed
+import CustomerInformationSlider from './CustomerInformationSlider'; // Adjust the path if needed
+import { RiInformation2Fill } from "react-icons/ri";
 
 
 const FunnelSection = () => {
   const dispatch = useDispatch();
   const [selectedCustomerId, setSelectedCustomerId] = useState(null); // Track selected customer changes made
-  const tableRef = useRef(null); // Ref to detect outside clicks
-// Handle clicks outside the table to remove selection
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (tableRef.current && !tableRef.current.contains(event.target)) {
-      setSelectedCustomerId(null); // Deselect customer when clicking outside
-    }
-  };
-
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
-//up to this
+ 
+//tableref part removed
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [newComment, setNewComment] = useState('');
@@ -168,6 +156,7 @@ useEffect(() => {
     dispatch(setModalState({
       showInvoiceSlider: true,
       selectedInvoiceCustomerId: customerId
+      
     }));
   };
   
@@ -179,17 +168,17 @@ useEffect(() => {
   };
   
 
-  const handleShowPOInvoice = (customerId) => {
+  const handleShowCustomerInformation = (customerId) => {
     dispatch(setModalState({
-      showPOInvoiceSlider: true,
-      selectedPOInvoiceCustomerId: customerId
+      showCustomerInformationSlider: true,
+      selectedCustomerInformationCustomerId: customerId
     }));
   };
   
-  const handleClosePOInvoice = () => {
+  const handleCloseCustomerInformation = () => {
     dispatch(setModalState({
-      showPOInvoiceSlider: false,
-      selectedPOInvoiceCustomerId: null
+      showCustomerInformationSlider: false,
+      selectedCustomerInformationCustomerId: null
     }));
   };
   
@@ -216,8 +205,9 @@ useEffect(() => {
   if (error) return <div className='error'>Error: {error}</div>;//changes made
 
   return (
-    
-    <div className="funnel-container">
+    // tableref removed
+    <div className="funnel-container"> 
+
       <h3>My Funnel</h3>
       <br></br>
       <input
@@ -231,7 +221,7 @@ useEffect(() => {
       {funnelData && funnelData.length > 0 ? (
         
      <div className='right-pannel'>
-     <table className="funnel-table"  ref={tableRef}>
+     <table className="funnel-table" >
        <thead>
          <tr>
            <th>Assigned Date</th>
@@ -273,9 +263,10 @@ useEffect(() => {
   className="action-icon" 
   onClick={() => handleShowQuotes(item._id)} // Pass customer ID
 />
-     <FaFileCircleCheck  title="PO Invoice" className="action-icon"    onClick={() => handleShowPOInvoice(item._id)} // Pass customer ID
-     />
+     
      <FaIndianRupeeSign title="Invoice" className="action-icon"   onClick={() => handleShowInvoice(item._id)} // Pass customer ID
+     />
+     <RiInformation2Fill   title=" Customer Information" className="action-icon"    onClick={() => handleShowCustomerInformation(item._id)} // Pass customer ID
      />
      </span> : item.comments}
 
@@ -358,10 +349,10 @@ useEffect(() => {
     onClose={handleCloseInvoice} 
   />
 )}
-{modalState.showPOInvoiceSlider && modalState.selectedPOInvoiceCustomerId && (
-  <POInvoiceSlider 
-    customerId={modalState.selectedPOInvoiceCustomerId} 
-    onClose={handleClosePOInvoice} 
+{modalState.showCustomerInformationSlider && modalState.selectedCustomerInformationCustomerId && (
+  <CustomerInformationSlider 
+    customerId={modalState.selectedCustomerInformationCustomerId} 
+    onClose={handleCloseCustomerInformation} 
   />
 )}
 

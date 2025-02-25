@@ -844,8 +844,8 @@ html, body {
 
 .close-slider {
   position: absolute;
-  top: 20px;
-  right: 15px;
+  top: 15px;
+  left: 15px; /* Positioning at top-left */
   font-size: 17px;
   cursor: pointer;
   color: red;
@@ -857,10 +857,19 @@ html, body {
 /* Header */
 .quote-header h4 {
   text-align: center;
-  color: #069696;
+  color: #07b1b1;
   font-size: 15px;
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 25px;
+}
+.quote-header p {
+  text-align: center;
+  color: #037070;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 32px;
 }
 
 /* Quote Creation Section */
@@ -1081,7 +1090,7 @@ html, body {
 
 /* Quote Table */
 .quote-created-section h4 {
-  color: #037070;
+  color: #703803;
   margin-top: 20px;
   font-size: 15px;
   font-weight: 900;
@@ -1100,26 +1109,71 @@ html, body {
   text-align:center;
  margin-top: 10%;
 }
+
+
 .quote-table {
   width: 100%;
   border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
 }
 
 .quote-table th, 
 .quote-table td {
-  border: 1px solid #ddd;
   padding: 10px;
   text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
 }
 
 .quote-table th {
-  background: #007bff;
-  color: white;
+  background-color: #dfa436;
+  color: aliceblue;
+  text-align: center;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  min-width: 120px;
+  white-space: nowrap; 
+  padding: 11px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.quote-table td {
+  background-color: rgba(231, 236, 155, 0.87);
+  color: black;
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  white-space: nowrap;  /* Ensures content stays in one line */
+  overflow: hidden;
+  font-size: 12px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-right: 5px; /* Slight padding for column spacing */
+  min-width: 120px;
+  color: rgba(0, 0, 0, 0.801);
+  padding-left: 15px;
+  padding-right: 15px;
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+}
+/* Hover effect for table rows */
+.quote-table tbody tr:hover {
+  background-color: #c5a205; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
 }
 
-.quote-table tbody tr:nth-child(even) {
-  background: #f9f9f9;
-}
 
 /* Pagination Controls */
 .pagination-controls {
@@ -1160,6 +1214,7 @@ html, body {
 
 
 /*INVOICE slider*/
+/*INVOICE slider*/
 .invoice-slider-overlay {
   position: fixed;
   top: 0;
@@ -1192,7 +1247,7 @@ html, body {
 
 /*POInvoice slider*/
 
-.POinvoice-slider-overlay {
+.customerinformation-slider-overlay {
   position: fixed;
   top: 0;
   right: 0;
@@ -1203,7 +1258,7 @@ html, body {
   z-index: 1000;
 }
 
-.POinvoice-slider-container {
+.customerinformation-slider-container {
   width: 350px;
   height: 100vh;
   background: white;

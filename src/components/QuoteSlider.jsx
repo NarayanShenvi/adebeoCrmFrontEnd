@@ -28,6 +28,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
   //changes
   const [overallDiscount, setOverallDiscount] = useState(0); // New state for overall discount
   const [finalTotal, setFinalTotal] = useState(0); // New state for final total
+  const [taxAmount, setTaxAmount] = useState(0); // <-- ADD THIS to fix the issue
 
   // Pagination state for lower section
   const [currentPageState, setCurrentPageState] = useState(1);
@@ -70,27 +71,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
     updateTotal(newQuoteLines);
   };
   
-  //changes made
-
-  const updateTotal = (lines) => {
-    const totalCost = lines.reduce((acc, line) => acc + line.subtotal, 0);
-    setTotal(totalCost);
-    calculateFinalTotal(totalCost, overallDiscount);
-  };
-
-  const handleOverallDiscountChange = (e) => {
-    const discountValue = parseFloat(e.target.value) || 0;
-    setOverallDiscount(discountValue);
-    calculateFinalTotal(total, discountValue);
-  };
-  const [taxAmount, setTaxAmount] = useState(0); // New state for tax
-
-  const calculateFinalTotal = (totalAmount, discount) => {
-    const discountedTotal = totalAmount - discount;
-    const tax = discountedTotal * 0.18; // 18% Tax
-    setTaxAmount(tax);  // Store tax separately
-    setFinalTotal(discountedTotal + tax);
-  };
+  
   const handleAddProductRow = () => {
     setQuoteLines([
       ...quoteLines,
@@ -127,6 +108,26 @@ const QuoteSlider = ({ customerId, onClose }) => {
     setQuoteLines(newQuoteLines);
     updateTotal(newQuoteLines);
   };
+//changes made
+
+const updateTotal = (lines) => {
+  const totalCost = lines.reduce((acc, line) => acc + line.subtotal, 0);
+  setTotal(totalCost);
+  calculateFinalTotal(totalCost, overallDiscount);
+};
+
+const handleOverallDiscountChange = (e) => {
+  const discountValue = parseFloat(e.target.value) || 0;
+  setOverallDiscount(discountValue);
+  calculateFinalTotal(total, discountValue);
+};
+
+const calculateFinalTotal = (totalAmount, discount) => {
+  const discountedTotal = Math.max(0, totalAmount - discount); // Ensure it doesn't go negative
+  const tax = discountedTotal * 0.18; // 18% Tax
+  setTaxAmount(tax);
+  setFinalTotal(discountedTotal + tax);
+};
 
   const handleDeleteProductRow = (index) => {
     const newQuoteLines = quoteLines.filter((_, i) => i !== index); // Remove the product row by index
@@ -142,8 +143,36 @@ const QuoteSlider = ({ customerId, onClose }) => {
     setCurrentPageState(pageNumber);
     dispatch(fetchQuotesAsync({ page: pageNumber }));
   };
-
+//changes made to disable button
   const handleSubmitQuote = () => {
+    console.log("🔹 handleSubmitQuote function triggered!");
+  
+    if (!customerId) {
+      console.log("❌ No customer selected!");
+      alert("❌ Please select a customer before submitting the quote.");
+      return;
+    }
+  
+    if (quoteLines.length === 0) {
+      console.log("❌ No products added!");
+      alert("❌ Please add at least one product.");
+      return;
+    }
+  
+    if (quoteLines.some(line => !line.productId)) {
+      console.log("❌ Missing product in one or more lines!");
+      alert("❌ Please select a product for each line.");
+      return;
+    }
+  
+    if (quoteLines.some(line => line.quantity <= 0)) {
+      console.log("❌ Quantity cannot be zero or negative!");
+      alert("❌ Please enter a valid quantity for all products.");
+      return;
+    }
+  
+    console.log("✅ All validations passed, submitting the quote...");
+  
     const quoteData = {
       customer_id: customerId,
       quoteTag: 'QUOTE_TAG',
@@ -153,14 +182,16 @@ const QuoteSlider = ({ customerId, onClose }) => {
         discount: line.discount,
         unit_price: line.unitPrice,
         sub_total: line.subtotal,
-        dr_status: line.drStatus, // Include DR Status
-
+        dr_status: line.drStatus,
       })),
       gross_total: finalTotal,
     };
-
+  
+    console.log("📝 Dispatching createQuote action:", quoteData);
     dispatch(createQuote(quoteData));
   };
+  
+  
 
 // Handle click outside to close slider chnages below
   useEffect(() => {
@@ -181,7 +212,10 @@ const QuoteSlider = ({ customerId, onClose }) => {
 <div ref={sliderRef}  className="quote-slider show">
       <div className="quote-slider-content">
         <div className="quote-header">
-        <h4>Create a New Quote</h4>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+  <h4 >Create a New Quote For</h4> 
+  <p >Customer Name </p>
+</div>
           <MdOutlineCancel onClick={onClose} className="close-slider" title="Close" />
         </div>
 
@@ -262,7 +296,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
           ))}
 
 <div className="quote-summary">
-  <strong className="label">Total: <span className="amount">₹&nbsp;{total.toFixed(2)}</span></strong>
+  <strong className="label">Sum: <span className="amount">₹&nbsp;{total.toFixed(2)}</span></strong>
   <input
   type="number"
   step="0.01"
@@ -271,14 +305,15 @@ const QuoteSlider = ({ customerId, onClose }) => {
   placeholder="Enter Overall Discount"
 />
 
-  <strong className="label">Final Total: <span className="amount">₹&nbsp;{finalTotal.toFixed(2)}</span></strong>
+  <strong className="label">Total: <span className="amount">₹&nbsp;{(total - overallDiscount).toFixed(2)}</span></strong>
   <strong className="label">Tax (18%): <span className="amount">₹&nbsp;{taxAmount.toFixed(2)}</span></strong>
   </div>
 
           <div className="quote-final-total">
-          <strong className="label">Final Total (with 18% tax): <span className="amount"> ₹&nbsp;{finalTotal.toFixed(2)}</span></strong>
+          <strong className="label">Grand Total (with 18% tax): <span className="amount"> ₹&nbsp;{finalTotal.toFixed(2)}</span></strong>
           </div>
-          <button onClick={handleSubmitQuote} disabled={loading} className="submit-button-quote">
+          <button onClick={handleSubmitQuote}   disabled={loading }
+ className="submit-button-quote">
             {loading ? (
               <>
                 <FaSpinner className="spinner" size={20} title='Submitting...'/>
@@ -289,6 +324,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
               </>
             )}
           </button>
+          
           
         </div>
 
@@ -333,7 +369,8 @@ const QuoteSlider = ({ customerId, onClose }) => {
             </table>
           )}
                       
-          {/* Pagination controls */}
+           {/* Pagination controls */}
+           {quotes.length > 0 && (
           <div className="pagination-controls">
             <button
               onClick={() => handlePageChange(currentPageState - 1)}
@@ -348,7 +385,8 @@ const QuoteSlider = ({ customerId, onClose }) => {
             >
               <FaChevronRight />
             </button>
-          </div>
+            </div>
+)}
         </div>
       </div>
       
