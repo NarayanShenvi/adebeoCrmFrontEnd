@@ -801,6 +801,15 @@ html, body {
     margin-left: -10px;
   }
 }
+.selected-customer {
+  background-color: #012124 !important; /* Yellow highlight */
+  font-weight: bold;
+  transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+
+
+/*quote slider*/
 .quote-slider {
   position: fixed;
   top: 0;
@@ -813,7 +822,9 @@ html, body {
   z-index: 9999;
   overflow-y: auto;
   border-left: 2px solid black;
-
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  align-items: center;
+  justify-content: center;
 }
 
 .quote-slider.show {
@@ -833,15 +844,374 @@ html, body {
 
 .close-slider {
   position: absolute;
-  top: 10px;
+  top: 20px;
   right: 15px;
-  font-size: 24px;
+  font-size: 17px;
   cursor: pointer;
   color: red;
 }
+.close-slider:hover{
+  transform: scale(1.3); /* Slight zoom on hover */
+
+}
+/* Header */
+.quote-header h4 {
+  text-align: center;
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+/* Quote Creation Section */
+.quote-create-section {
+  margin-bottom: 20px;
+  background-color: #adebeb71;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+/* Quote Line */
+.quote-line {
+  display: flex;
+  flex-wrap: wrap; /* Wrap items to new lines on smaller screens */
+  gap: 9px; /* Space between fields */
+  align-items: center;
+  width: 100%; /* Ensure it doesn't exceed container width */
+  overflow: hidden; /* Prevent extra horizontal scrolling */
+  margin-bottom: 12px;
+}
 
 
+/* Quote Select (Dropdown) - Wider */
+.quote-select {
+  flex: 2; /* Larger width for dropdown */
+  min-width: 140px;
+  max-width: 150px;
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 3px;     font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
 
+.quote-quantity-input,
+.quote-discount-input {
+  flex: 1; /* Smaller width for numeric inputs */
+  min-width: 80px;
+  max-width: 90px;
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  font-size: 12px;  
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 3px;             /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+.quote-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+  outline: none;
+}
+.quote-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.quote-quantity-input:focus,
+.quote-discount-input:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 6px rgba(83, 176, 243, 0.9);
+  outline: none;
+}
+
+.quote-discount-input:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+
+.quote-quantity-input:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+
+
+.quote-unit-price, 
+.quote-subtotal {
+  flex: 1;
+  min-width: 60px;
+  max-width: 80px; 
+  font-size: 11px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800; 
+}
+
+/* Quote Buttons */
+.add-quote
+{
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  color: #28a745;
+  height: 18px;
+  cursor: pointer; /* Make it clickable */
+  transition: transform 0.2s ease-in-out;
+} 
+.delete-quote
+ {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  color: #f32b3f;
+  font-size: 9px; /* Adjust icon size */
+  cursor: pointer; /* Make it clickable */
+  transition: transform 0.2s ease-in-out;
+  height: 18px;
+}
+
+.add-quote:hover {
+  transform: scale(1.2); /* Slight zoom on hover */
+}
+
+.delete-quote:hover {
+  transform: scale(1.2); /* Slight zoom on hover */
+}
+
+.submit-button-quote {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px; /* Adjust gap between icon and text */
+  width: 100%;
+  max-width: 25px;
+  display: block;
+  color: #c90808;
+  cursor: pointer;
+  margin-bottom: 10px;
+  margin-left: 96%;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.submit-button-quote:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.submit-button-quote:hover:not(:disabled) {
+  transform: scale(1.3); /* Slight zoom on hover */
+  color: #0e7204;
+}
+
+
+/* Quote Totals */
+.quote-summary {
+  display: flex;
+  align-items: center;
+  gap: 65px;  /* Space between elements */
+  flex-wrap: wrap;  /* Prevents breaking to a new line if enough space */
+  font-size: 14px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #025757;
+  font-weight: 800;
+  margin-top: 70px;
+  margin-bottom: 30px;
+}
+
+.quote-summary input {
+  flex: 1; /* Smaller width for numeric inputs */
+  min-width: 80px;
+  max-width: 160px;
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 1px;             /* Slightly rounded corners */
+  font-size: 12px;  
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 8px;             /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: #9cd1d1a1;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+.quote-summary input:focus
+{
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 6px rgba(83, 176, 243, 0.9);
+  outline: none;
+}
+
+.quote-final-total {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #025757;
+  font-weight: 800;
+  margin-top: 20px;
+  margin-bottom: -30px;
+}
+
+.label {
+  color: #025757;
+  font-weight: bold;
+}
+
+.amount {
+  color: rgba(0, 0, 0, 0.747);
+  font-weight: bold;
+}
+
+/* Quote Table */
+.quote-created-section h4 {
+  color: #037070;
+  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 900;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+.quote-created-section {
+  margin-top: 20px;
+  width: 100%;
+}
+.quote-created-section .no-quote
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #db6c03;
+  text-align:center;
+ margin-top: 10%;
+}
+.quote-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.quote-table th, 
+.quote-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.quote-table th {
+  background: #007bff;
+  color: white;
+}
+
+.quote-table tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.pagination-controls button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+
+/*INVOICE slider*/
+.invoice-slider-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+}
+
+.invoice-slider-container {
+  width: 350px;
+  height: 100vh;
+  background: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.close-btn {
+  align-self: flex-end;
+  font-size: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+
+/*POInvoice slider*/
+
+.POinvoice-slider-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+}
+
+.POinvoice-slider-container {
+  width: 350px;
+  height: 100vh;
+  background: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
 /* Customer Section Container */
 /* Customer Section - Make Full Width */
 .customer-section {
