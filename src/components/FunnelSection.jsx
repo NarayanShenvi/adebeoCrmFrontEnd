@@ -8,13 +8,28 @@ import './dashboard/Dashboard.css'; // Import the CSS fil
 import { MdOutlineCancel } from "react-icons/md";
 import { HiSave } from "react-icons/hi";
 import QuoteSlider from './QuoteSlider'; // Adjust the path if needed
-
+import InvoiceSlider from './InvoiceSlider'; // Adjust the path if needed
+import POInvoiceSlider from './POInvoiceSlider'; // Adjust the path if needed
 
 
 const FunnelSection = () => {
   const dispatch = useDispatch();
-  
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null); // Track selected customer changes made
+  const tableRef = useRef(null); // Ref to detect outside clicks
+// Handle clicks outside the table to remove selection
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (tableRef.current && !tableRef.current.contains(event.target)) {
+      setSelectedCustomerId(null); // Deselect customer when clicking outside
+    }
+  };
 
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+//up to this
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [newComment, setNewComment] = useState('');
@@ -22,6 +37,9 @@ const FunnelSection = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [showQuoteSlider, setShowQuoteSlider] = useState(false);
+  const [showInvoiceSlider, setShowInvoiceSlider] = useState(false); // New state for slider
+  const [showPOInvoiceSlider, setShowPOInvoiceSlider] = useState(false); // New state for slider
+
   const sliderRef = useRef(null); // Create a ref for the slider
 
 
@@ -32,7 +50,7 @@ const FunnelSection = () => {
   const modalState = useSelector((state) => state.funnel.modalState);
 
   const [totalPages, setTotalPages] = useState(1);
-
+ 
   // Calculate page boundaries based on rows per page
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
@@ -144,7 +162,36 @@ const FunnelSection = () => {
       selectedQuoteCustomerId: null
     }));
   };
+
+
+  const handleShowInvoice = (customerId) => {
+    dispatch(setModalState({
+      showInvoiceSlider: true,
+      selectedInvoiceCustomerId: customerId
+    }));
+  };
   
+  const handleCloseInvoice = () => {
+    dispatch(setModalState({
+      showInvoiceSlider: false,
+      selectedInvoiceCustomerId: null
+    }));
+  };
+  
+
+  const handleShowPOInvoice = (customerId) => {
+    dispatch(setModalState({
+      showPOInvoiceSlider: true,
+      selectedPOInvoiceCustomerId: customerId
+    }));
+  };
+  
+  const handleClosePOInvoice = () => {
+    dispatch(setModalState({
+      showPOInvoiceSlider: false,
+      selectedPOInvoiceCustomerId: null
+    }));
+  };
   
 
   // Close slider when clicking outside
@@ -184,7 +231,7 @@ const FunnelSection = () => {
       {funnelData && funnelData.length > 0 ? (
         
      <div className='right-pannel'>
-     <table className="funnel-table">
+     <table className="funnel-table"  ref={tableRef}>
        <thead>
          <tr>
            <th>Assigned Date</th>
@@ -200,7 +247,12 @@ const FunnelSection = () => {
        </thead>
        <tbody>
        {currentRows.map((item) => (
-             <tr key={item._id}>
+            <tr
+            key={item._id}
+            onClick={() => setSelectedCustomerId(item._id)}
+            className={selectedCustomerId === item._id ? 'selected-customer' : ''}
+          >
+           
    <td>{item.insertDate}</td>
    <td>{item.ownerName}</td>
    <td>{item.address.replace(/, /g, ',\n')}</td>
@@ -221,8 +273,10 @@ const FunnelSection = () => {
   className="action-icon" 
   onClick={() => handleShowQuotes(item._id)} // Pass customer ID
 />
-     <FaFileCircleCheck  title="PO Invoice" className="action-icon"/>
-     <FaIndianRupeeSign title="Invoice" className="action-icon"/>
+     <FaFileCircleCheck  title="PO Invoice" className="action-icon"    onClick={() => handleShowPOInvoice(item._id)} // Pass customer ID
+     />
+     <FaIndianRupeeSign title="Invoice" className="action-icon"   onClick={() => handleShowInvoice(item._id)} // Pass customer ID
+     />
      </span> : item.comments}
 
    </td>
@@ -298,7 +352,18 @@ const FunnelSection = () => {
     onClose={handleCloseQuotes} 
   />
 )}
-
+{modalState.showInvoiceSlider && modalState.selectedInvoiceCustomerId && (
+  <InvoiceSlider 
+    customerId={modalState.selectedInvoiceCustomerId} 
+    onClose={handleCloseInvoice} 
+  />
+)}
+{modalState.showPOInvoiceSlider && modalState.selectedPOInvoiceCustomerId && (
+  <POInvoiceSlider 
+    customerId={modalState.selectedPOInvoiceCustomerId} 
+    onClose={handleClosePOInvoice} 
+  />
+)}
 
 
     </div>

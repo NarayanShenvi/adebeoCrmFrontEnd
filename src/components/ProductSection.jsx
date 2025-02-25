@@ -161,7 +161,7 @@ const ProductSection = () => {
       <Row className="g-5">
       <Col md={6}>
       <Form.Group className="form-group-prod">
-  <Form.Label>Product Name:</Form.Label>
+  <Form.Label className="required-label">Product Name:</Form.Label>
   <Form.Control
     type="text"
     name="productName"
@@ -169,16 +169,18 @@ const ProductSection = () => {
     onChange={handleChange}
     disabled={mode === "edit"} // Disable editing in Edit mode
     placeholder='Enter product name'
+    required
   />
 </Form.Group>
 </Col>
 <Col md={6}>
 <Form.Group className="form-group-prod">
-          <Form.Label>Address:</Form.Label>
+          <Form.Label className="required-label">Address:</Form.Label>
         <Form.Control as="textarea" rows={1} placeholder="Enter address" 
         name="address"
         value={formData.address}
         onChange={handleChange}
+        required
         /> 
         </Form.Group>
         </Col>
@@ -235,13 +237,14 @@ const ProductSection = () => {
       <Row className="g-5">
      <Col md={6}>
      <Form.Group className="form-group-prod">
-        <Form.Label>Product Display Name:</Form.Label>
+        <Form.Label className="required-label">Product Display Name:</Form.Label>
   <Form.Control
     type="text"
     name="ProductDisplay"
     value={formData.ProductDisplay}
     onChange={handleChange}
     placeholder='Enter product display name'
+    required
   />
 </Form.Group>
 
@@ -296,27 +299,28 @@ const ProductSection = () => {
           <Col md={6}>
            
           <Form.Group className="form-group-prod">
-              <Form.Label>Product Company Name:</Form.Label>
+              <Form.Label className="required-label">Product Company Name:</Form.Label>
   <Form.Control
     type="text"
     name="ProductCompanyName"
     value={formData.ProductCompanyName}
     onChange={handleChange}
     placeholder='Enter product company name'
+    required
                     />
                 </Form.Group>
             
             </Col>  
             <Col md={6}>
             <Form.Group className="form-group-prod">
-                <Form.Label>Sales Code:</Form.Label>
+                <Form.Label className="required-label">Sales Code:</Form.Label>
   <Form.Control
     type="text"
     name="salesCode"
     value={formData.salesCode}
     onChange={handleChange}
     placeholder='Enter sales code'
-
+     required
   />
 </Form.Group>
 
@@ -326,26 +330,28 @@ const ProductSection = () => {
    <Row className="g-5">   
            <Col md={6}>
            <Form.Group className="form-group-prod">
-              <Form.Label>Company GSTIN:</Form.Label>
+              <Form.Label className="required-label">Company GSTIN:</Form.Label>
   <Form.Control
     type="text"
     name="companyGstin"
     value={formData.companyGstin}
     onChange={handleChange}
     placeholder='Enter company GSTIN'
+    required
   />
 </Form.Group>
 
            </Col>
            <Col md={6}>
            <Form.Group className="form-group-prod">
-              <Form.Label>Purchase Cost:</Form.Label>
+              <Form.Label className="required-label">Purchase Cost:</Form.Label>
   <Form.Control
     type="number"
     name="purchaseCost"
     value={formData.purchaseCost}
     onChange={handleChange}
 placeholder='Enter purchase cost'
+required
   />
 </Form.Group>
 
@@ -354,26 +360,28 @@ placeholder='Enter purchase cost'
          <Row className="g-5">   
            <Col md={6}>
            <Form.Group className="form-group-prod">
-              <Form.Label>Email:</Form.Label>
+              <Form.Label className="required-label">Email:</Form.Label>
   <Form.Control
     type="email"
     name="email"
     value={formData.email}
     onChange={handleChange}
 placeholder='Enter email address'
+required
   />
 </Form.Group>
 
            </Col>
            <Col md={6}>
            <Form.Group className="form-group-prod">
-              <Form.Label>Sales Cost:</Form.Label>
+              <Form.Label className="required-label">Sales Cost:</Form.Label>
   <Form.Control
     type="number"
     name="salesCost"
     value={formData.salesCost}
     onChange={handleChange}
 placeholder='Enter sales cost'
+required
   />
 </Form.Group>
 
@@ -383,11 +391,12 @@ placeholder='Enter sales cost'
          <Row className="g-5">   
            <Col md={6}>
            <Form.Group className="form-group-prod">
-  <Form.Label>DR Status:</Form.Label>
+  <Form.Label className="required-label">DR Status:</Form.Label>
   <Form.Select
     name="drStatus"
     value={formData.drStatus}
     onChange={handleChange}
+    required
   >
     <option value="">Select Status</option>
     <option value="pending">Approved</option>
@@ -399,13 +408,14 @@ placeholder='Enter sales cost'
            </Col>
            <Col md={6}>
            <Form.Group className="form-group-prod">
-  <Form.Label>Max Discount:</Form.Label>
+  <Form.Label className="required-label">Max Discount:</Form.Label>
   <Form.Control
     type="number"
     name="maxDiscount"
     value={formData.maxDiscount}
     onChange={handleChange}
 placeholder='Enter maximum discount'
+required
   />
 </Form.Group>
 
