@@ -10,7 +10,7 @@ const InvoiceSlider = ({ customerId, onClose }) => {
         <button className="close-btn" onClick={onClose}>
           <MdOutlineCancel />
         </button>
-        <h3>Invoice Details </h3>
+        <h3>Information </h3>
         <p>Customer ID: {customerId}</p>
         {/* Add invoice details here */}
       </div>
