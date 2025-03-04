@@ -265,7 +265,7 @@ const FunnelSection = () => {
   onClick={() => handleShowQuotes(item._id)} // Pass customer ID
 />
      
-     <FaIndianRupeeSign title="Invoice" className="action-icon"   onClick={() => handleShowPOInvoice(item._id)} // Pass customer ID 
+     <FaIndianRupeeSign title=" Porforma Invoice" className="action-icon"   onClick={() => handleShowPOInvoice(item._id)} // Pass customer ID 
      />
      <RiInformation2Fill   title=" Customer Information" className="action-icon"    onClick={() => handleShowInvoice(item._id)} // Pass customer ID
      />

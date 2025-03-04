@@ -353,7 +353,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
                     <td>{quoteItem.quote_tag}</td> {/* Display the quote tag */}
                     <td>
                       {/* Safely handle total price */}
-                      ${quoteItem.total_price && !isNaN(quoteItem.total_price)
+                      ₹&nbsp;{quoteItem.total_price && !isNaN(quoteItem.total_price)
                         ? quoteItem.total_price.toFixed(2)
                         : "0.00"}
                     </td> {/* Display total price */}

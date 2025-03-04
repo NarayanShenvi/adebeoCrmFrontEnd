@@ -802,9 +802,9 @@ html, body {
   }
 }
 .selected-customer {
-  background-color: #012124 !important; /* Yellow highlight */
+  background-color: #012124 !important; 
   font-weight: bold;
-  transition: background-color 0.3s ease; /* Smooth transition */
+  transition: background-color 0.3s ease; 
 }
 
 
@@ -1212,8 +1212,60 @@ html, body {
   text-align: center;
 }
 
+/* Responsive Styles */
 
-/*INVOICE slider*/
+/* For screens up to 1024px */
+@media (max-width: 1024px) {
+  .quote-slider {
+    width: 60%;
+  }
+  .quote-table th, .quote-table td {
+    font-size: 11px;
+  }
+}
+
+/* For screens up to 768px */
+@media (max-width: 768px) {
+  .quote-slider {
+    width: 80%;
+  }
+  .quote-line {
+    flex-direction: column;
+    gap: 5px;
+  }
+  .quote-select, .quote-quantity-input, .quote-discount-input {
+    width: 100%;
+    max-width: none;
+  }
+  .quote-table th, .quote-table td {
+    font-size: 10px;
+    padding: 8px;
+  }
+}
+
+/* For screens up to 480px */
+@media (max-width: 480px) {
+  .quote-slider {
+    width: 100%;
+    right: -100%;
+  }
+  .quote-header h4, .quote-header p {
+    font-size: 12px;
+  }
+  .close-slider {
+    font-size: 14px;
+  }
+  .quote-create-section, .quote-summary, .quote-final-total {
+    padding: 5px;
+  }
+  .quote-table th, .quote-table td {
+    font-size: 9px;
+    padding: 5px;
+  }
+  .pagination-controls button {
+    font-size: 12px;
+  }
+}
 /*INVOICE slider*/
 .invoice-slider-overlay {
   position: fixed;
@@ -1246,7 +1298,7 @@ html, body {
 
 
 /*POInvoice slider*/
-.POinvoice-slider-overlay {
+.POinvoice-slider {
   position: fixed;
   top: 0;
   right: -400px; /* Initially off-screen */
@@ -1263,36 +1315,641 @@ html, body {
   justify-content: center;
 }
 
-.POinvoice-slider-container {
-  width: 350px;
-  height: 100vh;
-  background: white;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-/*POInvoice slider*/
-.customerinformation-slider-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: flex-end;
-  z-index: 1000;
+.POinvoice-slider.show {
+  right: 0; /* Slide in */
+  opacity: 1; /* Fade in */
+
 }
 
-.customerinformation-slider-container {
-  width: 350px;
-  height: 100vh;
-  background: white;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+.POinvoice-slider-content {
   padding: 20px;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  min-height: 100%;
 }
+
+.close-slider {
+  position: absolute;
+  top: 15px;
+  left: 15px; /* Positioning at top-left */
+  font-size: 17px;
+  cursor: pointer;
+  color: red;
+}
+.close-slider:hover{
+  transform: scale(1.3); /* Slight zoom on hover */
+
+}
+/* Header */
+.POinvoice-header h4 {
+  text-align: center;
+  color: #07b1b1;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 25px;
+}
+.POinvoice-header p {
+  text-align: center;
+  color: #037070;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 32px;
+}
+.proforma-invoice-create-section {
+  margin-bottom: 20px;
+  background-color: #adebeb71;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+/* Container for radio buttons */
+.radio-group {
+  display: flex;
+  gap: 80px;
+  margin: 5px 0;
+  margin-bottom: 15px;
+}
+
+/* Hide the default radio button */
+.radio-group input[type="radio"] {
+  display: none;
+}
+
+/* Label styling */
+.radio-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding-left: 30px;
+  font-size: 14px;
+  color: #242323da;
+  user-select: none;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 700;
+}
+
+/* Custom radio button */
+.radio-group label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid #069696;
+  border-radius: 50%;
+  background-color: #fff;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* Inner dot for checked state */
+.radio-group input[type="radio"]:checked + label::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #069696;
+}
+
+/* Hover effect */
+.radio-group label:hover::before {
+  border-color: #069631;
+}
+
+/* General Table Styles */
+.po-invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Ensure columns are of fixed size */
+  overflow: hidden;
+  max-height: 300px; /* Optional: Limit table height */
+}
+
+.po-invoice-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.po-invoice-table th, 
+.po-invoice-table td {
+  padding: 8px;
+  text-align: left;
+  border: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; /* Set a max width for table cells */
+}
+
+/* Wrap Text in Cells */
+.po-invoice-table td {
+  white-space: nowrap;  /* Ensures content stays in one line */
+  word-wrap: break-word; /* Ensure long text wraps */
+  color: #242323da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+.po-invoice-table th {
+  color: rgba(19, 23, 27, 0.952);
+  text-align: left;
+  font-size: 12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  word-wrap: break-word; 
+  white-space: normal; /* Allow text to wrap */
+  overflow: hidden;
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* Specific width for dropdowns (select elements) */
+.po-invoice-table td select {
+  width: 140px; /* Set width for dropdown */
+  max-width: 200px; /* Optional: Prevents too wide dropdown */
+  min-width: 120px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 400;
+}
+
+/* Specific width for input fields */
+.po-invoice-table td input[type="number"],
+.po-invoice-table td input[type="text"] {
+  width: 80; /* Set width for input fields */
+  max-width: 80px;
+  min-width: 80px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 400;
+}
+
+/* Optional: Apply different width to specific columns */
+.po-invoice-table td:nth-child(1),
+.po-invoice-table th:nth-child(1) {
+  width: 200px; /* First column */
+}
+.po-invoice-table td:nth-child(2),
+.po-invoice-table th:nth-child(2) {
+  width: 90px; /* First column */
+}
+.po-invoice-table td:nth-child(3),
+.po-invoice-table th:nth-child(3) {
+  width: 90px; /* First column */
+}
+.po-invoice-table td:nth-child(4),
+.po-invoice-table th:nth-child(4) {
+  width: 200px; /* First column */
+}
+
+/* Fixed Table Header */
+.po-invoice-table th {
+  position: sticky;
+  top: 0;
+  background-color: #adebeb;
+  z-index: 2;
+}
+
+/* Ensure the Table is Contained */
+.POinvoice-slider-content {
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Prevent Horizontal Scroll */
+.proforma-invoice-create-section {
+  overflow-x: hidden;
+}
+
+/* Buttons in the Table */
+.add-poinvoice
+{
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  color: #28a745;
+  font-size: 17px;  
+  cursor: pointer; /* Make it clickable */
+  transition: transform 0.2s ease-in-out;
+} 
+.delete-poinvoice
+ {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  color: #f32b3f;
+  font-size: 17px;  
+  cursor: pointer; /* Make it clickable */
+  transition: transform 0.2s ease-in-out;
+}
+
+.add-poinvoice:hover {
+  transform: scale(1.2); /* Slight zoom on hover */
+}
+
+.delete-poinvoice:hover {
+  transform: scale(1.2); /* Slight zoom on hover */
+}
+.icon-container-po {
+  display: inline-flex;
+  align-items: center;
+  gap: 17px; /* Add space between the icons */
+}
+
+.po-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius:1px;             /* Slightly rounded corners */
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 3px;     
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #050202fb;
+  font-weight: bold;
+  pointer-events: auto;
+}
+
+.po-quantity-input,
+.po-discount-input {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius:1px;             /* Slightly rounded corners */
+  font-size: 12px;  
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 3px;             /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #050202fb;
+  font-weight: bold; 
+  pointer-events: auto;
+}
+.po-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+  outline: none;
+}
+.po-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.po-quantity-input:focus,
+.po-discount-input:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 6px rgba(83, 176, 243, 0.9);
+  outline: none;
+}
+
+.po-discount-input:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+
+.po-quantity-input:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+
+/* Add specific styling for the ₹ symbol */
+.po-unit-price::before,
+.po-subtotal::before {
+  content: '₹ '; /* Adds the Rupee symbol before the value */
+}
+
+.quote-selection {
+  margin-bottom: 20px;
+}
+
+.quote-selection select {
+  width: 100%;
+  max-width: 340px; /* Adjust this to control the width of the dropdown */
+  height: 30px;
+  background: rgba(195, 237, 243, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  color: rgb(4, 133, 156); /* Change input text color */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease-in-out;
+  appearance: none; /* Remove default dropdown arrow */
+  cursor: pointer;
+}
+
+.quote-selection select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.quote-selection select:hover {
+  border-color: #108fa5;
+}
+.totals-section {
+  display: flex;
+  align-items: center;
+  gap: 35px;  /* Space between elements */
+  flex-wrap: wrap;  /* Prevents breaking to a new line if enough space */
+  font-size: 14px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #025757;
+  font-weight: 800;
+  margin-top: 70px;
+  margin-bottom: 30px;
+}
+
+.totals-section input {
+  flex: 1; /* Smaller width for numeric inputs */
+  min-width: 80px;
+  max-width: 160px;
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 1px;             /* Slightly rounded corners */
+  font-size: 12px;  
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 8px;             /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: #9cd1d1a1;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+.totals-section input:focus
+{
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 6px rgba(83, 176, 243, 0.9);
+  outline: none;
+}
+
+.po-quote-final-total {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #025757;
+  font-weight: 800;
+  margin-top: 20px;
+  margin-bottom: -30px;
+}
+
+.label {
+  color: #025757;
+  font-weight: bold;
+}
+
+.amount {
+  color: rgba(0, 0, 0, 0.747);
+  font-weight: bold;
+}
+
+.submit-button-po {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px; /* Adjust gap between icon and text */
+  width: 100%;
+  max-width: 25px;
+  display: block;
+  color: #c90808;
+  cursor: pointer;
+  margin-bottom: 10px;
+  margin-left: 96%;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.submit-button-po:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.submit-button-po:hover:not(:disabled) {
+  transform: scale(1.3); /* Slight zoom on hover */
+  color: #0e7204;
+}
+
+/* PO Table */
+.proforma-created-section h4 {
+  color: #703803;
+  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 900;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+.proforma-created-section {
+  margin-top: 20px;
+  width: 100%;
+}
+.proforma-created-section .no-po
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #db6c03;
+  text-align:center;
+ margin-top: 10%;
+}
+
+.po-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+}
+
+.po-table th, 
+.po-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+}
+
+.po-table th {
+  background-color: #dfa436;
+  color: aliceblue;
+  text-align: center;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  min-width: 120px;
+  white-space: nowrap; 
+  padding: 11px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.po-table td {
+  background-color: rgba(231, 236, 155, 0.87);
+  color: black;
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  white-space: nowrap;  /* Ensures content stays in one line */
+  overflow: hidden;
+  font-size: 12px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-right: 5px; /* Slight padding for column spacing */
+  min-width: 120px;
+  color: rgba(0, 0, 0, 0.801);
+  padding-left: 15px;
+  padding-right: 15px;
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+}
+/* Hover effect for table rows */
+.po-table tbody tr:hover {
+  background-color: #c5a205; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+}
+
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.pagination-controls button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* Responsive Styles */
+/* For screens 1024px and below */
+@media (max-width: 1024px) {
+  .POinvoice-slider {
+    width: 60%;
+    right: -60%;
+  }
+  .POinvoice-slider.show {
+    right: 0;
+  }
+  .radio-group {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .totals-section {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .po-invoice-table th, .po-invoice-table td {
+    font-size: 10px;
+  }
+}
+
+/* For screens 768px and below */
+@media (max-width: 768px) {
+  .POinvoice-slider {
+    width: 80%;
+    right: -80%;
+  }
+  .POinvoice-slider.show {
+    right: 0;
+  }
+  .po-table th, .po-table td {
+    font-size: 10px;
+    padding: 5px;
+  }
+  .totals-section input {
+    min-width: 60px;
+  }
+}
+
+/* For screens 480px and below */
+@media (max-width: 480px) {
+  .POinvoice-slider {
+    width: 100%;
+    right: -100%;
+  }
+  .POinvoice-slider.show {
+    right: 0;
+  }
+  .POinvoice-header h4, .POinvoice-header p {
+    font-size: 12px;
+  }
+  .radio-group label {
+    font-size: 12px;
+    padding-left: 25px;
+  }
+  .po-invoice-table th, .po-invoice-table td {
+    font-size: 8px;
+    padding: 4px;
+  }
+  .totals-section {
+    flex-direction: column;
+    gap: 5px;
+  }
+  .totals-section input {
+    min-width: 50px;
+  }
+  .quote-selection select {
+    max-width: 100%;
+  }
+}
+
 /* Customer Section Container */
 /* Customer Section - Make Full Width */
 .customer-section {

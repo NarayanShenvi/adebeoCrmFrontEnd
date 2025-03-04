@@ -274,37 +274,51 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     dispatch(fetchPerformasAsync({ page: pageNumber }));
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sliderRef.current && !sliderRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
   return (
-    <div ref={sliderRef} className={`POinvoice-slider-overlay ${onClose ? "show" : ""}`}>
-      <div className="POinvoice-slider-container">
-        <div className="proforma-invoice-header">
-          <h4>Create a New Proforma Invoice</h4>
+<div ref={sliderRef}  className="POinvoice-slider show">
+      <div className="POinvoice-slider-content">
+        <div className="POinvoice-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+  <h4 >Create Proforma Invoice For</h4> 
+  <p >Customer Name </p>
+</div>
           <MdOutlineCancel onClick={onClose} className="close-slider" title="Close" />
         </div>
+        <div className="radio-group">
+  <input 
+    type="radio" 
+    id="new" 
+    value="new" 
+    checked={proformaType === "new"} 
+    onChange={() => setProformaType("new")} 
+  />
+  <label htmlFor="new">New</label>
+
+  <input 
+    type="radio" 
+    id="existing" 
+    value="existing" 
+    checked={proformaType === "existing"} 
+    onChange={() => setProformaType("existing")} 
+  />
+  <label htmlFor="existing">From Existing Quotes</label>
+</div>
 
         {/* Proforma Invoice Selection */}
         <div className="proforma-invoice-create-section">
-          <div>
-            <label>
-              <input 
-                type="radio" 
-                value="new" 
-                checked={proformaType === "new"} 
-                onChange={() => setProformaType("new")}
-              />
-              New
-            </label>
-            <label>
-              <input 
-                type="radio" 
-                value="existing" 
-                checked={proformaType === "existing"} 
-                onChange={() => setProformaType("existing")}
-              />
-              From Existing Quotes
-            </label>
-          </div>
-
+        
           {proformaType === "existing" && (
             <div className="quote-selection">
               <select
@@ -322,20 +336,21 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                   <option>No quotes available</option>
                 )}
               </select>
-            </div>
+            </div>  
         )}
           {/* Invoice Table for "New" Proforma */}
-          <table className="invoice-table">
+          <table className="po-invoice-table">
             <thead>
               <tr>
                 <th>Product</th>
                 <th>Quantity</th>
                 <th>Discount</th>
+                <th>DR Status</th> {/* New column for DR Status */}
                 <th>Unit Price</th>
-                <th>Subtotal</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+                <th>Sub Total</th>
+      {proformaType === "new" && <th>Actions</th>} {/* Conditionally render "Actions" header */}
+    </tr>
+  </thead>
             <tbody>
               {invoiceLines.map((line, index) => (
                 <tr key={line.description + index}>
@@ -343,7 +358,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                     {proformaType === "existing" ? (
                       <span>{line.description || "Unknown Product"}</span>
                     ) : (
-                      <select value={line.productId} onChange={(e) => handleProductSelect(index, e.target.value)}>
+                      <select value={line.productId} onChange={(e) => handleProductSelect(index, e.target.value)} className='po-select'>
                         <option value="" disabled>Select Product</option>
                         {products && products.length > 0 ? (
                           products.map((product) => (
@@ -362,7 +377,9 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                       <span>{line.quantity}</span>
                     ) : (
                       <input 
+                      className="po-quantity-input"
                         type="number" 
+                        min="1"
                         value={line.quantity} 
                         onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
                       />
@@ -373,105 +390,147 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                       <span>{line.discount}</span>
                     ) : (
                       <input 
+                      className="po-quantity-input"
+                      min="0"
                         type="number" 
                         value={line.discount} 
                         onChange={(e) => handleLineChange(index, 'discount', e.target.value)}
                       />
                     )}
                   </td>
-                  <td>{(line.unitPrice || 0).toFixed(2)}</td>
-                  <td>{(line.subtotal || 0).toFixed(2)}</td>
-                  <td>
-                    {proformaType === "new" && (
-                      <MdDelete 
-                        onClick={() => handleDeleteProductRow(index)} 
-                        className="delete-btn"
-                      />
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                   {/* New DR Status Column */}
+                   <td>
+  {proformaType === "existing" ? (
+    <span>{line.drStatus || "Unknown Status"}</span>
+  ) : (
+    <select
+      value={line.drStatus || ""}
+      onChange={(e) => handleLineChange(index, 'drStatus', e.target.value)}
+      className="po-select"
+    >
+      <option value="" disabled>Select DR Status</option>
+      <option value="Pending">Pending</option>
+      <option value="Approved">Approved</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+  )}
+</td>
 
-          {proformaType === "new" && (
-            <button onClick={handleAddProductRow}>Add Product</button>
-          )}
-        </div>
+                  <td className="po-unit-price">{(line.unitPrice || 0).toFixed(2)}</td>
+                  <td className="po-subtotal">{(line.subtotal || 0).toFixed(2)}</td>
+                  {/* Conditionally render actions only for "new" proformaType */}
+        {proformaType === "new" && (
+          <td>
+            <div class="icon-container-po">
+            <MdDelete
+              onClick={() => handleDeleteProductRow(index)}
+              className="delete-poinvoice"
+              title="Delete Quote"
 
-        <div className="totals-section">
+            />
+            <MdAddBox
+              onClick={() => handleAddProductRow(index)}
+              className="add-poinvoice"
+              title="Add Quote"
+
+            />
+            </div>
+          </td>
+        )}
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+        <div  className="totals-section">
           <div>
-            <label>Total</label>
-            <span>{total.toFixed(2)}</span>
+            <label className="label">Sum:</label>
+            <span className="amount"> ₹&nbsp;{total.toFixed(2)}</span>
           </div>
           <div>
-            <label>Overall Discount</label>
             <input 
+              className="amount"
               type="number" 
-              value={overallDiscount} 
-              onChange={(e) => setOverallDiscount(parseFloat(e.target.value))}
+              step="0.01"
+              value={overallDiscount === 0 ? '' : overallDiscount}  
+              onChange={(e) => setOverallDiscount(parseFloat(e.target.value)|| 0)}
               disabled={proformaType === "existing"}
+              placeholder="Enter Overall Discount"
             />
           </div>
           <div>
-            <label>Tax</label>
-            <span>{taxAmount.toFixed(2)}</span>
-          </div>
+            <label className="label">Total:</label>
+            <span className="amount"> ₹&nbsp;{(total - overallDiscount).toFixed(2)}</span> 
+            </div>
+
           <div>
-            <label>Final Total</label>
-            <span>{finalTotal.toFixed(2)}</span>
+            <label className="label">Tax (18%):</label>
+            <span className="amount"> ₹&nbsp;{taxAmount.toFixed(2)}</span>
           </div>
+           </div>
+          <div className="po-quote-final-total">           
+             <label className="label">Grand Total (with 18% tax):</label>
+            <span className="amount"> &nbsp;₹&nbsp;{finalTotal.toFixed(2)}</span>
+          </div>
+         
           <button 
             onClick={handleSubmitProformaInvoice} 
             disabled={loading || total === 0}
-          >
-            {loading ? <FaSpinner /> : 'Create Proforma Invoice'}
-          </button>
+            className="submit-button-po">
+                    {loading ? (
+                      <>
+                        <FaSpinner className="spinner" size={20} title='Submitting...'/>
+                      </>
+                    )  : (
+                      <>
+                        <FaFilePdf  size={24} title='Save & Generate PDF' className='Newpo'/>
+                      </>
+                    )}
+                  </button>
         </div>
-
         {/* Available PO's Section (Empty Placeholder for now) */}
-        <div className="available-pos-section">
-  <h4>Previous Proforma's</h4>
-
-  {/* Table to display Proformas */}
-  <table>
-    <thead>
-      <tr>
-        <th>Proforma Id</th>
-        <th>Date</th>
-        <th>Proforma Tag</th>
-        <th>Price</th>
-        <th>PDF Link</th>
-      </tr>
-    </thead>
-    <tbody>
-      {currentPerformas && currentPerformas.length > 0 ? (
-        currentPerformas.map((invoice) => (
+        <div className="proforma-created-section">
+  <h4>Previous Proformas</h4>
+  
+  {currentPerformas && currentPerformas.length > 0 ? (
+    <table className="po-table">
+      <thead>
+        <tr>
+          <th>Proforma Id</th>
+          <th>Date</th>
+          <th>Proforma Tag</th>
+          <th>Price</th>
+          <th>PDF Link</th>
+        </tr>
+      </thead>
+      <tbody>
+        {currentPerformas.map((invoice) => (
           <tr key={invoice.performa_number}>
             <td>{invoice.performa_number}</td>
             <td>{new Date(invoice.insertDate).toLocaleDateString()}</td>
             <td>{invoice.proforma_tag}</td>
             <td>
-              {invoice.total_amount && !isNaN(invoice.total_amount)
+            ₹&nbsp;{invoice.total_amount && !isNaN(invoice.total_amount)
                 ? invoice.total_amount.toFixed(2)
                 : "0.00"}
             </td>
             <td>
               <a href={invoice.pdf_filename} target="_blank" rel="noopener noreferrer">
-                <FaFilePdf />
+                Download PDF
               </a>
             </td>
           </tr>
-        ))
-      ) : (
-        <tr>
-          <td colSpan="5">No performas available for this page.</td>
-        </tr>
-      )}
-    </tbody>
-  </table>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <p className="no-po">No Proformas Available</p>
+  )}
+
+
 
   {/* Pagination Controls */}
+  {currentPerformas && currentPerformas.length > 0 && (
   <div className="pagination-controls">
             <button
               onClick={() => handlePageChange(currentPageState - 1)}
@@ -487,6 +546,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
               <FaChevronRight />
             </button>
           </div>
+          )}
 </div>
 </div>
 </div>
