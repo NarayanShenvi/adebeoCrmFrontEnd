@@ -4,7 +4,8 @@ import funnelReducer from './slices/funnelSlice';  // Adjust path
 import customerReducer from "./slices/customerSlice";
 import productReducer from './slices/productSlice';// Import the products slice
 import  quoteReducer  from './slices/quoteSlice';
-import proformaReducer  from './slices/proformaSlice'
+import proformaReducer  from './slices/proformaSlice';
+import purchaseOderReducer from './slices/purchaseOrderSlice';
 
 const rootReducer = combineReducers({
     //data: userReducer
@@ -12,7 +13,8 @@ const rootReducer = combineReducers({
     customers:customerReducer,
     products:productReducer,
     quote: quoteReducer,
-    proformaInvoice:proformaReducer 
+    proformaInvoice:proformaReducer,
+    purchaseOrder:purchaseOderReducer
 })
 
 export default rootReducer;

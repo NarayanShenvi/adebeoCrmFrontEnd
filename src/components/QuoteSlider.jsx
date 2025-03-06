@@ -183,6 +183,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
         unit_price: line.unitPrice,
         sub_total: line.subtotal,
         dr_status: line.drStatus,
+        product_id:line.productId
       })),
       gross_total: finalTotal,
     };

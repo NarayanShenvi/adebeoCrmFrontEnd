@@ -124,6 +124,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
         subtotal: item.sub_total || 0,
         unitPrice: item.unit_price || 0,
         drStatus: item.dr_status || "",
+        productId: item.product_id || 0,  // Ensure product_id is used
       }));
   
       setInvoiceLines(quoteItems);
@@ -242,6 +243,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
       subtotal: item.sub_total || 0,
       unitPrice: item.unit_price || 0,
       drStatus: item.dr_status || "",
+      productId:item.product_id||0
     }));
   
     setInvoiceLines(quoteItems);
@@ -262,6 +264,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
         unit_price: line.unitPrice,
         sub_total: line.subtotal,
         dr_status: line.drStatus,
+        product_id:line.productId
       })),
       gross_total: finalTotal,
     };
