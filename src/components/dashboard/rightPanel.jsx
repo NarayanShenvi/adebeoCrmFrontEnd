@@ -6,7 +6,8 @@ import CustomerSection from '../../components/CustomerSection'; // CustomerSecti
 import { resetNewCustomer } from '../../redux/slices/customerSlice'; // Action to reset new customer
 import ProductSection from '../../components/ProductSection'
 import { fetchProductsAsync } from '../../redux/slices/productSlice';  // Adjust the path accordingly
-
+import  CreatePurchaseOrder from '../purchaseOrderSection';
+import {fetchProformas} from '../../redux/slices/purchaseOrderSlice';
 
 const RightPanel = ({ selectedSection }) => {
   const dispatch = useDispatch();
@@ -31,6 +32,9 @@ const customerLoading = useSelector((state) => state.customer?.loading);
     console.log("Loading customer data...");
   };
 
+  const loadPurchaseOrder =() =>  {
+    dispatch(fetchProformas());
+  }
   useEffect(() => {
     if (selectedSection === 'funnel') {
       getFunnel(); // Load funnel data when 'funnel' section is selected
@@ -38,6 +42,8 @@ const customerLoading = useSelector((state) => state.customer?.loading);
       getCustomer(); // Reset new customer fields when entering customers section
     } else if (selectedSection === 'products') {
       getProducts();
+    } else if (selectedSection === 'purchase_orders'){
+      loadPurchaseOrder();
     }
   }, [selectedSection, dispatch]);
 
@@ -49,6 +55,8 @@ const customerLoading = useSelector((state) => state.customer?.loading);
        return <CustomerSection />;
       case 'products':
         return <ProductSection />;
+      case 'purchase_orders':
+        return <CreatePurchaseOrder/>  
       default:
         return <div className='default_msg'>Select a section from the menu.</div>;
     }
