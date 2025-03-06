@@ -255,8 +255,8 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     const proformaInvoiceData = {
       customer_id: customerId,
       preformaTag: 'PROFORMA_INVOICE_TAG',
-      quote_id: selectedQuoteDetails.quote_id, // Add selected quote_id here
-      quote_tag: selectedQuoteDetails.quote_tag, // Add selected quote_tag here
+      quote_id: selectedQuoteDetails?.quote_id || null, // Add selected quote_id here
+      quote_tag: selectedQuoteDetails?.quote_tag || null, // Add selected quote_tag here
       items: invoiceLines.map(line => ({
         description: line.description || "Sample Product",
         quantity: line.quantity,
