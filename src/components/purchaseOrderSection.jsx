@@ -2,6 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProformas, fetchPurchaseOrders, createPurchaseOrder } from '../redux/slices/purchaseOrderSlice';
 import API from '../config/config';
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { HiDocumentArrowDown } from "react-icons/hi2";
+import { FaSpinner, FaFilePdf } from 'react-icons/fa';
+
 
 const CreatePurchaseOrder = () => {
   const dispatch = useDispatch();
@@ -91,12 +95,37 @@ const CreatePurchaseOrder = () => {
     window.open(`${API}/download-pdf/${orderId}`, '_blank');
   };
 
+
+    // mode and type dropdowns
+
+  const [selectedModes, setSelectedModes] = useState(
+    items.map(() => 'regular') // Default mode to 'renewal' for all items
+  );
+  
+  const [selectedTypes, setSelectedTypes] = useState(
+    items.map(() => 'new') // Default type to 'new' for all items
+  );
+  
+  const handleModeChange = (index, value) => {
+    const updatedModes = [...selectedModes];
+    updatedModes[index] = value;
+    setSelectedModes(updatedModes);
+  };
+  
+  const handleTypeChange = (index, value) => {
+    const updatedTypes = [...selectedTypes];
+    updatedTypes[index] = value;
+    setSelectedTypes(updatedTypes);
+  };
+  
+
   return (
     <div className="purchase-order-container">
-      {/* Top Section */}
+      {/* Top Section */}      
+      <h3>Purchase Orders</h3>
+
       <div className="top-section">
         <div className="select-proforma">
-          <label>Select Proforma:</label>
           <select
             value={selectedProforma}
             onChange={(e) => handleProformaSelect(e.target.value)}
@@ -114,38 +143,38 @@ const CreatePurchaseOrder = () => {
           </select>
         </div>
 
-        <button onClick={handleGeneratePurchaseOrder} disabled={loading}>
-          {loading ? 'Generating Purchase Order...' : 'Generate Purchase Order'}
-        </button>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message-porder">{error}</div>}
 
       {/* Bottom Section: Review Items */}
       {selectedProforma && (
         <div className="bottom-section">
-          <h3>Review Items</h3>
           {items.length === 0 ? (
-            <p>No items available for this Proforma.</p>
+            <p className='no-proforma'>No items available for this Proforma.</p>
           ) : (
-            <table>
+            <table className="p-order-invoice-table">
               <thead>
                 <tr>
                   <th>Product Name</th>
-                  <th>Vendor</th>
+                  <th>Vendor Name</th>
                   <th>Vendor Address</th>
                   <th>Quantity</th>
                   <th>Purchase Price</th>
                   <th>Discount</th>
+                  <th>Mode</th>
+                  <th>Type</th>
                   <th>Total</th>
+                  <th>Tax (18%)</th>
                   <th>Grand Total (with Tax)</th>
                 </tr>
               </thead>
               <tbody>
-                {items.map((item, index) => {
-                  const discountAmount = (discounts[index] / 100) * item.purchase_cost;
-                  const total = item.purchase_cost * item.quantity - discountAmount;
-                  const grandTotal = total + total * 0.18;
+              {items.map((item, index) => {
+      const discountAmount = (discounts[index] / 100) * item.purchase_cost;
+      const total = item.purchase_cost * item.quantity - discountAmount;
+      const taxAmount = total * 0.18;
+      const grandTotal = total + taxAmount;
 
                   return (
                     <tr key={index}>
@@ -153,7 +182,7 @@ const CreatePurchaseOrder = () => {
                       <td>{item.company_name}</td>
                       <td>{item.address}</td>
                       <td>{item.quantity}</td>
-                      <td>{item.purchase_cost}</td>
+                      <td>₹&nbsp;{item.purchase_cost}</td>
                       <td>
                         <input
                           type="number"
@@ -162,8 +191,30 @@ const CreatePurchaseOrder = () => {
                           placeholder="Enter Discount"
                         />
                       </td>
-                      <td>{total.toFixed(2)}</td>
-                      <td>{grandTotal.toFixed(2)}</td>
+                      {/* Mode Dropdown */}
+                      <td>
+  <select
+    value={selectedModes[index] || 'regular'} // Default to 'renewal'
+    onChange={(e) => handleModeChange(index, e.target.value)}
+  >
+    <option value="regular">Regular</option>
+    <option value="lc">LC</option>
+  </select>
+</td>
+
+<td>
+  <select
+    value={selectedTypes[index] || 'new'} // Default to 'new'
+    onChange={(e) => handleTypeChange(index, e.target.value)}
+  >
+    <option value="new">New</option>
+    <option value="renewal">Renewal</option>
+  </select>
+</td>
+
+                      <td>₹&nbsp;{total.toFixed(2)}</td>
+                      <td>₹&nbsp;{taxAmount.toFixed(2)}</td>
+                      <td>₹&nbsp;{grandTotal.toFixed(2)}</td>
                     </tr>
                   );
                 })}
@@ -171,10 +222,32 @@ const CreatePurchaseOrder = () => {
             </table>
           )}
         </div>
+        
       )}
+{selectedProforma && items.length > 0 && (
+  <button onClick={handleGeneratePurchaseOrder} disabled={loading}   className="submit-button-p-order">
+
+{loading ? (
+                      <>
+                        <FaSpinner className="spinner" size={20} title='Submitting...'/>
+                      </>
+                    )  : (
+                      <>
+                        <FaFilePdf  size={24} title='Save & Generate PDF' className='New-p-order'/>
+                      </>
+                    )}
+  </button>
+)}
 
       {/* Pagination for Recent Orders */}
-      <div className="pagination-section">
+     
+
+      {/* Recent Purchase Orders Section */}
+      <div className="recent-orders-section">
+        <h5>Recent Purchase Orders</h5>
+        {recentOrders && recentOrders.length > 0 && (
+
+        <div className="pagination-section">
         {totalPages > 0 && (
           <div>
             <label>Rows per page:</label>
@@ -186,38 +259,19 @@ const CreatePurchaseOrder = () => {
               ))}
             </select>
 
-            <div className="pagination-controls">
-              <button
-                onClick={() => handleRecentOrdersPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => handleRecentOrdersPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-            </div>
+            
           </div>
         )}
       </div>
-
-      {/* Recent Purchase Orders Section */}
-      <div className="recent-orders-section">
-        <h3>Recent Purchase Orders</h3>
+      )}
         {recentOrders && recentOrders.length > 0 ? (
-          <table>
+    <table className="purchase-orders-table">
             <thead>
               <tr>
                 <th>PO Number</th>
                 <th>Customer Name</th>
                 <th>Product Name</th>
-                <th>Vendor</th>
+                <th>Vendor Name</th>
                 <th>Total Amount</th>
                 <th>Status</th>
                 <th>Download PDF</th>
@@ -230,11 +284,11 @@ const CreatePurchaseOrder = () => {
                   <td>{order.customer_name}</td>
                   <td>{order.product_name}</td>
                   <td>{order.vendor}</td>
-                  <td>{order.total_amount.toFixed(2)}</td>
+                  <td> ₹&nbsp;{order.total_amount.toFixed(2)}</td>
                   <td>{order.status}</td>
                   <td>
-                    <button onClick={() => handleDownloadPDF(order._id)}>
-                      Download PDF
+                    <button onClick={() => handleDownloadPDF(order._id)} title='Download PDF'>
+                    <HiDocumentArrowDown  />
                     </button>
                   </td>
                 </tr>
@@ -242,9 +296,28 @@ const CreatePurchaseOrder = () => {
             </tbody>
           </table>
         ) : (
-          <p>No recent orders found.</p>
+          <p className="no-purchase-orders">No Recent Purchase Orders Found.</p>
         )}
       </div>
+      {recentOrders && recentOrders.length > 0 && (
+      <div className="pagination-controls">
+              <button
+                onClick={() => handleRecentOrdersPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <FaChevronLeft />
+              </button>
+              <span className='page-quote'>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => handleRecentOrdersPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+               <FaChevronRight />
+              </button>
+            </div>
+             )}
     </div>
   );
 };

@@ -37,6 +37,7 @@ const ProductSection = () => {
     drStatus: '',  // ✅ Added this
     maxDiscount: '',
     prodisEnabled: false,
+    subscriptionDuration: "1 Year", // Set default value here
   });
   
   const [searchResults, setSearchResults] = useState([]); // For holding search results
@@ -66,6 +67,8 @@ const ProductSection = () => {
         drStatus: '',  // ✅ Added this
         maxDiscount: '',
         prodisEnabled: false,
+        subscriptionDuration: '1 Year', // ✅ Add default value here
+
       });
     }
   }, [mode, productToEdit]);
@@ -77,6 +80,7 @@ const ProductSection = () => {
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
+
 
   // Handle search input change for productName
   const handleSearchChange = async (e) => {
@@ -343,6 +347,9 @@ const ProductSection = () => {
 
            </Col>
            <Col md={6}>
+    {/* Nested row for Sub Area and Area with a smaller gap */}
+    <Row className="g-2">
+           <Col md={6}>
            <Form.Group className="form-group-prod">
               <Form.Label className="required-label">Purchase Cost:</Form.Label>
   <Form.Control
@@ -356,6 +363,21 @@ required
 </Form.Group>
 
            </Col>
+           <Col md={6}>
+           <Form.Group className="form-group-prod">
+              <Form.Label className="required-label">Sales Cost:</Form.Label>
+  <Form.Control
+    type="number"
+    name="salesCost"
+    value={formData.salesCost}
+    onChange={handleChange}
+placeholder='Enter sales cost'
+required
+  />
+</Form.Group>
+</Col>
+</Row>
+</Col>
          </Row>     
          <Row className="g-5">   
            <Col md={6}>
@@ -374,18 +396,17 @@ required
            </Col>
            <Col md={6}>
            <Form.Group className="form-group-prod">
-              <Form.Label className="required-label">Sales Cost:</Form.Label>
+  <Form.Label className="required-label">Max Discount:</Form.Label>
   <Form.Control
     type="number"
-    name="salesCost"
-    value={formData.salesCost}
+    name="maxDiscount"
+    value={formData.maxDiscount}
     onChange={handleChange}
-placeholder='Enter sales cost'
+placeholder='Enter maximum discount'
 required
   />
 </Form.Group>
 
-         
            </Col>
          </Row>     
          <Row className="g-5">   
@@ -408,19 +429,26 @@ required
            </Col>
            <Col md={6}>
            <Form.Group className="form-group-prod">
-  <Form.Label className="required-label">Max Discount:</Form.Label>
-  <Form.Control
-    type="number"
-    name="maxDiscount"
-    value={formData.maxDiscount}
-    onChange={handleChange}
-placeholder='Enter maximum discount'
-required
-  />
+  <Form.Label className="required-label">Duration:</Form.Label>
+  <div className="radio-group-prod">
+    {["1 Month", "3 Months", "6 Months", "1 Year", "2 Years", "3 Years", "Perpetual"].map((duration) => (
+      <div key={duration} className="radio-button-prod">
+        <input
+          type="radio"
+          id={`duration-${duration}`}
+          name="subscriptionDuration"
+          value={duration}
+          onChange={handleChange}
+          checked={formData.subscriptionDuration === duration}
+        />
+        <label htmlFor={`duration-${duration}`}>{duration}</label>
+      </div>
+    ))}
+  </div>
 </Form.Group>
 
-           </Col>
-         </Row>         
+  </Col>
+         </Row> 
          <Form.Group className="form-group-prod mt-4 custom-checkbox" controlId="productEnabled">
   <Form.Check
     type="checkbox"
@@ -430,7 +458,10 @@ required
     onChange={handleChange}
 
   />
-</Form.Group>   
+</Form.Group>         
+         
+
+
         <button type="submit" disabled={loading} className="submit-button-prod">
           {loading ? (
             <>
