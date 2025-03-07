@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '../../config/apiConfig';  // Axios instance
 import API from '../../config/config';       // API URL constants
 
-// Async thunk to fetch customer orders
+// Async thunk to fetch customer orders here
 export const fetchAdebeoOrders = createAsyncThunk(
   'information/fetchAdebeoOrders',
   async ({ customer_ID }) => {

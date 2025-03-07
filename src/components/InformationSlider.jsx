@@ -108,7 +108,7 @@ const InvoiceSlider = ({ customerId, onClose }) => {
                           View Invoice
                         </a>
                       ) : (
-                        'No Invoice Available'
+                        'No Invoice Available here'
                       )}
                     </td>
                   </tr>

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setProductToEdit, updateProductAsync, fetchProductsAsync, addProductAsync } from '../redux/slices/productSlice';
 import axios from "../config/apiConfig"; // Axios instance
 import API from "../config/config"; // API URL
-import { Form } from "react-bootstrap";//changed from here
+import { Form } from "react-bootstrap";//changed from here 
 import { Row, Col } from 'react-bootstrap';
 import { FaCheckToSlot } from "react-icons/fa6";
 import { HiSave } from "react-icons/hi";
