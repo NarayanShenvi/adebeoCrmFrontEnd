@@ -1,72 +1,90 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { MdOutlineCancel } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAdebeoOrders } from '../redux/slices/informationSlice';  // Action to fetch orders
+import { fetchAdebeoOrders } from '../redux/slices/informationSlice';
 
 const InvoiceSlider = ({ customerId, onClose }) => {
   const dispatch = useDispatch();
-  const { orders, status, error } = useSelector((state) => state.information);  // Accessing Redux state for orders
-  const [activeTab, setActiveTab] = useState('');  // State to manage which tab is active
+  const { orders, status, error } = useSelector((state) => state.information);
+  const [activeTab, setActiveTab] = useState('');
+  const sliderRef = useRef(null); // Reference for the slider
 
-  // Debugging log to check customerId when the slider is opened
   useEffect(() => {
     console.log('Slider opened with customerId:', customerId);
 
     if (customerId) {
-      dispatch(fetchAdebeoOrders({ customer_ID: customerId }));  // Dispatch action to fetch orders
+      dispatch(fetchAdebeoOrders({ customer_ID: customerId }));
     }
-  }, [customerId, dispatch]);  // Re-run the effect if customerId changes
+  }, [customerId, dispatch]);
 
-  // Show loading or error message
+  // Close slider when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sliderRef.current && !sliderRef.current.contains(event.target)) {
+        onClose(); // Trigger close if clicked outside
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
+
   if (status === 'loading') {
-    return <div>Loading orders...</div>;
+    return (
+      <div className="invoice-slider show" ref={sliderRef}>
+        <div className="loading-container-invoice">
+          <div className="loading-spinner-invoice"></div>
+          <div className="loading-message-invoice">Loading Orders...</div>
+        </div>
+      </div>
+    );
   }
-
+  
   if (status === 'failed') {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="invoice-slider show" ref={sliderRef}>
+        <div className="error-container-invoice">
+          <div className="error-message-invoice">Error: {error}</div>
+        </div>
+      </div>
+    );
   }
+  
 
-  // Function to handle tab click
   const handleTabClick = (productName) => {
-    setActiveTab(productName); // Set active tab to the clicked product name
+    setActiveTab(productName);
   };
 
   const formatDate = (dateString) => {
-    // Check if the input dateString is an object (MongoDB format)
     if (dateString && dateString.$date) {
-      dateString = dateString.$date;  // Extract the ISO date string from the MongoDB object
+      dateString = dateString.$date;
     }
-  
-    // Now `dateString` should be a valid ISO date string, so convert it to a Date object
     const date = new Date(dateString);
-  
-    // If it's still invalid, return 'Invalid Date'
     if (isNaN(date)) {
       return 'Invalid Date';
     }
-  
-    // Return formatted date as 'day month year' (e.g., "6 Mar 2025")
     return date.toLocaleDateString('en-GB', {
-      day: 'numeric',   // Day of the month (e.g., "6")
-      month: 'short',    // Abbreviated month name (e.g., "Mar")
-      year: 'numeric',   // Full year (e.g., "2025")
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
     });
   };
-  
-  
-    
+
   return (
-    <div className="invoice-slider-overlay">
-      <div className="invoice-slider-container">
-        <button className="close-btn" onClick={onClose}>
-          <MdOutlineCancel />
-        </button>
+    <div className="invoice-slider show" ref={sliderRef}>
+      <div className="invoice-slider-content" >
+        <div className="invoice-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+            <h4>Account Overview of
+            </h4>
+            <p>Customer Name</p>
+          </div>
+          <MdOutlineCancel onClick={onClose} className="close-slider" title="Close" />
+        </div>
 
-        <h3>Information</h3>
-        <p>Customer ID: {customerId}</p>
-
-        {/* Tabs for each product */}
-        <div className="tabs">
+        <div className="tabs dynamic-grid">
           {Object.keys(orders).map((productName) => (
             <button
               key={productName}
@@ -78,10 +96,11 @@ const InvoiceSlider = ({ customerId, onClose }) => {
           ))}
         </div>
 
-        {/* Render the content for the active tab */}
         {activeTab && orders[activeTab] && (
           <div className="tab-content">
-            <table className="orders-table">
+            <h4>Order Details
+            </h4>
+            <table className="invoice-table">
               <thead>
                 <tr>
                   <th>Order Number</th>
@@ -90,7 +109,7 @@ const InvoiceSlider = ({ customerId, onClose }) => {
                   <th>Price</th>
                   <th>Total</th>
                   <th>Status</th>
-                  <th>Invoice PDF</th>
+                  <th>Download Invoice </th>
                 </tr>
               </thead>
               <tbody>
@@ -99,16 +118,17 @@ const InvoiceSlider = ({ customerId, onClose }) => {
                     <td>{order.order_number}</td>
                     <td>{formatDate(order.order_date)}</td>
                     <td>{order.quantity}</td>
-                    <td>{order.purchase_price}</td>
-                    <td>{order.total_amount}</td>
+                    <td>₹&nbsp;{order.purchase_price}</td>
+                    <td>₹&nbsp;{order.total_amount}</td>
                     <td>{order.status}</td>
                     <td>
                       {order.Invoice_PDF_link ? (
                         <a href={order.Invoice_PDF_link} target="_blank" rel="noopener noreferrer">
-                          View Invoice
+                          View Invoice PDF
                         </a>
+                        
                       ) : (
-                        'No Invoice Available here'
+                        'No Invoice Available'
                       )}
                     </td>
                   </tr>

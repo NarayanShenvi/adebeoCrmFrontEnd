@@ -1266,35 +1266,6 @@ html, body {
     font-size: 12px;
   }
 }
-/*INVOICE slider*/
-.invoice-slider-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: flex-end;
-  z-index: 1000;
-}
-
-.invoice-slider-container {
-  width: 50%;
-  height: 100vh;
-  background: white;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.close-btn {
-  align-self: flex-end;
-  font-size: 24px;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
 
 
 /*POInvoice slider*/
@@ -1949,6 +1920,460 @@ html, body {
     max-width: 100%;
   }
 }
+
+
+/* Invoice Slider */
+/* Overlay styling */
+.invoice-slider {
+  position: fixed;
+  top: 0;
+  right: -400px; /* Initially off-screen */
+  width: 50%;
+  height: 100vh;
+  background: white;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+  transition: right 0.8s ease-in-out; /* Adjust transition duration */
+  z-index: 9999;
+  overflow-y: auto;
+  border-left: 2px solid black;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  align-items: center;
+  justify-content: center;
+}
+
+.invoice-slider.show {
+  right: 0; /* Slide in */
+  opacity: 1; /* Fade in */
+
+}
+
+.invoice-slider-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  min-height: 100%;
+}
+
+.close-slider {
+  position: absolute;
+  top: 15px;
+  left: 15px; /* Positioning at top-left */
+  font-size: 17px;
+  cursor: pointer;
+  color: red;
+}
+.close-slider:hover{
+  transform: scale(1.3); /* Slight zoom on hover */
+
+}
+/* Header */
+.invoice-header h4 {
+  text-align: center;
+  color: #07b1b1;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 25px;
+}
+.invoice-header p {
+  text-align: center;
+  color: #037070;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 32px;
+}
+
+/* Centered container for loading and error messages */
+/* Container for loading and error messages */
+.loading-container-invoice,
+.error-container-invoice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Aligns content to the top */
+  padding: 20px;
+  min-height: 100vh; /* Ensure full height of the slider */
+  color: #333;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  box-sizing: border-box;
+}
+
+/* Loading spinner animation */
+.loading-spinner-invoice {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #028618;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+  margin-top: 20px; /* Add space from the top */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+/* Spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading message */
+.loading-message-invoice {
+  font-size: 16px;
+  font-weight: bold;
+  color: #028618;
+  margin-top: 10px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+/* Error message styling */
+.error-message-invoice {
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #f51009; /* Red color for error */
+  background-color: #f8d7da; /* Light red background */
+  border: 1px solid #f5c6cb;
+  padding: 7px;
+  border-radius: 5px;
+  margin: 20px auto;
+  max-width: 400px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  width: 100%;
+  margin-top: 10%;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  max-height: calc(2 * 50px + 10px); /* Max 2 rows with space between */
+  overflow-y: auto; /* Vertical scroll if more than 2 rows */
+  padding-top: 20px;
+  justify-content: center; /* Center items in each row */
+  overflow-x: hidden;
+  max-height: 200px;
+}
+
+/* Tab button styling */
+.tab-button {
+  flex: 1 1 calc(25% - 10px); /* 4 tabs per row, with gap */
+  max-width: calc(25% - 10px);
+  min-width: 80px; /* Prevent shrinking too much */
+  padding: 5px;
+  background-color: rgba(170, 207, 234, 0.87);
+  color: rgba(35, 35, 36, 0.938);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  white-space: normal;
+  text-align: center;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  box-sizing: border-box;
+  font-weight: 900;
+  font-size: calc(6px + 0.5vw); /* Responsive font size */
+}
+
+/* Active tab style */
+.tab-button.active {
+  background-color: #ebe8e849;
+  color: #037070;
+  border: 2px solid #028618;
+}
+
+.tab-button:hover:not(.active) {
+  background-color: #06969688;
+  color: #f4f4f4;
+}
+
+/* Center alignment for fewer than 4 tabs in each row */
+.tabs > *:nth-child(4n+1):nth-last-child(1) {
+  flex: 1 1 100%; /* Center 1 tab */
+}
+
+.tabs > *:nth-child(4n+1):nth-last-child(2),
+.tabs > *:nth-child(4n+2):nth-last-child(1) {
+  flex: 1 1 calc(50% - 10px); /* Evenly space 2 tabs */
+}
+
+.tabs > *:nth-child(4n+1):nth-last-child(3),
+.tabs > *:nth-child(4n+2):nth-last-child(2),
+.tabs > *:nth-child(4n+3):nth-last-child(1) {
+  flex: 1 1 calc(33.33% - 10px); /* Evenly space 3 tabs */
+}
+
+
+/* Table */
+
+a {
+  color: #1890ff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #328f08;
+}
+
+.tab-content {
+  margin-top: 15%;
+  width: 100%;
+  max-width: 100%; /* Remove hard max-width */
+  min-width: 0; /* Allow shrinking */
+  box-sizing: border-box;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+.tab-content h4 {
+  text-align: center;
+  color: #b16707;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 15px;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  max-width: 1200px; /* Adjust as needed */
+  table-layout: fixed; /* Prevents columns from resizing */
+  overflow: hidden;
+}
+
+.invoice-table thead
+{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.invoice-table th, 
+.invoice-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold;
+}
+
+.invoice-table th {
+  background-color: #dfa436;
+  color: aliceblue;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:12px;
+  padding-bottom:12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.invoice-table td {
+  background-color: rgba(231, 236, 155, 0.87);
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  font-size: 12px;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-right: 5px; /* Slight padding for column spacing */
+  color: rgba(34, 31, 31, 0.986);
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+
+.invoice-table th:nth-child(1),
+.invoice-table td:nth-child(1) {
+  width: 160px; /* Fixed width */
+}
+.invoice-table th:nth-child(3),
+.invoice-table td:nth-child(3) 
+{
+  width: 80px;
+}
+
+.invoice-table th:last-child,
+.invoice-table td:last-child {
+  width: 160px;
+}
+
+/* Hover effect for table rows */
+.invoice-table tbody tr:hover {
+  background-color: #c5a205; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+}
+
+
+/* Responsive Styles */
+
+/* 🔍 For Large Tablets and Small Desktops (1024px and below) */
+@media (max-width: 1024px) {
+  .invoice-slider {
+      width: 60%; /* Make slider narrower */
+  }
+
+  .purchase-orders-table,
+  .invoice-table {
+      max-width: 100%;
+      min-width: unset;
+      padding-left: 10px;
+      padding-right: 10px;
+  }
+
+  .tabs {
+      gap: 8px;
+  }
+
+  .tab-button {
+      font-size: calc(8px + 0.5vw);
+      padding: 4px;
+  }
+
+  .invoice-table th, .invoice-table td {
+      max-width: 120px;
+      font-size: 12px;
+      padding: 8px;
+  }
+}
+
+/* 📲 For Tablets and Large Mobile Devices (768px and below) */
+@media (max-width: 768px) {
+  .invoice-slider {
+      width: 80%;
+      right: -100%;
+  }
+
+  .select-proforma select {
+      max-width: 100%;
+      margin-left: 0;
+  }
+
+  .purchase-orders-table,
+  .invoice-table {
+      max-width: 100%;
+      overflow-x: auto;
+      min-width: unset;
+  }
+
+  .tabs {
+      flex-direction: column;
+      gap: 5px;
+  }
+
+  .tab-button {
+      max-width: 100%;
+      font-size: 12px;
+      padding: 5px;
+  }
+
+  .invoice-table th, 
+  .invoice-table td {
+      max-width: 100px;
+      font-size: 11px;
+      padding: 6px;
+  }
+
+  .close-slider {
+      font-size: 20px;
+      top: 10px;
+      left: 10px;
+  }
+}
+
+/* 📱 For Mobile Devices (480px and below) */
+@media (max-width: 480px) {
+  .invoice-slider {
+      width: 100%;
+      right: -100%;
+  }
+
+  .purchase-orders-table,
+  .invoice-table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+  }
+
+  .invoice-slider-content {
+      padding: 10px;
+      align-items: stretch;
+  }
+
+  .select-proforma select {
+      width: 100%;
+      margin-left: 0;
+  }
+
+  .tabs {
+      flex-direction: column;
+      gap: 5px;
+      max-height: none;
+  }
+
+  .tab-button {
+      max-width: 100%;
+      font-size: 10px;
+      padding: 5px;
+  }
+
+  .invoice-table th, 
+  .invoice-table td {
+      max-width: 80px;
+      font-size: 10px;
+      padding: 4px;
+  }
+
+  .invoice-table th:nth-child(1),
+  .invoice-table td:nth-child(1),
+  .invoice-table th:last-child,
+  .invoice-table td:last-child {
+      width: 100px; /* Reduce fixed widths */
+  }
+
+  .error-message-invoice,
+  .loading-message-invoice {
+      font-size: 14px;
+      padding: 5px;
+  }
+
+  .close-slider {
+      font-size: 18px;
+      top: 8px;
+      left: 8px;
+  }
+}
+
 
 /* Customer Section Container */
 /* Customer Section - Make Full Width */
@@ -3053,7 +3478,7 @@ html, body {
   margin-top: 30px;
   gap: 10px; /* Add space between elements if needed */
   margin-bottom: 30px;
-  margin-left: -68%;
+  margin-left: -70%;
 }
 
 .select-proforma select {
@@ -3595,3 +4020,5 @@ select option {
       max-width: 100%;
   }
 }
+
+
