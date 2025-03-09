@@ -7,7 +7,7 @@ html, body {
   height: 100%;
   font-family: "Shippori Mincho B1", "Times New Roman", serif;
   background-color: white;
-  overflow-y: auto; /* Enables vertical scrolling */
+  overflow-y: auto; /* Enables vertical scrolling  */
   overflow-x: hidden;
 }
 

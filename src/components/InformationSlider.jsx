@@ -7,7 +7,7 @@ const InvoiceSlider = ({ customerId, onClose }) => {
   const dispatch = useDispatch();
   const { orders, status, error } = useSelector((state) => state.information);
   const [activeTab, setActiveTab] = useState('');
-  const sliderRef = useRef(null); // Reference for the slider
+  const sliderRef = useRef(null); // Reference for the slider 
 
   useEffect(() => {
     console.log('Slider opened with customerId:', customerId);
