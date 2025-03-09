@@ -8,6 +8,9 @@ import ProductSection from '../../components/ProductSection'
 import { fetchProductsAsync } from '../../redux/slices/productSlice';  // Adjust the path accordingly
 import  CreatePurchaseOrder from '../purchaseOrderSection';
 import {fetchProformas} from '../../redux/slices/purchaseOrderSlice';
+import {fetchCustomerPaymentsAsync} from '../../redux/slices/customerPaymentSlice';
+import CustomerPaymentSection from '../customerPaymentSection';
+import { returnStatement } from '@babel/types';
 
 const RightPanel = ({ selectedSection }) => {
   const dispatch = useDispatch();
@@ -35,17 +38,24 @@ const customerLoading = useSelector((state) => state.customer?.loading);
   const loadPurchaseOrder =() =>  {
     dispatch(fetchProformas());
   }
+
+  const loadCutomerPayments =() =>  {
+    dispatch(fetchCustomerPaymentsAsync());
+  }
   useEffect(() => {
     if (selectedSection === 'funnel') {
       getFunnel(); // Load funnel data when 'funnel' section is selected
      } else if (selectedSection === 'customers') {
       getCustomer(); // Reset new customer fields when entering customers section
-    } else if (selectedSection === 'products') {
-      getProducts();
-    } else if (selectedSection === 'purchase_orders'){
-      loadPurchaseOrder();
-    }
-  }, [selectedSection, dispatch]);
+      } else if (selectedSection === 'products') {
+        getProducts();
+      } else if (selectedSection === 'purchase_orders'){
+        loadPurchaseOrder();
+      }  
+        else if (selectedSection === 'cx_payment'){
+        loadCutomerPayments();
+      }
+    }, [selectedSection, dispatch]);
 
   const renderSection = () => {
     switch (selectedSection) {
@@ -56,7 +66,9 @@ const customerLoading = useSelector((state) => state.customer?.loading);
       case 'products':
         return <ProductSection />;
       case 'purchase_orders':
-        return <CreatePurchaseOrder/>  
+        return <CreatePurchaseOrder/>;
+      case 'cx_payment':
+        return <CustomerPaymentSection/>   
       default:
         return <div className='default_msg'>Select a section from the menu.</div>;
     }
