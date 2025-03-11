@@ -2063,8 +2063,8 @@ html, body {
 
 /* Tab button styling */
 .tab-button {
-  flex: 1 1 calc(25% - 10px); /* 4 tabs per row, with gap */
-  max-width: calc(25% - 10px);
+  flex: 1 1 calc(20% - 10px); /* 5 tabs per row */
+  max-width: calc(20% - 10px);
   min-width: 80px; /* Prevent shrinking too much */
   padding: 5px;
   background-color: rgba(170, 207, 234, 0.87);
@@ -2080,7 +2080,7 @@ html, body {
   font-family: "Shippori Mincho B1", "Times New Roman", serif;
   box-sizing: border-box;
   font-weight: 900;
-  font-size: calc(6px + 0.5vw); /* Responsive font size */
+  font-size: calc(5px + 0.5vw); /* Responsive font size */
 }
 
 /* Active tab style */
@@ -2095,20 +2095,27 @@ html, body {
   color: #f4f4f4;
 }
 
-/* Center alignment for fewer than 4 tabs in each row */
-.tabs > *:nth-child(4n+1):nth-last-child(1) {
+/* Center alignment for fewer than 5 tabs in each row */
+.tabs > *:nth-child(5n+1):nth-last-child(1) {
   flex: 1 1 100%; /* Center 1 tab */
 }
 
-.tabs > *:nth-child(4n+1):nth-last-child(2),
-.tabs > *:nth-child(4n+2):nth-last-child(1) {
+.tabs > *:nth-child(5n+1):nth-last-child(2),
+.tabs > *:nth-child(5n+2):nth-last-child(1) {
   flex: 1 1 calc(50% - 10px); /* Evenly space 2 tabs */
 }
 
-.tabs > *:nth-child(4n+1):nth-last-child(3),
-.tabs > *:nth-child(4n+2):nth-last-child(2),
-.tabs > *:nth-child(4n+3):nth-last-child(1) {
+.tabs > *:nth-child(5n+1):nth-last-child(3),
+.tabs > *:nth-child(5n+2):nth-last-child(2),
+.tabs > *:nth-child(5n+3):nth-last-child(1) {
   flex: 1 1 calc(33.33% - 10px); /* Evenly space 3 tabs */
+}
+
+.tabs > *:nth-child(5n+1):nth-last-child(4),
+.tabs > *:nth-child(5n+2):nth-last-child(3),
+.tabs > *:nth-child(5n+3):nth-last-child(2),
+.tabs > *:nth-child(5n+4):nth-last-child(1) {
+  flex: 1 1 calc(25% - 10px); /* Evenly space 4 tabs */
 }
 
 
@@ -2236,11 +2243,10 @@ a:hover {
 
 
 /* Responsive Styles */
-
 /* 🔍 For Large Tablets and Small Desktops (1024px and below) */
 @media (max-width: 1024px) {
   .invoice-slider {
-      width: 60%; /* Make slider narrower */
+      width: 60%;
   }
 
   .purchase-orders-table,
@@ -2252,12 +2258,16 @@ a:hover {
   }
 
   .tabs {
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
+      justify-content: center;
   }
 
   .tab-button {
+      flex: 1 1 calc(20% - 10px); /* 5 tabs per row */
       font-size: calc(8px + 0.5vw);
-      padding: 4px;
+      padding: 6px;
   }
 
   .invoice-table th, .invoice-table td {
@@ -2287,12 +2297,14 @@ a:hover {
   }
 
   .tabs {
-      flex-direction: column;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 5px;
   }
 
   .tab-button {
-      max-width: 100%;
+      flex: 1 1 calc(33.33% - 10px); /* 3 tabs per row */
       font-size: 12px;
       padding: 5px;
   }
@@ -2336,13 +2348,14 @@ a:hover {
   }
 
   .tabs {
-      flex-direction: column;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 5px;
-      max-height: none;
   }
 
   .tab-button {
-      max-width: 100%;
+      flex: 1 1 calc(50% - 10px); /* 2 tabs per row */
       font-size: 10px;
       padding: 5px;
   }
@@ -2358,7 +2371,7 @@ a:hover {
   .invoice-table td:nth-child(1),
   .invoice-table th:last-child,
   .invoice-table td:last-child {
-      width: 100px; /* Reduce fixed widths */
+      width: 100px;
   }
 
   .error-message-invoice,
@@ -2373,6 +2386,7 @@ a:hover {
       left: 8px;
   }
 }
+
 
 
 /* Customer Section Container */
@@ -4021,4 +4035,388 @@ select option {
   }
 }
 
+  /* Customer Payment Section */
 
+.customer-payment-section {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  max-height: 100vh; 
+  background-color: #feffff;
+  margin-left: 250px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.customer-payment-section h2 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 4%;
+  margin-bottom: 4%;
+}
+
+.payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Ensure columns are of fixed size */
+  overflow: hidden;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  min-width: 1100px; /* Ensures form doesn't shrink too much */
+  margin-bottom: 10px;
+  max-width: 1300px; /* Adjust as needed */
+}
+
+.payments-table thead
+{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.payments-table th, .payments-table td {
+  padding: 8px;
+  text-align: left;
+  border: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+}
+
+.payments-table th {
+  color: rgb(255, 255, 255);
+  text-align: left;
+  font-size: 13px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  word-wrap: break-word; 
+  white-space: normal; /* Allow text to wrap */
+  overflow: hidden;
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+  position: sticky;
+  top: 0;
+  background-color: #069696;
+  z-index: 2;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+}
+.payments-table td {
+  white-space: nowrap;  /* Ensures content stays in one line */
+  word-wrap: break-word; /* Ensure long text wraps */
+  color: #161616da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 13px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  background-color: rgba(170, 207, 234, 0.87);
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+}
+.payments-table input {
+  background: rgba(206, 234, 238, 0.87) !important;
+  border: 1px solid #8bcfcf !important;
+  color:  #161616da !important;
+  padding-left: 10px;
+  width: 100%;
+  max-width: 95px; /* Adjust this to control the width of the dropdown */
+  height: 34px;
+  border-radius: 4px;
+  outline: none;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  font-size: 12px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  cursor: pointer;
+}
+
+.payments-table input:focus {
+  border-color: rgba(60, 159, 230, 0.89)!important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795)!important;
+}
+
+.payments-table textarea {
+  background: rgba(206, 234, 238, 0.87) !important;
+  border: 1px solid #8bcfcf !important;
+  color:  #161616da !important;
+  padding-left: 10px;
+  padding-top: 9px;
+  width: 100%;
+  max-width: 190px; /* Adjust this to control the width of the dropdown */
+  height: 58px;
+  border-radius: 4px;
+  outline: none;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  font-size: 12px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  cursor: pointer;
+  overflow: hidden; /* Hides scrollbar until content exceeds textarea size */
+}
+.payments-table textarea:focus {
+  border-color: rgba(60, 159, 230, 0.89)!important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795)!important;
+}
+
+.payments-table th:nth-child(1),
+.payments-table td:nth-child(1) {
+  width: 150px; /* Fixed width */
+}
+.payments-table th:nth-child(2),
+.payments-table td:nth-child(2) {
+  width: 130px; /* Fixed width */
+}
+
+.payments-table th:nth-child(3),
+.payments-table td:nth-child(3) {
+  width: 130px; /* Fixed width */
+}
+.payments-table th:nth-child(4),
+.payments-table td:nth-child(4) {
+  width: 100px; /* Fixed width */
+}
+.payments-table th:nth-child(5),
+.payments-table td:nth-child(5) {
+  width: 110px; /* Fixed width */
+}
+
+.payments-table th:nth-child(6),
+.payments-table td:nth-child(6) {
+  width: 130px; /* Fixed width */
+}
+.payments-table th:nth-child(7),
+.payments-table td:nth-child(7) {
+  max-width: 300px; /* Fixed width */
+}
+.payments-table th:nth-child(8),
+.payments-table td:nth-child(8) {
+  width: 100px; /* Fixed width */
+}
+.payments-table th:nth-child(10),
+.payments-table td:nth-child(10) {
+  width: 50px; /* Fixed width */
+}
+
+.payments-table tbody tr:hover {
+  background-color: #05afc5; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+}
+.payments-table .submit-icon {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 19px;
+  color: #28a745;
+  transition: color 0.3s ease-in-out;
+  margin-left: 18px;
+}
+
+.payments-table .submit-icon:hover {
+  color: #288504;
+  transform: scale(1.4) !important; /* Slight zoom on hover */
+}
+.submit-icon.disabled {
+  color: gray;
+  cursor: not-allowed;
+  pointer-events: auto; /* Ensures alert works even when disabled */
+}
+.submit-icon.disabled:hover {
+  color: gray;
+  cursor: not-allowed;
+  pointer-events: auto; /* Ensures alert works even when disabled */
+  transform: scale(1.4) !important; /* Slight zoom on hover */
+}
+.payments-table .action-icon-payment {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 19px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+  margin-left: 4px;
+}
+
+.payments-table .action-icon-payment:hover {
+  color: #288504;
+  transform: scale(1.4) !important; /* Slight zoom on hover */
+}
+a {
+  color: #1890ff;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-size: 12px;
+}
+
+a:hover {
+  color: #328f08;
+}
+
+
+.loading-container-pinvoice {
+  position: fixed; /* Fix it to the viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  z-index: 9999; /* Ensure it appears above everything */
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.loading-spinner-pinvoice {
+  border: 6px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #028618;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1.5s linear infinite; /* Slightly slower spin */
+  margin-left: 10%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.loading-message-pinvoice {
+  font-size: 18px;
+  font-weight: bold;
+  color: #028618;
+  margin-top: 15px;
+  text-align: center;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.no-payments-message {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #db6c03;
+  text-align:center;
+  margin-top: 10%;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  margin-top: 30px;
+}
+
+.pagination-controls button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* 🔹 Responsive Design for Smaller Screens */
+@media (max-width: 1024px) {
+  .customer-payment-section {
+    max-width: 100%;
+    margin-left: 0;
+    padding: 10px;
+  }
+
+  .payments-table {
+    min-width: 800px;
+  }
+
+  .payments-table th, 
+  .payments-table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .customer-payment-section {
+    padding: 10px;
+  }
+
+  .payments-table {
+    min-width: 700px;
+  }
+
+  .payments-table th, 
+  .payments-table td {
+    font-size: 11px;
+    padding: 5px;
+  }
+}
+
+/* 🔹 Further Adjustments for Very Small Screens (Phones) */
+@media (max-width: 480px) {
+  .customer-payment-section {
+    padding: 5px;
+  }
+
+  .payments-table {
+    min-width: 100%;
+  }
+
+  .payments-table th, 
+  .payments-table td {
+    font-size: 10px;
+    padding: 6px;
+  }
+
+  /* Compact Pagination */
+  .pagination-controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .pagination-controls button {
+    font-size: 14px;
+  }
+
+  .pagination-controls span {
+    font-size: 12px;
+  }
+}

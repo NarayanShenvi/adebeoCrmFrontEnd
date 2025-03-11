@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCustomerPaymentsAsync, processCustomerPaymentAsync } from '../redux/slices/customerPaymentSlice';  // Adjust the path as necessary
+import { FaCheckCircle } from "react-icons/fa"; // changed---Import the check-circle icon 
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { RiInformation2Fill } from "react-icons/ri";
 
 const CustomerPaymentSection = () => {
   const dispatch = useDispatch();
@@ -31,10 +34,16 @@ const CustomerPaymentSection = () => {
     }
   }, [payments]);
 
-  // Guard to prevent showing errors during loading phase
+  // Guard to prevent showing errors during loading phase ---- CHANGES MADE
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-container-pinvoice">
+        <div className="loading-spinner-pinvoice"></div>
+        <p className="loading-message-pinvoice"> Please wait...</p>
+      </div>
+    );
   }
+  
 
   // Handle errors gracefully only if there's no valid payment data
   if (error && payments.length === 0 && !loading) {
@@ -87,94 +96,109 @@ const CustomerPaymentSection = () => {
       <h2>Customer Payments</h2>
 
       {/* Display the payment records in a table */}
-      <table className="payments-table">
-        <thead>
-          <tr>
-            <th>Invoice Number</th>
-            <th>Total Amount</th>
-            <th>Amount Due</th>
-            <th>Invoice Date</th>
-            <th>Status</th>
-            <th>Paid Amount</th>
-            <th>Comment</th> {/* New column for the comment */}
-            <th>Actions</th>
-            <th>Invoice PDF</th>
-          </tr>
-        </thead>
-        <tbody>
-          {editablePayments.length > 0 ? (
-            editablePayments.map((payment, index) => (
-              <tr key={payment.invoice_number}>
-                <td>{payment.invoice_number}</td>
-                <td>{payment.total_amount}</td>
-                <td>{payment.amount_due}</td>
-                <td>{new Date(payment.invoice_date).toLocaleDateString()}</td>
-                <td>{payment.payment_status}</td>
-                <td>
-                  <input
-                    type="number"
-                    value={payment.paid_amount}
-                    onChange={(e) => handlePaidAmountChange(index, e.target.value)}
-                    disabled={payment.payment_status === 'Completed'}
-                  />
-                </td>
-                <td>
-                  <textarea
-                    value={payment.comment}
-                    onChange={(e) => handleCommentChange(index, e.target.value)}
-                    placeholder="Enter payment details (max 50 words)"
-                    maxLength={250}  // Limit to 50 words (approx. 250 characters)
-                    rows={3}
-                    disabled={payment.payment_status === 'Completed'}
-                  />
-                </td>
-                <td>
-                  {payment.payment_status === 'Pending' && (
-                    <button onClick={() => handleSubmit(index, payment)}>
-                      Submit
-                    </button>
-                  )}
-                </td>
-                <td>
-                  {payment.pdf_filename ? (
-                    <a href={payment.pdf_filename} target="_blank" rel="noopener noreferrer">
-                      View Invoice PDF
-                    </a>
-                  ) : (
-                    'No PDF Available'
-                  )}
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="9">No payments found.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      {/* Show "No payments found" outside the table if there are no payments */}
+{editablePayments.length === 0 ? (
+  <div className="no-payments-message">No Payments Found.</div>
+) : (
+  <table className="payments-table">
+    <thead>
+      <tr>
+        <th>Invoice Number</th>
+        <th>Total Amount</th>
+        <th>Amount Due</th>
+        <th>Invoice Date</th>
+        <th>Status</th>
+        <th>Paid Amount</th>
+        <th>Comment</th>
+        <th>Actions</th>
+        <th>Download Invoice PDF</th>
+        <th>Info</th> {/* New Info column */}
+
+      </tr>
+    </thead>
+    <tbody>
+      {editablePayments.map((payment, index) => (
+        <tr key={payment.invoice_number}>
+          <td>{payment.invoice_number}</td>
+          <td>{payment.total_amount}</td>
+          <td>{payment.amount_due}</td>
+          <td>{new Date(payment.invoice_date).toLocaleDateString()}</td>
+          <td>{payment.payment_status}</td>
+          <td>
+            <input
+              type="number"
+              value={payment.paid_amount}
+              onChange={(e) => handlePaidAmountChange(index, e.target.value)}
+              disabled={payment.payment_status === "Completed"}
+            />
+          </td>
+          <td>
+            <textarea
+              value={payment.comment}
+              onChange={(e) => handleCommentChange(index, e.target.value)}
+              placeholder="Enter payment details (max 50 words)"
+              maxLength={250}
+              rows={3}
+              disabled={payment.payment_status === "Completed"}
+            />
+          </td>
+          <td>
+  {payment.payment_status === "Pending" && (
+    <FaCheckCircle
+      title="Submit"
+      className={`submit-icon ${payment.amount_due === 0 ? "disabled" : ""}`}
+      onClick={() => {
+        if (payment.amount_due === 0) {
+          alert("Payment already completed. No submission required.");
+        } else {
+          handleSubmit(index, payment);
+        }
+      }}
+    />
+  )}
+</td>
+
+          <td>
+            {payment.pdf_filename ? (
+              <a
+                href={payment.pdf_filename}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Invoice PDF
+              </a>
+            ) : (
+              "No PDF Available"
+            )}
+          </td>
+          <td>
+        
+          <RiInformation2Fill   title=" Payment Information" className="action-icon-payment"   // Pass customer ID
+               />
+        </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
 
       {/* Pagination controls */}
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
+      {/* Show Pagination only if there are payments */}
+      {totalPages > 1 && editablePayments.length > 0 && (
+          <div className="pagination-controls">
+            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+              <FaChevronLeft />
+            </button>
 
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
+            <span className="page-quote">
+              Page {currentPage} of {totalPages}
+            </span>
 
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
+            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+              <FaChevronRight />
+            </button>
+          </div>
       )}
     </div>
   );
