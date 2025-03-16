@@ -11,12 +11,13 @@ const QuoteSlider = ({ customerId, onClose }) => {
   const dispatch = useDispatch();
   const { products } = useSelector((state) => state.products); // List of products from Redux
   const quoteState = useSelector((state) => state.quote); // Getting entire quote state
-  const { loading, quotes, error, currentPage, totalPages } = quoteState || {}; // Safe destructuring
+  const { loading, quotes, error, currentPage, totalPages,quoteCreationResponse } = quoteState || {}; // Safe destructuring
 
   const sliderRef = useRef(null); // Reference for the slider container changes made
 
   const [quoteLines, setQuoteLines] = useState([{
     productId: '',
+    description:'',
     quantity: 1,
     discount: 0,
     subtotal: 0,
@@ -33,7 +34,15 @@ const QuoteSlider = ({ customerId, onClose }) => {
   // Pagination state for lower section
   const [currentPageState, setCurrentPageState] = useState(1);
   const itemsPerPage = 5; // Number of items to display per page
-
+  useEffect(() => {
+    if (quoteCreationResponse && quoteCreationResponse.message) {
+      const timer = setTimeout(() => {
+        dispatch({ type: 'quote/clearSuccessMessage' }); // Dispatch an action to reset the success message if you want
+      }, 5000);  // Hide after 5 seconds
+      return () => clearTimeout(timer);  // Cleanup timer if component unmounts
+    }
+  }, [quoteCreationResponse, dispatch]);  // This will trigger when quoteCreationResponse updates
+  
   useEffect(() => {
     // Fetch products from the backend when the component mounts
     dispatch(fetchProductsAsync());
@@ -43,6 +52,13 @@ const QuoteSlider = ({ customerId, onClose }) => {
       dispatch(fetchQuotesAsync({ page: currentPageState, customer_id: customerId }));
     }
   }, [dispatch, currentPageState, customerId]);
+
+  useEffect(() => {
+    console.log("Updated quote creation response:", quoteCreationResponse); // Add this log
+    if (quoteCreationResponse) {
+      alert(`Quote created successfully! PDF link: ${quoteCreationResponse.pdf_link}`);
+    }
+  }, [quoteCreationResponse]); // This will trigger when quoteCreationResponse updates
   
 
   const handleLineChange = (index, field, value) => {
@@ -55,6 +71,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
         const quantity = parseInt(newQuoteLines[index].quantity, 10) || 1;
         let discount = parseFloat(newQuoteLines[index].discount) || 0;
         const price = parseFloat(product.salesCost) || 0;
+        const description = product.ProductDisplay;
   
         const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
         newQuoteLines[index].discount = validDiscount;
@@ -64,6 +81,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
   
         newQuoteLines[index].unitPrice = unitPrice;
         newQuoteLines[index].subtotal = subtotal;
+        newQuoteLines[index].description = description;
       }
     }
   
@@ -77,6 +95,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
       ...quoteLines,
       {
         productId: '',
+        description:'',
         quantity: 1,
         discount: 0,
         subtotal: 0,
@@ -95,7 +114,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
       const quantity = parseInt(newQuoteLines[index].quantity, 10) || 1;
       let discount = parseFloat(newQuoteLines[index].discount) || 0;
       const price = parseFloat(product.salesCost) || 0;
-
+      const description = product.ProductDisplay || '';
       const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
 
       const unitPrice = price;
@@ -103,6 +122,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
 
       newQuoteLines[index].unitPrice = unitPrice;
       newQuoteLines[index].subtotal = subtotal;
+      newQuoteLines[index].description = description;
     }
 
     setQuoteLines(newQuoteLines);
@@ -175,9 +195,9 @@ const calculateFinalTotal = (totalAmount, discount) => {
   
     const quoteData = {
       customer_id: customerId,
-      quoteTag: 'QUOTE_TAG',
+      quoteTag: `QUOTE_TAG-${quoteLines.map(line => line.productCode).join('-')}`, // Adding productCode to the quoteTag
       items: quoteLines.map(line => ({
-        description: "Sample Product",
+        description: line.description,
         quantity: line.quantity,
         discount: line.discount,
         unit_price: line.unitPrice,
@@ -234,7 +254,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
                   <option value="" disabled>Select a product</option>
                   {products.map((product) => (
                     <option key={product._id} value={product._id}>
-                      {product.productName} ({product.productCode})
+                      {product.productName} ({product.productCode}) - {product.ProductDisplay}
                     </option>
                   ))}
                 </select>
