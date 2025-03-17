@@ -525,9 +525,9 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                 : "0.00"}
             </td>
             <td>
-              <a href={invoice.pdf_filename} target="_blank" rel="noopener noreferrer">
-                Download PDF
-              </a>
+            <a href={`${invoice.base_url}${invoice.pdf_link}`} target="_blank" rel="noopener noreferrer">
+            Download PDF
+            </a>
             </td>
           </tr>
         ))}
