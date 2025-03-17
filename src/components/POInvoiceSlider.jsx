@@ -132,6 +132,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     }
   }, [selectedQuoteDetails]);
 
+  //changes made from here 
   const handleLineChange = (index, field, value) => {
     const newInvoiceLines = [...invoiceLines];
     newInvoiceLines[index][field] = value;
@@ -153,7 +154,28 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
         newInvoiceLines[index].subtotal = subtotal;
       }
     }
-  
+    
+    if (field === 'discount') {
+      const product = products.find(product => product._id === newInvoiceLines[index].productId);
+
+      if (!product) {
+          alert("💡 Please select a product first, before entering a discount!");
+          return; // Prevents further execution
+      }
+
+      let discount = parseFloat(value) || 0;
+      const maxDiscount = parseFloat(product.maxDiscount) || 100; 
+
+      if (discount < 0) {
+          alert("⛔ Discount cannot be negative!");
+          discount = 0;
+      } else if (discount > maxDiscount) {
+          alert(`🚫 Maximum discount allowed is ${maxDiscount}₹!`);
+          discount = maxDiscount;
+      }
+
+      newInvoiceLines[index].discount = discount;
+  }
     setInvoiceLines(newInvoiceLines);
     updateTotal(newInvoiceLines);
   };
@@ -218,7 +240,31 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
       updateTotal(newInvoiceLines);
     }
   };
-
+  const handleOverallDiscountChange = (e) => {
+    let discountValue = parseFloat(e.target.value) || 0;
+    const maxOverallDiscount = 100; // Maximum allowed discount
+  
+    // Check if at least one product is selected
+    const hasProduct = invoiceLines.some(line => line.productId);
+  
+    if (!hasProduct) {  
+        alert("💡 Please select a product first, before entering a overall discount!");
+        return;
+    }
+  
+    if (discountValue < 0) {
+        alert("⛔ Overall Discount cannot be negative!");
+        discountValue = 0;
+    } else if (discountValue > maxOverallDiscount) {
+        alert(`🚫 Maximum allowed Overall Discount is ${maxOverallDiscount}₹!`);
+        discountValue = maxOverallDiscount;
+    }
+  
+    setOverallDiscount(discountValue);
+    calculateFinalTotal(total, discountValue);
+  };
+  //to here -- bugs free
+  
   const handleDeleteProductRow = (index) => {
     const newInvoiceLines = invoiceLines.filter((_, i) => i !== index);
     setInvoiceLines(newInvoiceLines);
@@ -375,16 +421,19 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                       </select>
                     )}
                   </td>
+                  {/*CHANGES MADE */}
                   <td>
                     {proformaType === "existing" ? (
                       <span>{line.quantity}</span>
                     ) : (
                       <input 
                       className="po-quantity-input"
-                        type="number" 
-                        min="1"
-                        value={line.quantity} 
-                        onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
+                      type="number"
+                      value={line.quantity || ""} // Allows placeholder to show when empty
+                      onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
+                      min="1"
+                      placeholder={`Quantity`} // Dynamic placeholder
+                      required
                       />
                     )}
                   </td>
@@ -392,15 +441,20 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                     {proformaType === "existing" ? (
                       <span>{line.discount}</span>
                     ) : (
-                      <input 
-                      className="po-quantity-input"
-                      min="0"
-                        type="number" 
-                        value={line.discount} 
-                        onChange={(e) => handleLineChange(index, 'discount', e.target.value)}
-                      />
+                      <input
+  type="number"
+  className="po-quantity-input"
+  value={line.discount || ""}  // Shows placeholder when empty
+  onChange={(e) => handleLineChange(index, 'discount', e.target.value)}
+  min="0"
+  max={products.find(product => product._id === line.productId)?.maxDiscount || 100}
+  placeholder={`Discount`}
+  required
+/>
                     )}
                   </td>
+                  
+{/*TO HERE - bugs free */}
                    {/* New DR Status Column */}
                    <td>
   {proformaType === "existing" ? (
@@ -451,16 +505,18 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
             <span className="amount"> ₹&nbsp;{total.toFixed(2)}</span>
           </div>
           <div>
+                              {/*CHANGES MADE */}
             <input 
               className="amount"
               type="number" 
               step="0.01"
               value={overallDiscount === 0 ? '' : overallDiscount}  
-              onChange={(e) => setOverallDiscount(parseFloat(e.target.value)|| 0)}
+              onChange={handleOverallDiscountChange}            
               disabled={proformaType === "existing"}
               placeholder="Enter Overall Discount"
-            />
+            />                  {/*TO HERE - bugs free */}
           </div>
+          
           <div>
             <label className="label">Total:</label>
             <span className="amount"> ₹&nbsp;{(total - overallDiscount).toFixed(2)}</span> 

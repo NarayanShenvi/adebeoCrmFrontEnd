@@ -24,6 +24,7 @@ import { MdOutlineCancel } from "react-icons/md";
 import { HiSave } from "react-icons/hi";
 import { fetchProductsAsync } from '../redux/slices/productSlice'; // Import fetchProductsAsync
 import Select from 'react-select'; // Import react-select
+import {  FaFaceMeh  } from "react-icons/fa6";//chages made- bugs free
 
 
 
@@ -36,6 +37,9 @@ const CustomerSection = ({ customer}) => {
   const error = useSelector((state) => state.customers?.error || null);
   const successMessage = useSelector((state) => state.customers?.successMessage || '');
   const selectedCustomer = useSelector((state) => state.customers?.selectedCustomer || null);
+  
+  const commentsRef = useRef(null); //changes made - bugs free
+    const addCommentRef = useRef(null);//changes made - bugs free
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -326,25 +330,56 @@ const fetchCommentsIfNeeded = (customerId) => {
   }
 };
 
-const handleShowComments = (customerId) => {
-  dispatch(setModalState({ selectedShowCommentsCustomerId: customerId, showComments: true }));
-  fetchCommentsIfNeeded(customerId);
-};
-const handleAddComment = (customerId) => {
-  dispatch(setModalState({
-      addComment: true,  // Open the Add Comment modal
-      selectedAddCommentCustomerId: customerId, // Store the selected customer ID
-  }));
-};
+  // Close modal when clicking outside changes made from here
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (modalState.showComments && commentsRef.current && !commentsRef.current.contains(event.target)) {
+      handleCloseCommentsModal();
+    }
+    if (modalState.addComment && addCommentRef.current && !addCommentRef.current.contains(event.target)) {
+      handleCloseAddCommentModal();
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [modalState.showComments, modalState.addComment]);
 
 
-const handleCloseCommentsModal = () => {
-  dispatch(setModalState({ showComments: false }));
-};
-
-const handleCloseAddCommentModal = () => {
-  dispatch(setModalState({ addComment: false }));
-};
+  const handleShowComments = (customerId) => {
+    dispatch(setModalState({ 
+      selectedShowCommentsCustomerId: customerId, 
+      showComments: true, 
+      addComment: false  // Ensure "Add Comment" is closed
+    }));
+    fetchCommentsIfNeeded(customerId);
+  };
+  
+  const handleAddComment = (customerId) => {
+    dispatch(setModalState({ 
+      selectedAddCommentCustomerId: customerId, 
+      addComment: true, 
+      showComments: false  // Ensure "View Comments" is closed
+    }));
+  };
+  
+  const handleCloseCommentsModal = () => {
+    dispatch(setModalState({
+      selectedShowCommentsCustomerId: null, // Reset selected customer
+      showComments: false, 
+      addComment: false // Ensure add comment is also closed
+    }));
+  };
+  
+  const handleCloseAddCommentModal = () => {
+    dispatch(setModalState({
+      selectedAddCommentCustomerId: null, // Reset selected customer
+      addComment: false,
+      showComments: false // Ensure view comments is also closed
+    }));
+  };
+  
+  // to here - bugs free
 
 const handleCommentChange = (e) => {
   setNewComment(e.target.value);
@@ -758,56 +793,53 @@ const handleSubmitComment = () => {
       </Form>
       
 
-   {/* Show Comments Modal */}
-{modalState.showComments && (
-    <div className="comments-modal-customer">
-        <h4>Customer Comments</h4>
-        {Array.isArray(customerComments) && customerComments.length > 0 ? (
-            <>
-                <p className='displaycomments-customer'>Displaying {customerComments.length} comments</p>
-                <textarea
-                    readOnly
-                    rows={5}
-                    value={customerComments.map(comment => (
-                        `${comment.name}: ${comment.text}\nDate: ${new Date(comment.date).toLocaleString()}\n`
-                    )).join("\n")} 
-                />
-            </>
-        ) : (
-            <p className='nocomments-customer'>No comments available...</p>
-        )}
-        <MdOutlineCancel 
-            onClick={handleCloseCommentsModal} 
-            title='Cancel' 
-            className='cancelcomment-customer'
-        />
-    </div>
-)}
-
-{/* Add Comment Modal */}
-{modalState.addComment && (
-    <div className="comment-edit-modal-customer">
-        <h4>Add Comment</h4>
-        <textarea
-            value={newComment}
-            onChange={handleCommentChange}
-            placeholder="Enter your comment here..."
-            rows="5"
-        />
-        <div>
-            <MdOutlineCancel 
-                onClick={handleCloseAddCommentModal} 
-                title='Cancel' 
-                className='cancelcomment-customer'
-            />
-            <HiSave 
-                onClick={handleSubmitComment} 
-                title='Submit' 
-                className='submitcomment-customer'
-            />
-        </div>
-    </div>
-)}
+         {/* Show Comments Modal */}
+         {/* changes made from Show Comments Modal */}
+   {modalState.showComments && !modalState.addComment && (
+     <div className="comments-modal-container-customer" ref={commentsRef}>
+       <div className="comments-modal-customer" >
+         <h4>Customer Comments</h4>
+         {Array.isArray(customerComments) && customerComments.length > 0 ? (
+           <>
+             <p className='displaycomments-customer'>Displaying {customerComments.length} comments</p>
+             <textarea
+               readOnly
+               rows={5}
+               value={customerComments.map((comment) => (
+                 `${comment.name}: ${comment.text}\nDate: ${new Date(comment.date).toLocaleString()}\n`
+               )).join("\n")}
+             />
+           </>
+         ) : (
+           <p className='nocomments-customer'>No comments available... <FaFaceMeh /></p>
+         )}
+         <div className='cancel-customer'>
+           <MdOutlineCancel onClick={handleCloseCommentsModal} title='Cancel' className='cancelcomment-customer'/>
+         </div>
+       </div>
+     </div>
+   )}
+   
+   {/* Add Comment Modal */}
+   {modalState.addComment && !modalState.showComments && (
+     <div className="comment-edit-modal-container-customer"  ref={addCommentRef}>
+       <div className="comment-edit-modal-customer">
+         <h4>Add Comment</h4>
+         <textarea
+           value={newComment}
+           onChange={handleCommentChange}
+           placeholder="Enter your comment here..."
+           rows="5"
+         />
+         <div>
+           <MdOutlineCancel onClick={handleCloseAddCommentModal} title='Cancel' className='cancelcomment-customer'/>
+           <HiSave onClick={handleSubmitComment} title='Submit' className='submitcomment-customer'/>
+         </div>
+         <p className="alert-box-customer">Comment saved successfully! ✅</p>
+       </div>
+     </div>
+   )}
+   {/* to here Add Comment Modal -- bugs free */}
 
 
     </div>
