@@ -187,7 +187,36 @@ export const {
 } = funnelSlice.actions;
 export default funnelSlice.reducer;
 
-// Load funnel data with pagination
+// // Load funnel data with pagination
+// export const loadFunneldata = (page = 1, limit = 500, companyName = "") => {
+//   return async (dispatch) => {
+//     dispatch(setLoading(true));
+//     try {
+//       const response = await axios.get(`${API}/funnel_users`, {
+//         params: { page, limit, companyName },
+//       });
+
+//       // Ensure you are correctly handling the response with total_records and total_pages
+//       if (response.data && response.data.data) {
+//         const { data, total_records, total_pages } = response.data;
+
+//         // Dispatch the data and pagination information to the store
+//         dispatch(funnelCustomers({
+//           data,
+//           totalRecords: total_records,  // total records are the same for all pages
+//           totalPages: total_pages,  // total pages based on the limit and total records
+//         }));
+
+//         // Set the current page and total pages in the store for pagination
+//         dispatch(setPagination({ page, totalPages: total_pages }));
+//       }
+//     } catch (err) {
+//       dispatch(setError(err.message || "Error loading funnel data"));
+//     } finally {
+//       dispatch(setLoading(false));
+//     }
+//   };
+// };
 export const loadFunneldata = (page = 1, limit = 500, companyName = "") => {
   return async (dispatch) => {
     dispatch(setLoading(true));
@@ -211,7 +240,14 @@ export const loadFunneldata = (page = 1, limit = 500, companyName = "") => {
         dispatch(setPagination({ page, totalPages: total_pages }));
       }
     } catch (err) {
-      dispatch(setError(err.message || "Error loading funnel data"));
+      // Check for specific error response handling
+      if (err.response && err.response.status === 404) {
+        // Handle 404 error gracefully by showing the message from the backend
+        dispatch(setError(err.response.data.message || "No customers found."));
+      } else {
+        // For other errors, use a general fallback message
+        dispatch(setError(err.message || "Error loading funnel data"));
+      }
     } finally {
       dispatch(setLoading(false));
     }

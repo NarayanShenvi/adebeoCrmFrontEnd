@@ -90,11 +90,21 @@ const CreatePurchaseOrder = () => {
   };
 
   // Download PDF for the Purchase Order
-  const handleDownloadPDF = (orderId) => {
-    // Assuming the API endpoint to generate/download PDF is `/download-pdf/{orderId}`
-    window.open(`${API}/download-pdf/${orderId}`, '_blank');
+  // const handleDownloadPDF = (orderId) => {
+  //   // Assuming the API endpoint to generate/download PDF is `/download-pdf/{orderId}`
+  //   window.open(`${API}/download-pdf/${orderId}`, '_blank');
+  // };
+  const handleDownloadPDF = (order) => {
+    // Assuming `order` has `pdf_link` and `base_url`
+    const pdfLink = order.pdf_link;  // This is the full path to the PDF
+    const baseUrl = order.base_url;  // This is the base URL for the static files
+  
+    // Construct the full URL for the PDF using the base_url and pdf_link
+    const downloadUrl = baseUrl ? `${baseUrl}${pdfLink}` : pdfLink;
+  
+    // Open the PDF in a new tab or trigger a download
+    window.open(downloadUrl, '_blank');
   };
-
 
     // mode and type dropdowns
 
@@ -287,9 +297,9 @@ const CreatePurchaseOrder = () => {
                   <td> ₹&nbsp;{order.total_amount.toFixed(2)}</td>
                   <td>{order.status}</td>
                   <td>
-                    <button onClick={() => handleDownloadPDF(order._id)} title='Download PDF'>
-                    <HiDocumentArrowDown  />
-                    </button>
+                  <a href={`${order.base_url}${order.pdf_link}`} target="_blank" rel="noopener noreferrer">
+                  Download PDF
+                  </a>
                   </td>
                 </tr>
               ))}

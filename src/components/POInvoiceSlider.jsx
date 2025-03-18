@@ -17,6 +17,8 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
   const { loading, performas, proformaInvoices, error, currentPage, totalPages } = proformaInvoiceState || {};
   const quoteState = useSelector((state) => state.quote); // Getting entire quote state
   const { quotes } = quoteState || {};
+  const proformaCreationResponse = useSelector(state => state.proformaInvoice.successMessage); // Get success message from state
+
   // const { quotes, proformaInvoices, loading, error, currentPage, totalPages } = useSelector(
   //   (state) => state.proformaInvoice
   // );
@@ -44,7 +46,12 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
   const [taxAmount, setTaxAmount] = useState(0);
 
   const [currentPageState, setCurrentPageState] = useState(1);
-
+  useEffect(() => {
+    if (proformaCreationResponse) {
+      alert(proformaCreationResponse); // This will display the success message
+    }
+  }, [proformaCreationResponse]);
+  
 
   useEffect(() => {
     if (customerId) {  // Make sure the customerId is provided
@@ -301,7 +308,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     const proformaInvoiceData = {
       customer_id: customerId,
       preformaTag: 'PROFORMA_INVOICE_TAG',
-      quote_id: selectedQuoteDetails?.quote_id || null, // Add selected quote_id here
+      quote_number: selectedQuoteDetails?.quote_number || null, // Add selected quote_id here
       quote_tag: selectedQuoteDetails?.quote_tag || null, // Add selected quote_tag here 
       items: invoiceLines.map(line => ({
         description: line.description || "Sample Product",
@@ -574,9 +581,9 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                 : "0.00"}
             </td>
             <td>
-              <a href={invoice.pdf_filename} target="_blank" rel="noopener noreferrer">
-                Download PDF
-              </a>
+            <a href={`${invoice.base_url}${invoice.pdf_link}`} target="_blank" rel="noopener noreferrer">
+            Download PDF
+            </a>
             </td>
           </tr>
         ))}

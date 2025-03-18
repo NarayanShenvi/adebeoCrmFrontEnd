@@ -10,7 +10,13 @@ const CustomerPaymentSection = () => {
   const { payments, loading, error, currentPage = 1, totalPages = 1, totalCount = 0 } = useSelector((state) => state.customerPayment);
 
   const [editablePayments, setEditablePayments] = useState([]);  // Store payments with editable 'paid_amount' and comment
-
+  
+  
+  // useEffect(() => {
+  //   if (error) {
+  //     console.error('Error fetching payments:', error);  // Log the error to the console
+  //   }
+  // }, [error]);
   // Dispatch action to fetch payments only when currentPage and totalPages are valid
   useEffect(() => {
     console.log('Dispatching fetchCustomerPaymentsAsync with page:', currentPage);
@@ -158,19 +164,15 @@ const CustomerPaymentSection = () => {
   )}
 </td>
 
-          <td>
-            {payment.pdf_filename ? (
-              <a
-                href={payment.pdf_filename}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Invoice PDF
-              </a>
-            ) : (
-              "No PDF Available"
-            )}
-          </td>
+<td>
+              {payment.pdf_link ? (
+                <a href={`${payment.base_url}${payment.pdf_link}`} target="_blank" rel="noopener noreferrer">
+                  Download PDF
+                </a>
+              ) : (
+                "No PDF Available"
+              )}
+            </td>
           <td>
         
           <RiInformation2Fill   title=" Payment Information" className="action-icon-payment"   // Pass customer ID
@@ -205,3 +207,4 @@ const CustomerPaymentSection = () => {
 };
 
 export default CustomerPaymentSection;
+

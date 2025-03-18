@@ -72,7 +72,7 @@ const customerPaymentSlice = createSlice({
       })
       .addCase(fetchCustomerPaymentsAsync.fulfilled, (state, action) => {
         state.loading = false;
-        
+        console.log("Payment fetched successfully:", action.payload);
         // Extract the necessary values from the payload with default fallbacks
         const { payments, totalCount, totalPages, currentPage } = action.payload;
 
