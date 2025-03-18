@@ -60,11 +60,11 @@ const QuoteSlider = ({ customerId, onClose }) => {
     }
   }, [quoteCreationResponse]); // This will trigger when quoteCreationResponse updates
   
-
+//changes made from here 
   const handleLineChange = (index, field, value) => {
     const newQuoteLines = [...quoteLines];
     newQuoteLines[index][field] = value;
-  
+     
     if (field === 'quantity' || field === 'discount') {
       const product = products.find(product => product._id === newQuoteLines[index].productId);
       if (product) {
@@ -84,7 +84,28 @@ const QuoteSlider = ({ customerId, onClose }) => {
         newQuoteLines[index].description = description;
       }
     }
-  
+   
+    if (field === 'discount') {
+      const product = products.find(product => product._id === newQuoteLines[index].productId);
+
+      if (!product) {
+          alert("💡 Please select a product first, before entering a discount!");
+          return; // Prevents further execution
+      }
+
+      let discount = parseFloat(value) || 0;
+      const maxDiscount = parseFloat(product.maxDiscount) || 100; 
+
+      if (discount < 0) {
+          alert("⛔ Discount cannot be negative!");
+          discount = 0;
+      } else if (discount > maxDiscount) {
+          alert(`🚫 Maximum discount allowed is ${maxDiscount}₹!`);
+          discount = maxDiscount;
+      }
+
+      newQuoteLines[index].discount = discount;
+  }
     setQuoteLines(newQuoteLines);
     updateTotal(newQuoteLines);
   };
@@ -137,10 +158,29 @@ const updateTotal = (lines) => {
 };
 
 const handleOverallDiscountChange = (e) => {
-  const discountValue = parseFloat(e.target.value) || 0;
+  let discountValue = parseFloat(e.target.value) || 0;
+  const maxOverallDiscount = 100; // Maximum allowed discount
+
+  // Check if at least one product is selected
+  const hasProduct = quoteLines.some(line => line.productId);
+
+  if (!hasProduct) {  
+      alert("💡 Please select a product first, before entering a overall discount!");
+      return;
+  }
+
+  if (discountValue < 0) {
+      alert("⛔ Overall Discount cannot be negative!");
+      discountValue = 0;
+  } else if (discountValue > maxOverallDiscount) {
+      alert(`🚫 Maximum allowed Overall Discount is ${maxOverallDiscount}₹!`);
+      discountValue = maxOverallDiscount;
+  }
+
   setOverallDiscount(discountValue);
   calculateFinalTotal(total, discountValue);
 };
+//to here -- bugs free
 
 const calculateFinalTotal = (totalAmount, discount) => {
   const discountedTotal = Math.max(0, totalAmount - discount); // Ensure it doesn't go negative
@@ -169,7 +209,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
   
     if (!customerId) {
       console.log("❌ No customer selected!");
-      alert("❌ Please select a customer before submitting the quote.");
+      alert(" 💡  Please select a customer before submitting the quote.");
       return;
     }
   
