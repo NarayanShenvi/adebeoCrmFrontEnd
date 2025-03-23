@@ -115,6 +115,7 @@ const CustomerPaymentSection = () => {
       <tr>
         <th>PDF Gen</th> {/* New Info column */}
         <th>Invoice Number</th>
+        <th>Client</th>
         <th>Total Amount</th>
         <th>Amount Due</th>
         <th>Invoice Date</th>
@@ -138,6 +139,7 @@ const CustomerPaymentSection = () => {
           </button>
         </td>
           <td>{payment.invoice_number}</td>
+          <td>{payment.customer_name}</td>
           <td>{payment.total_amount}</td>
           <td>{payment.amount_due}</td>
           <td>{new Date(payment.invoice_date).toLocaleDateString()}</td>

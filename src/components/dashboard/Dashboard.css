@@ -4171,7 +4171,7 @@ select option {
 
 .payments-table th:nth-child(1),
 .payments-table td:nth-child(1) {
-  width: 150px; /* Fixed width */
+  width: 100px; /* Fixed width */
 }
 .payments-table th:nth-child(2),
 .payments-table td:nth-child(2) {
