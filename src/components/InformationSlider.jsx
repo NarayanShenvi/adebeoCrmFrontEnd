@@ -123,7 +123,7 @@ const InvoiceSlider = ({ customerId, onClose }) => {
                     <td>{order.status}</td>
                     <td>
                       {order.Invoice_PDF_link ? (
-                        <a href={order.Invoice_PDF_link} target="_blank" rel="noopener noreferrer">
+                        <a href={`${order.base_url}${order.pdf_link}`} target="_blank" rel="noopener noreferrer">
                           View Invoice PDF
                         </a>
                         
