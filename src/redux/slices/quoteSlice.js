@@ -167,7 +167,7 @@ import API from "../../config/config";  // Import the API URL
 
 export const fetchQuotesAsync = createAsyncThunk('quote/fetchQuotes', async ({ page, per_page, customer_id }) => {
   try {
-    const token = localStorage.getItem('token');  // Retrieve token (if needed)
+    const token = localStorage.getItem('Access_Token');  // Retrieve token (if needed)
     
     // If token is needed in the request headers, include it like this:
     const response = await axios.get(`${API}/get_quotes`, {
