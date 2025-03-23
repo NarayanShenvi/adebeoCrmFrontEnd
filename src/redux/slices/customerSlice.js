@@ -453,6 +453,7 @@ export const postCustomerComment = (customerId, commentText) => {
 // Create a new customer (POST)
 export const createCustomerAsync = (newCustomer) => async (dispatch) => {
   dispatch(setCreateLoading(true));  // Start loading for create
+  dispatch(clearError()); // Clear any previous error
   try {
     const response = await axios.post(`${API}/create_adebeo_customers`, newCustomer);
     if (response && response.data) {
@@ -478,18 +479,43 @@ export const createCustomerAsync = (newCustomer) => async (dispatch) => {
 };
 
 // Fetch customers based on company name (GET)
+// export const fetchCustomerAsync = (companyName) => async (dispatch) => {
+//   dispatch(setLoading(true));
+//   try {
+//     const response = await axios.get(`${API}/edit_adebeo_customer`, { params: { companyName } });
+//     if (response && response.data && response.data.data) {
+//       const customers = response.data.data;
+//       dispatch(setCustomerList(customers));
+//     } else {
+//       dispatch(setError('No customers found.'));
+//     }
+//   } catch (error) {
+//     dispatch(setError('Failed to fetch customers.'));
+//   } finally {
+//     dispatch(setLoading(false));
+//   }
+// };
+
+// Fetch customers based on company name (GET)
 export const fetchCustomerAsync = (companyName) => async (dispatch) => {
   dispatch(setLoading(true));
+  dispatch(clearError());  // Clear any previous error message before initiating a new request
+
   try {
     const response = await axios.get(`${API}/edit_adebeo_customer`, { params: { companyName } });
     if (response && response.data && response.data.data) {
       const customers = response.data.data;
-      dispatch(setCustomerList(customers));
+      if (customers.length === 0) {
+        dispatch(setError('No customer data found'));
+      } else {
+        dispatch(setCustomerList(customers));
+      }
     } else {
-      dispatch(setError('No customers found.'));
+      dispatch(setError('No customer data found'));
     }
   } catch (error) {
-    dispatch(setError('Failed to fetch customers.'));
+    // Handle any unexpected errors from the server or network issues
+    dispatch(setError(error.response?.data?.message || 'Failed to fetch customers.'));
   } finally {
     dispatch(setLoading(false));
   }

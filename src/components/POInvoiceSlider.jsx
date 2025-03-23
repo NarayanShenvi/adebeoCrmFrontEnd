@@ -111,6 +111,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     } else if (proformaType === "existing" && selectedQuoteDetails) {
       const quoteItems = selectedQuoteDetails.items.map(item => ({
         productId: item.productId,
+        productCode: item.productCode,
         quantity: item.quantity,
         discount: item.discount,
         subtotal: item.subtotal,
@@ -126,6 +127,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     if (selectedQuoteDetails) {
       const quoteItems = selectedQuoteDetails.items.map(item => ({
         description: item.description || "Unknown Product",
+        productCode:item.productCode|| ' ',
         quantity: item.quantity || 0,
         discount: item.discount || 0,
         subtotal: item.sub_total || 0,
@@ -139,7 +141,6 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     }
   }, [selectedQuoteDetails]);
 
-  //changes made from here 
   const handleLineChange = (index, field, value) => {
     const newInvoiceLines = [...invoiceLines];
     newInvoiceLines[index][field] = value;
@@ -150,6 +151,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
         const quantity = parseInt(newInvoiceLines[index].quantity, 10) || 1;
         let discount = parseFloat(newInvoiceLines[index].discount) || 0;
         const price = parseFloat(product.salesCost) || 0;
+        const productCode = product.productCode
   
         const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
         newInvoiceLines[index].discount = validDiscount;
@@ -159,30 +161,10 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
   
         newInvoiceLines[index].unitPrice = unitPrice;
         newInvoiceLines[index].subtotal = subtotal;
+        newInvoiceLines[index].productCode = productCode;
       }
     }
-    
-    if (field === 'discount') {
-      const product = products.find(product => product._id === newInvoiceLines[index].productId);
-
-      if (!product) {
-          alert("💡 Please select a product first, before entering a discount!");
-          return; // Prevents further execution
-      }
-
-      let discount = parseFloat(value) || 0;
-      const maxDiscount = parseFloat(product.maxDiscount) || 100; 
-
-      if (discount < 0) {
-          alert("⛔ Discount cannot be negative!");
-          discount = 0;
-      } else if (discount > maxDiscount) {
-          alert(`🚫 Maximum discount allowed is ${maxDiscount}₹!`);
-          discount = maxDiscount;
-      }
-
-      newInvoiceLines[index].discount = discount;
-  }
+  
     setInvoiceLines(newInvoiceLines);
     updateTotal(newInvoiceLines);
   };
@@ -232,46 +214,26 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
       const quantity = parseInt(invoiceLines[index].quantity, 10) || 1;
       let discount = parseFloat(invoiceLines[index].discount) || 0;
       const price = parseFloat(product.salesCost) || 0;
-  
+      const description = product.ProductDisplay;
+      const productCode = product.productCode;
+
       const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
   
       const unitPrice = price;
       const subtotal = (unitPrice - validDiscount) * quantity;
+      
   
       const newInvoiceLines = [...invoiceLines];
       newInvoiceLines[index].productId = productId;
       newInvoiceLines[index].unitPrice = unitPrice;
       newInvoiceLines[index].subtotal = subtotal;
-  
+      newInvoiceLines[index].description = description;
+      newInvoiceLines[index].productCode = productCode;
       setInvoiceLines(newInvoiceLines);
       updateTotal(newInvoiceLines);
     }
   };
-  const handleOverallDiscountChange = (e) => {
-    let discountValue = parseFloat(e.target.value) || 0;
-    const maxOverallDiscount = 100; // Maximum allowed discount
-  
-    // Check if at least one product is selected
-    const hasProduct = invoiceLines.some(line => line.productId);
-  
-    if (!hasProduct) {  
-        alert("💡 Please select a product first, before entering a overall discount!");
-        return;
-    }
-  
-    if (discountValue < 0) {
-        alert("⛔ Overall Discount cannot be negative!");
-        discountValue = 0;
-    } else if (discountValue > maxOverallDiscount) {
-        alert(`🚫 Maximum allowed Overall Discount is ${maxOverallDiscount}₹!`);
-        discountValue = maxOverallDiscount;
-    }
-  
-    setOverallDiscount(discountValue);
-    calculateFinalTotal(total, discountValue);
-  };
-  //to here -- bugs free
-  
+
   const handleDeleteProductRow = (index) => {
     const newInvoiceLines = invoiceLines.filter((_, i) => i !== index);
     setInvoiceLines(newInvoiceLines);
@@ -291,6 +253,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
   
     const quoteItems = selectedQuote.items.map(item => ({
       description: item.description || "Unknown Product",
+      productCode:item.productCode || ' ',
       quantity: item.quantity || 0,
       discount: item.discount || 0,
       subtotal: item.sub_total || 0,
@@ -303,11 +266,15 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     updateTotal(quoteItems);
   };
 
+  console.log('invoiceLines:', invoiceLines);
   const handleSubmitProformaInvoice = () => {
     console.log ("selected quote:",selectedQuoteDetails)
     const proformaInvoiceData = {
       customer_id: customerId,
-      preformaTag: 'PROFORMA_INVOICE_TAG',
+    //  preformaTag: 'PROFORMA_INVOICE_TAG',
+    preformaTag: `${invoiceLines
+      .map(line => `${line.productCode}(${line.quantity})`) // Add productCode and quantity for each line
+      .join('-')}`,  // Join them with a dash
       quote_number: selectedQuoteDetails?.quote_number || null, // Add selected quote_id here
       quote_tag: selectedQuoteDetails?.quote_tag || null, // Add selected quote_tag here 
       items: invoiceLines.map(line => ({
@@ -385,7 +352,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                 {quotes && quotes.length > 0 ? (
                   quotes.map((quote,index) => (
                     <option key={quote.quote_id} value={quote.quote_id}>
-                      {quote.quote_id && quote.quote_tag ? `${quote.quote_id} - ${quote.quote_tag}` : 'Unknown Quote'}
+                      {quote.quote_number && quote.quote_tag ? `${quote.quote_number} - ${quote.quote_tag}` : 'Unknown Quote'}
                     </option>
                   ))
                 ) : (
@@ -419,7 +386,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                         {products && products.length > 0 ? (
                           products.map((product) => (
                             <option key={product._id} value={product._id}>
-                              {product.ProductDisplay || "Unknown Product"}
+                               {product.productName} ({product.productCode}) - {product.ProductDisplay}
                             </option>
                           ))
                         ) : (
@@ -428,19 +395,16 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                       </select>
                     )}
                   </td>
-                  {/*CHANGES MADE */}
                   <td>
                     {proformaType === "existing" ? (
                       <span>{line.quantity}</span>
                     ) : (
                       <input 
                       className="po-quantity-input"
-                      type="number"
-                      value={line.quantity || ""} // Allows placeholder to show when empty
-                      onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
-                      min="1"
-                      placeholder={`Quantity`} // Dynamic placeholder
-                      required
+                        type="number" 
+                        min="1"
+                        value={line.quantity} 
+                        onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
                       />
                     )}
                   </td>
@@ -448,20 +412,15 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                     {proformaType === "existing" ? (
                       <span>{line.discount}</span>
                     ) : (
-                      <input
-  type="number"
-  className="po-quantity-input"
-  value={line.discount || ""}  // Shows placeholder when empty
-  onChange={(e) => handleLineChange(index, 'discount', e.target.value)}
-  min="0"
-  max={products.find(product => product._id === line.productId)?.maxDiscount || 100}
-  placeholder={`Discount`}
-  required
-/>
+                      <input 
+                      className="po-quantity-input"
+                      min="0"
+                        type="number" 
+                        value={line.discount} 
+                        onChange={(e) => handleLineChange(index, 'discount', e.target.value)}
+                      />
                     )}
                   </td>
-                  
-{/*TO HERE - bugs free */}
                    {/* New DR Status Column */}
                    <td>
   {proformaType === "existing" ? (
@@ -512,18 +471,16 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
             <span className="amount"> ₹&nbsp;{total.toFixed(2)}</span>
           </div>
           <div>
-                              {/*CHANGES MADE */}
             <input 
               className="amount"
               type="number" 
               step="0.01"
               value={overallDiscount === 0 ? '' : overallDiscount}  
-              onChange={handleOverallDiscountChange}            
+              onChange={(e) => setOverallDiscount(parseFloat(e.target.value)|| 0)}
               disabled={proformaType === "existing"}
               placeholder="Enter Overall Discount"
-            />                  {/*TO HERE - bugs free */}
+            />
           </div>
-          
           <div>
             <label className="label">Total:</label>
             <span className="amount"> ₹&nbsp;{(total - overallDiscount).toFixed(2)}</span> 
@@ -562,7 +519,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     <table className="po-table">
       <thead>
         <tr>
-          <th>Proforma Id</th>
+          <th>Proforma Number</th>
           <th>Date</th>
           <th>Proforma Tag</th>
           <th>Price</th>
@@ -573,8 +530,8 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
         {currentPerformas.map((invoice) => (
           <tr key={invoice.performa_number}>
             <td>{invoice.performa_number}</td>
-            <td>{new Date(invoice.insertDate).toLocaleDateString()}</td>
-            <td>{invoice.proforma_tag}</td>
+            <td>{new Date(invoice.performa_date).toLocaleDateString('en-US')}</td>
+            <td>{invoice.preformaTag}</td>
             <td>
             ₹&nbsp;{invoice.total_amount && !isNaN(invoice.total_amount)
                 ? invoice.total_amount.toFixed(2)

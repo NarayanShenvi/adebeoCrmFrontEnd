@@ -217,12 +217,64 @@ export default funnelSlice.reducer;
 //     }
 //   };
 // };
+
+// Commented on 22 March for first load issue
+// export const loadFunneldata = (page = 1, limit = 500, companyName = "") => {
+//   return async (dispatch) => {
+//     dispatch(setLoading(true));
+//     try {
+//       const response = await axios.get(`${API}/funnel_users`, {
+//         params: { page, limit, companyName },
+//       });
+
+//       // Ensure you are correctly handling the response with total_records and total_pages
+//       if (response.data && response.data.data) {
+//         const { data, total_records, total_pages } = response.data;
+
+//         // Dispatch the data and pagination information to the store
+//         dispatch(funnelCustomers({
+//           data,
+//           totalRecords: total_records,  // total records are the same for all pages
+//           totalPages: total_pages,  // total pages based on the limit and total records
+//         }));
+
+//         // Set the current page and total pages in the store for pagination
+//         dispatch(setPagination({ page, totalPages: total_pages }));
+//       }
+//     } catch (err) {
+//       // Check for specific error response handling
+//       if (err.response && err.response.status === 404) {
+//         // Handle 404 error gracefully by showing the message from the backend
+//         dispatch(setError(err.response.data.message || "No customers found."));
+//       } else {
+//         // For other errors, use a general fallback message
+//         dispatch(setError(err.message || "Error loading funnel data"));
+//       }
+//     } finally {
+//       dispatch(setLoading(false));
+//     }
+//   };
+// };
+
 export const loadFunneldata = (page = 1, limit = 500, companyName = "") => {
   return async (dispatch) => {
     dispatch(setLoading(true));
+
+    const token = localStorage.getItem("Access_Token"); // Retrieve token from localStorage
+
+    if (!token) {
+      // Handle the case where there's no token (e.g., redirect to login page)
+      dispatch(setError("No authorization token found. Please log in again."));
+      dispatch(setLoading(false));
+      return;
+    }
+
     try {
       const response = await axios.get(`${API}/funnel_users`, {
         params: { page, limit, companyName },
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+        }
       });
 
       // Ensure you are correctly handling the response with total_records and total_pages

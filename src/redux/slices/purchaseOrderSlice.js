@@ -6,19 +6,80 @@ import API from '../../config/config';       // API URL constants
 export const fetchProformas = createAsyncThunk(
   'purchaseOrder/fetchProformas',
   async () => {
-    const response = await axios.get(`${API}/get_proformas_for_purchase_order`);
-    return response.data;
+    // Retrieve the access token from localStorage
+    const token = localStorage.getItem('Access_Token');  // Adjust if you use sessionStorage or another method
+    
+    if (!token) {
+      throw new Error("No access token found. Please log in.");
+    }
+
+    try {
+      // Make the API call with the access token included in the headers
+      const response = await axios.get(
+        `${API}/get_proformas_for_purchase_order`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,  // Add the token to the request headers
+          },
+        }
+      );
+      return response.data;  // Return the response data (proformas)
+    } catch (error) {
+      // Handle errors (e.g., token expired, invalid token, etc.)
+      if (error.response && error.response.status === 401) {
+        throw new Error("Token has expired or is invalid.");
+      }
+      throw new Error(error.response ? error.response.data.message : error.message);
+    }
   }
 );
+// export const fetchProformas = createAsyncThunk(
+//   'purchaseOrder/fetchProformas',
+//   async () => {
+//     const response = await axios.get(`${API}/get_proformas_for_purchase_order`);
+//     return response.data;
+//   }
+// );
+
+// Async thunk to fetch paginated purchase orders
+// export const fetchPurchaseOrders = createAsyncThunk(
+//   'purchaseOrder/fetchPurchaseOrders',
+//   async ({ page = 1, rows_per_page = 10 }) => {
+//     const response = await axios.get(
+//       `${API}/get_purchase_orders?page=${page}&rows_per_page=${rows_per_page}`
+//     );
+//     return response.data;
+//   }
+// );
 
 // Async thunk to fetch paginated purchase orders
 export const fetchPurchaseOrders = createAsyncThunk(
   'purchaseOrder/fetchPurchaseOrders',
   async ({ page = 1, rows_per_page = 10 }) => {
-    const response = await axios.get(
-      `${API}/get_purchase_orders?page=${page}&rows_per_page=${rows_per_page}`
-    );
-    return response.data;
+    // Retrieve the access token from localStorage (or wherever you store it)
+    const token = localStorage.getItem('Access_Token');  // Adjust if you use sessionStorage or another method
+    
+    if (!token) {
+      throw new Error("No access token found");
+    }
+
+    try {
+      const response = await axios.get(
+        `${API}/get_purchase_orders?page=${page}&rows_per_page=${rows_per_page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,  // Add the token to the headers
+          },
+        }
+      );
+      return response.data;  // Return the response data (purchase orders)
+    } catch (error) {
+      // Handle the error if token is expired or any other issue
+      if (error.response && error.response.status === 401) {
+        throw new Error("Token has expired or is invalid.");
+      }
+      throw new Error(error.response ? error.response.data.message : error.message);
+    }
   }
 );
 

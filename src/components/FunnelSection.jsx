@@ -29,8 +29,7 @@ const FunnelSection = () => {
   const [showPOInvoiceSlider, setShowPOInvoiceSlider] = useState(false); // New state for slider
 
   const sliderRef = useRef(null); // Create a ref for the slider
-  const commentsRef = useRef(null); //changes made - bugs free
-  const addCommentRef = useRef(null);//changes made - bugs free
+
 
   const funnelData = useSelector((state) => state.funnel.funnelData);
   const loading = useSelector((state) => state.funnel.loading);
@@ -44,6 +43,7 @@ const FunnelSection = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = funnelData.slice(indexOfFirstRow, indexOfLastRow);
+
   // Handle pagination changes
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -100,56 +100,26 @@ const FunnelSection = () => {
       dispatch(loadCustomerComments(customerId));
     }
   };
-  // Close modal when clicking outside changes made from here
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (modalState.showComments && commentsRef.current && !commentsRef.current.contains(event.target)) {
-      handleCloseCommentsModal();
-    }
-    if (modalState.addComment && addCommentRef.current && !addCommentRef.current.contains(event.target)) {
-      handleCloseAddCommentModal();
-    }
-  };
-
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => document.removeEventListener("mousedown", handleClickOutside);
-}, [modalState.showComments, modalState.addComment]);
-
 
   const handleShowComments = (customerId) => {
-    dispatch(setModalState({ 
-      selectedShowCommentsCustomerId: customerId, 
-      showComments: true, 
-      addComment: false  // Ensure "Add Comment" is closed
-    }));
+    dispatch(setModalState({ selectedShowCommentsCustomerId: customerId, showComments: true }));
     fetchCommentsIfNeeded(customerId);
   };
-  
+
   const handleAddComment = (customerId) => {
-    dispatch(setModalState({ 
-      selectedAddCommentCustomerId: customerId, 
-      addComment: true, 
-      showComments: false  // Ensure "View Comments" is closed
+    dispatch(setModalState({
+      selectedAddCommentCustomerId: customerId,
+      addComment: true,
     }));
   };
-  
+
   const handleCloseCommentsModal = () => {
-    dispatch(setModalState({
-      selectedShowCommentsCustomerId: null, // Reset selected customer
-      showComments: false, 
-      addComment: false // Ensure add comment is also closed
-    }));
+    dispatch(setModalState({ showComments: false }));
   };
-  
+
   const handleCloseAddCommentModal = () => {
-    dispatch(setModalState({
-      selectedAddCommentCustomerId: null, // Reset selected customer
-      addComment: false,
-      showComments: false // Ensure view comments is also closed
-    }));
+    dispatch(setModalState({ addComment: false }));
   };
-  
-  // to here - bugs free
 
   const handleCommentChange = (e) => {
     setNewComment(e.target.value);
@@ -234,7 +204,6 @@ useEffect(() => {
   
   if (loading) return <div className='loading'>Loading funnel data...</div>;//changes made.. classnames were added
   if (error) return <div className='error'>Error: {error}</div>;//changes made
-  
 
   return (
     // tableref removed
@@ -325,52 +294,48 @@ useEffect(() => {
       )}
 
       {/* Show Comments Modal */}
-      {/* changes made from Show Comments Modal */}
-{modalState.showComments && !modalState.addComment && (
-  <div className="comments-modal-container" ref={commentsRef}>
-    <div className="comments-modal" >
-      <h4>Customer Comments</h4>
-      {Array.isArray(customerComments) && customerComments.length > 0 ? (
-        <>
-          <p className='displaycomments'>Displaying {customerComments.length} comments</p>
-          <textarea
-            readOnly
-            rows={5}
-            value={customerComments.map((comment) => (
-              `${comment.name}: ${comment.text}\nDate: ${new Date(comment.date).toLocaleString()}\n`
-            )).join("\n")}
-          />
-        </>
-      ) : (
-        <p className='nocomments'>No comments available... <FaFaceMeh /></p>
-      )}
-      <div className='cancel'>
-        <MdOutlineCancel onClick={handleCloseCommentsModal} title='Cancel' className='cancelcomment'/>
-      </div>
+      {/* Show Comments Modal changed  to show no data msg */}
+{modalState.showComments && (
+  <div className="comments-modal">
+    <h4>Customer Comments</h4>
+    
+    {Array.isArray(customerComments) && customerComments.length > 0 ? (
+      <>
+        <p className='displaycomments'>Displaying {customerComments.length} comments</p>
+        <textarea
+          readOnly
+          rows={5}
+          value={customerComments.map((comment) => (
+            `${comment.name}: ${comment.text}\nDate: ${new Date(comment.date).toLocaleString()}\n`
+          )).join("\n")} 
+        />
+      </>
+    ) : (
+      <p className='nocomments'>No comments available... <FaFaceMeh /></p>
+       // Message when no comments exist
+    )}<div className='cancel'>
+    <MdOutlineCancel onClick={handleCloseCommentsModal} title='Cancel' className='cancelcomment'/>
     </div>
   </div>
 )}
 
-{/* Add Comment Modal */}
-{modalState.addComment && !modalState.showComments && (
-  <div className="comment-edit-modal-container"  ref={addCommentRef}>
-    <div className="comment-edit-modal">
-      <h4>Add Comment</h4>
-      <textarea
-        value={newComment}
-        onChange={handleCommentChange}
-        placeholder="Enter your comment here..."
-        rows="5"
-      />
-      <div>
-        <MdOutlineCancel onClick={handleCloseAddCommentModal} title='Cancel' className='cancelcomment'/>
-        <HiSave onClick={handleSubmitComment} title='Submit' className='submitcomment'/>
-      </div>
-      <p className="alert-box">Comment saved successfully! ✅</p>
-    </div>
-  </div>
-)}
-{/* to here Add Comment Modal -- bugs free */}
+      {/* Add Comment Modal */}
+      {modalState.addComment && (
+        <div className="comment-edit-modal">
+          <h4>Add Comment</h4>
+          <textarea
+            value={newComment}
+            onChange={handleCommentChange}
+            placeholder="Enter your comment here..."
+            rows="5"
+          />
+          <div>
+          <MdOutlineCancel onClick={handleCloseAddCommentModal} title='Cancel' className='cancelcomment'/>{/* changes made--icons are added */}
+          <HiSave onClick={handleSubmitComment} title='Submit' className='submitcomment'/>            
+          </div>
+          <p className="alert-box">Comment saved successfully! ✅</p>{/* changes made-- alertbox to show successfull submit */}
+        </div>
+      )}
 
 
     {modalState.showQuoteSlider && modalState.selectedQuoteCustomerId && (
@@ -391,6 +356,7 @@ useEffect(() => {
     onClose={handleClosePOInvoice} 
   />
 )}
+
 
 
     </div>

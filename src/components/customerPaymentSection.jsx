@@ -4,13 +4,17 @@ import { fetchCustomerPaymentsAsync, processCustomerPaymentAsync } from '../redu
 import { FaCheckCircle } from "react-icons/fa"; // changed---Import the check-circle icon 
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { RiInformation2Fill } from "react-icons/ri";
+import { generateInvoicePdfAsync } from '../redux/slices/customerPaymentSlice';
 
 const CustomerPaymentSection = () => {
   const dispatch = useDispatch();
-  const { payments, loading, error, currentPage = 1, totalPages = 1, totalCount = 0 } = useSelector((state) => state.customerPayment);
+  const { payments, loading, error, pdfGenerating, pdfError, pdfFilePath ,currentPage = 1, totalPages = 1, totalCount = 0 } = useSelector((state) => state.customerPayment);
 
   const [editablePayments, setEditablePayments] = useState([]);  // Store payments with editable 'paid_amount' and comment
   
+  const handleGeneratePDF = (invoiceNumber) => {
+    dispatch(generateInvoicePdfAsync(invoiceNumber));
+  };
   
   // useEffect(() => {
   //   if (error) {
@@ -109,6 +113,7 @@ const CustomerPaymentSection = () => {
   <table className="payments-table">
     <thead>
       <tr>
+        <th>PDF Gen</th> {/* New Info column */}
         <th>Invoice Number</th>
         <th>Total Amount</th>
         <th>Amount Due</th>
@@ -117,14 +122,21 @@ const CustomerPaymentSection = () => {
         <th>Paid Amount</th>
         <th>Comment</th>
         <th>Actions</th>
-        <th>Download Invoice PDF</th>
+        <th>Download PDF</th>
         <th>Info</th> {/* New Info column */}
-
       </tr>
     </thead>
     <tbody>
       {editablePayments.map((payment, index) => (
         <tr key={payment.invoice_number}>
+           <td>
+          <button 
+            className="pdf-gen-button" 
+            onClick={() => handleGeneratePDF(payment.invoice_number)} // Function to handle PDF generation
+          >
+            Generate PDF
+          </button>
+        </td>
           <td>{payment.invoice_number}</td>
           <td>{payment.total_amount}</td>
           <td>{payment.amount_due}</td>
@@ -149,22 +161,21 @@ const CustomerPaymentSection = () => {
             />
           </td>
           <td>
-  {payment.payment_status === "Pending" && (
-    <FaCheckCircle
-      title="Submit"
-      className={`submit-icon ${payment.amount_due === 0 ? "disabled" : ""}`}
-      onClick={() => {
-        if (payment.amount_due === 0) {
-          alert("Payment already completed. No submission required.");
-        } else {
-          handleSubmit(index, payment);
-        }
-      }}
-    />
-  )}
-</td>
-
-<td>
+            {payment.payment_status === "Pending" && (
+              <FaCheckCircle
+                title="Submit"
+                className={`submit-icon ${payment.amount_due === 0 ? "disabled" : ""}`}
+                onClick={() => {
+                  if (payment.amount_due === 0) {
+                    alert("Payment already completed. No submission required.");
+                  } else {
+                    handleSubmit(index, payment);
+                  }
+                }}
+              />
+            )}
+          </td>
+          <td>
               {payment.pdf_link ? (
                 <a href={`${payment.base_url}${payment.pdf_link}`} target="_blank" rel="noopener noreferrer">
                   Download PDF
@@ -174,11 +185,10 @@ const CustomerPaymentSection = () => {
               )}
             </td>
           <td>
-        
-          <RiInformation2Fill   title=" Payment Information" className="action-icon-payment"   // Pass customer ID
+             <RiInformation2Fill   title=" Payment Information" className="action-icon-payment"   // Pass customer ID
                />
-        </td>
-        </tr>
+          </td>
+       </tr>
       ))}
     </tbody>
   </table>

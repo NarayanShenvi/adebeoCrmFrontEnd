@@ -151,11 +151,28 @@ import axios from "../../config/apiConfig";  // Import the Axios instance
 import API from "../../config/config";  // Import the API URL
 
 // Async action to fetch available quotes with pagination and customer_id
+// export const fetchQuotesAsync = createAsyncThunk('quote/fetchQuotes', async ({ page, per_page, customer_id }) => {
+//   try {
+//     // Include the customer_id along with page and per_page as query parameters
+//     const response = await axios.get(`${API}/get_quotes`, {
+//       params: { page, per_page, customer_id }, // Pass customer_id as a query param
+//     });
+    
+//     return response.data; // Assuming the response contains quotes, totalPages, etc.
+//   } catch (error) {
+//     // Handle any errors, including error response data if available
+//     throw new Error(error.response ? error.response.data.message : error.message);
+//   }
+// });
+
 export const fetchQuotesAsync = createAsyncThunk('quote/fetchQuotes', async ({ page, per_page, customer_id }) => {
   try {
-    // Include the customer_id along with page and per_page as query parameters
+    const token = localStorage.getItem('token');  // Retrieve token (if needed)
+    
+    // If token is needed in the request headers, include it like this:
     const response = await axios.get(`${API}/get_quotes`, {
-      params: { page, per_page, customer_id }, // Pass customer_id as a query param
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}, // Include header only if token exists
+      params: { page, per_page, customer_id },
     });
     
     return response.data; // Assuming the response contains quotes, totalPages, etc.

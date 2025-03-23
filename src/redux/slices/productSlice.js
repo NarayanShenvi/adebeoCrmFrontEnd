@@ -80,14 +80,37 @@ export const { setProducts, setLoading, setError, setProductToEdit } = productSl
 
 export default productSlice.reducer;
 
-// Async Thunk to fetch all products
+// // Async Thunk to fetch all products
+// export const fetchProductsAsync = () => async (dispatch) => {
+//   dispatch(setLoading(true));
+
+//   try {
+//     const response = await axios.get(`${API}/getall_adebeo_products`);
+//     console.log('API response:', response);  // Log the full API response
+    
+//     if (response && response.data && response.data.data) {
+//       dispatch(setProducts(response.data.data));  // Set the full product data in the store
+//     }
+//   } catch (error) {
+//     dispatch(setError('Failed to fetch products.'));
+//   } finally {
+//     dispatch(setLoading(false));
+//   }
+// };
 export const fetchProductsAsync = () => async (dispatch) => {
   dispatch(setLoading(true));
 
   try {
-    const response = await axios.get(`${API}/getall_adebeo_products`);
-    console.log('API response:', response);  // Log the full API response
+    const token = localStorage.getItem('Access_Token');  // Get the token from localStorage
     
+    const response = await axios.get(`${API}/getall_adebeo_products`, {
+      headers: {
+        Authorization: `Bearer ${token}`  // Attach the token to the request header
+      }
+    });
+
+    console.log('API response:', response);  // Log the full API response
+
     if (response && response.data && response.data.data) {
       dispatch(setProducts(response.data.data));  // Set the full product data in the store
     }

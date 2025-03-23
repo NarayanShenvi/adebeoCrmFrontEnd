@@ -16,6 +16,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
   const sliderRef = useRef(null); // Reference for the slider container changes made
 
   const [quoteLines, setQuoteLines] = useState([{
+    productCode:'',
     productId: '',
     description:'',
     quantity: 1,
@@ -60,11 +61,11 @@ const QuoteSlider = ({ customerId, onClose }) => {
     }
   }, [quoteCreationResponse]); // This will trigger when quoteCreationResponse updates
   
-//changes made from here 
+
   const handleLineChange = (index, field, value) => {
     const newQuoteLines = [...quoteLines];
     newQuoteLines[index][field] = value;
-     
+  
     if (field === 'quantity' || field === 'discount') {
       const product = products.find(product => product._id === newQuoteLines[index].productId);
       if (product) {
@@ -72,6 +73,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
         let discount = parseFloat(newQuoteLines[index].discount) || 0;
         const price = parseFloat(product.salesCost) || 0;
         const description = product.ProductDisplay;
+        const productCode = product.productCode;
   
         const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
         newQuoteLines[index].discount = validDiscount;
@@ -82,30 +84,10 @@ const QuoteSlider = ({ customerId, onClose }) => {
         newQuoteLines[index].unitPrice = unitPrice;
         newQuoteLines[index].subtotal = subtotal;
         newQuoteLines[index].description = description;
+        newQuoteLines[index].productCode = productCode;
       }
     }
-   
-    if (field === 'discount') {
-      const product = products.find(product => product._id === newQuoteLines[index].productId);
-
-      if (!product) {
-          alert("💡 Please select a product first, before entering a discount!");
-          return; // Prevents further execution
-      }
-
-      let discount = parseFloat(value) || 0;
-      const maxDiscount = parseFloat(product.maxDiscount) || 100; 
-
-      if (discount < 0) {
-          alert("⛔ Discount cannot be negative!");
-          discount = 0;
-      } else if (discount > maxDiscount) {
-          alert(`🚫 Maximum discount allowed is ${maxDiscount}₹!`);
-          discount = maxDiscount;
-      }
-
-      newQuoteLines[index].discount = discount;
-  }
+  
     setQuoteLines(newQuoteLines);
     updateTotal(newQuoteLines);
   };
@@ -158,29 +140,10 @@ const updateTotal = (lines) => {
 };
 
 const handleOverallDiscountChange = (e) => {
-  let discountValue = parseFloat(e.target.value) || 0;
-  const maxOverallDiscount = 100; // Maximum allowed discount
-
-  // Check if at least one product is selected
-  const hasProduct = quoteLines.some(line => line.productId);
-
-  if (!hasProduct) {  
-      alert("💡 Please select a product first, before entering a overall discount!");
-      return;
-  }
-
-  if (discountValue < 0) {
-      alert("⛔ Overall Discount cannot be negative!");
-      discountValue = 0;
-  } else if (discountValue > maxOverallDiscount) {
-      alert(`🚫 Maximum allowed Overall Discount is ${maxOverallDiscount}₹!`);
-      discountValue = maxOverallDiscount;
-  }
-
+  const discountValue = parseFloat(e.target.value) || 0;
   setOverallDiscount(discountValue);
   calculateFinalTotal(total, discountValue);
 };
-//to here -- bugs free
 
 const calculateFinalTotal = (totalAmount, discount) => {
   const discountedTotal = Math.max(0, totalAmount - discount); // Ensure it doesn't go negative
@@ -209,7 +172,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
   
     if (!customerId) {
       console.log("❌ No customer selected!");
-      alert(" 💡  Please select a customer before submitting the quote.");
+      alert("❌ Please select a customer before submitting the quote.");
       return;
     }
   
@@ -232,12 +195,14 @@ const calculateFinalTotal = (totalAmount, discount) => {
     }
   
     console.log("✅ All validations passed, submitting the quote...");
-  
+    
     const quoteData = {
       customer_id: customerId,
-      quoteTag: `QUOTE_TAG-${quoteLines.map(line => line.productCode).join('-')}`, // Adding productCode to the quoteTag
+   //   quoteTag: `QUOTE_TAG-${quoteLines.map(line => line.productCode).join('-')}`, // Adding productCode to the quoteTag
+        quoteTag: `${quoteLines.map(line => `${line.productCode}(${line.quantity})`).join('-')}`,  // Join them with a dash
       items: quoteLines.map(line => ({
         description: line.description,
+        prodcutCode: line.productCode,
         quantity: line.quantity,
         discount: line.discount,
         unit_price: line.unitPrice,
@@ -398,7 +363,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
             <table className="quote-table">
               <thead>
                 <tr>
-                  <th>Quote Id</th>
+                  <th>Quote Number</th>
                   <th>Date</th>
                   <th>Quote Tag</th>
                   <th>Price</th>
@@ -409,7 +374,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
               <tbody>
                 {currentQuotes.map((quoteItem) => (
                   <tr key={quoteItem.quote_id}>  {/* Ensure the key is unique and corresponds to the correct field */}
-                    <td>{quoteItem.quote_id}</td> {/* Display the quote ID */}
+                    <td>{quoteItem.quote_number}</td> {/* Display the quote ID */}
                     <td>{quoteItem.quote_date}</td> {/* Display the quote date */}
                     <td>{quoteItem.quote_tag}</td> {/* Display the quote tag */}
                     <td>
