@@ -122,7 +122,7 @@ const InvoiceSlider = ({ customerId, onClose }) => {
                     <td>₹&nbsp;{order.total_amount}</td>
                     <td>{order.status}</td>
                     <td>
-                      {order.Invoice_PDF_link ? (
+                      {order.pdf_link ? (
                         <a href={`${order.base_url}${order.pdf_link}`} target="_blank" rel="noopener noreferrer">
                           View Invoice PDF
                         </a>
