@@ -454,8 +454,27 @@ export const postCustomerComment = (customerId, commentText) => {
 export const createCustomerAsync = (newCustomer) => async (dispatch) => {
   dispatch(setCreateLoading(true));  // Start loading for create
   dispatch(clearError()); // Clear any previous error
+
+  const token = localStorage.getItem("Access_Token"); // Retrieve token from localStorage
+
+  if (!token) {
+    // Handle the case where there's no token (e.g., redirect to login page)
+    dispatch(setError("No authorization token found. Please log in again."));
+    dispatch(setCreateLoading(false));  // End loading for create
+    return;
+  }
+
   try {
-    const response = await axios.post(`${API}/create_adebeo_customers`, newCustomer);
+    const response = await axios.post(
+      `${API}/create_adebeo_customers`, 
+      newCustomer,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+        }
+      }
+    );
+
     if (response && response.data) {
       const data = response.data;
 
@@ -472,11 +491,38 @@ export const createCustomerAsync = (newCustomer) => async (dispatch) => {
     }
   } catch (error) {
     // Handle network or unexpected errors
-    dispatch(setError(error.response?.data?.message));
+    dispatch(setError(error.response?.data?.message || 'An unexpected error occurred.'));
   } finally {
     dispatch(setCreateLoading(false));  // End loading for create
   }
 };
+
+// export const createCustomerAsync = (newCustomer) => async (dispatch) => {
+//   dispatch(setCreateLoading(true));  // Start loading for create
+//   dispatch(clearError()); // Clear any previous error
+//   try {
+//     const response = await axios.post(`${API}/create_adebeo_customers`, newCustomer);
+//     if (response && response.data) {
+//       const data = response.data;
+
+//       // Check for error or success status
+//       if (data.status === 'error' || data.success === false) {
+//         // Handle the error response from the API
+//         dispatch(setError(data.message || 'An error occurred while creating the customer.'));
+//       } else {
+//         // Add the new customer to the state
+//         dispatch(setCustomerList((prevCustomers) => [...prevCustomers, data]));
+//         dispatch(setSuccessMessage(data.message || 'Customer created successfully!'));
+//         dispatch(resetNewCustomer());
+//       }
+//     }
+//   } catch (error) {
+//     // Handle network or unexpected errors
+//     dispatch(setError(error.response?.data?.message));
+//   } finally {
+//     dispatch(setCreateLoading(false));  // End loading for create
+//   }
+// };
 
 // Fetch customers based on company name (GET)
 // export const fetchCustomerAsync = (companyName) => async (dispatch) => {
@@ -501,8 +547,23 @@ export const fetchCustomerAsync = (companyName) => async (dispatch) => {
   dispatch(setLoading(true));
   dispatch(clearError());  // Clear any previous error message before initiating a new request
 
+  const token = localStorage.getItem("Access_Token"); // Retrieve token from localStorage
+
+  if (!token) {
+    // Handle the case where there's no token (e.g., redirect to login page)
+    dispatch(setError("No authorization token found. Please log in again."));
+    dispatch(setLoading(false));  // End loading
+    return;
+  }
+
   try {
-    const response = await axios.get(`${API}/edit_adebeo_customer`, { params: { companyName } });
+    const response = await axios.get(`${API}/edit_adebeo_customer`, {
+      params: { companyName },
+      headers: {
+        'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+      }
+    });
+
     if (response && response.data && response.data.data) {
       const customers = response.data.data;
       if (customers.length === 0) {
@@ -517,9 +578,33 @@ export const fetchCustomerAsync = (companyName) => async (dispatch) => {
     // Handle any unexpected errors from the server or network issues
     dispatch(setError(error.response?.data?.message || 'Failed to fetch customers.'));
   } finally {
-    dispatch(setLoading(false));
+    dispatch(setLoading(false));  // End loading
   }
 };
+
+// export const fetchCustomerAsync = (companyName) => async (dispatch) => {
+//   dispatch(setLoading(true));
+//   dispatch(clearError());  // Clear any previous error message before initiating a new request
+
+//   try {
+//     const response = await axios.get(`${API}/edit_adebeo_customer`, { params: { companyName } });
+//     if (response && response.data && response.data.data) {
+//       const customers = response.data.data;
+//       if (customers.length === 0) {
+//         dispatch(setError('No customer data found'));
+//       } else {
+//         dispatch(setCustomerList(customers));
+//       }
+//     } else {
+//       dispatch(setError('No customer data found'));
+//     }
+//   } catch (error) {
+//     // Handle any unexpected errors from the server or network issues
+//     dispatch(setError(error.response?.data?.message || 'Failed to fetch customers.'));
+//   } finally {
+//     dispatch(setLoading(false));
+//   }
+// };
 
 // Update an existing customer (PUT)
 export const updateCustomerAsync = (updatedCustomer) => async (dispatch) => {
