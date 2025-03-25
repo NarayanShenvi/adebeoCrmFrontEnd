@@ -451,30 +451,28 @@ export const postCustomerComment = (customerId, commentText) => {
 };
 
 // Create a new customer (POST)
+
+
 export const createCustomerAsync = (newCustomer) => async (dispatch) => {
   dispatch(setCreateLoading(true));  // Start loading for create
   dispatch(clearError()); // Clear any previous error
-
-  const token = localStorage.getItem("Access_Token"); // Retrieve token from localStorage
-
+  
+  // Retrieve token from localStorage
+  const token = localStorage.getItem('Access_Token');
+  
   if (!token) {
-    // Handle the case where there's no token (e.g., redirect to login page)
-    dispatch(setError("No authorization token found. Please log in again."));
-    dispatch(setCreateLoading(false));  // End loading for create
+    // If no token found, reject the request
+    dispatch(setError("No authentication token found. Please login."));
+    dispatch(setCreateLoading(false));  // End loading if there's no token
     return;
   }
 
   try {
-    const response = await axios.post(
-      `${API}/create_adebeo_customers`, 
-      newCustomer,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
-        }
-      }
-    );
-
+    const response = await axios.post(`${API}/create_adebeo_customers`, newCustomer);
+    
+    // Log the response to ensure it has the expected structure
+    console.log("API Response:", response);
+    
     if (response && response.data) {
       const data = response.data;
 
@@ -485,46 +483,30 @@ export const createCustomerAsync = (newCustomer) => async (dispatch) => {
       } else {
         // Add the new customer to the state
         dispatch(setCustomerList((prevCustomers) => [...prevCustomers, data]));
+        
+        // Log before showing the alert to confirm the code is reaching this point
+        console.log("Success, showing alert:", data.message || 'Customer created successfully!');
+        
+        // Show success alert message
+        alert(data.message || 'Customer created successfully!');
+
         dispatch(setSuccessMessage(data.message || 'Customer created successfully!'));
         dispatch(resetNewCustomer());
       }
     }
   } catch (error) {
+    // Log the error in the catch block to see if it's being triggered
+    console.error("Error while creating customer:", error);
+    
     // Handle network or unexpected errors
-    dispatch(setError(error.response?.data?.message || 'An unexpected error occurred.'));
+    dispatch(setError(error.response?.data?.message || 'Success'));
   } finally {
     dispatch(setCreateLoading(false));  // End loading for create
   }
 };
 
-// export const createCustomerAsync = (newCustomer) => async (dispatch) => {
-//   dispatch(setCreateLoading(true));  // Start loading for create
-//   dispatch(clearError()); // Clear any previous error
-//   try {
-//     const response = await axios.post(`${API}/create_adebeo_customers`, newCustomer);
-//     if (response && response.data) {
-//       const data = response.data;
 
-//       // Check for error or success status
-//       if (data.status === 'error' || data.success === false) {
-//         // Handle the error response from the API
-//         dispatch(setError(data.message || 'An error occurred while creating the customer.'));
-//       } else {
-//         // Add the new customer to the state
-//         dispatch(setCustomerList((prevCustomers) => [...prevCustomers, data]));
-//         dispatch(setSuccessMessage(data.message || 'Customer created successfully!'));
-//         dispatch(resetNewCustomer());
-//       }
-//     }
-//   } catch (error) {
-//     // Handle network or unexpected errors
-//     dispatch(setError(error.response?.data?.message));
-//   } finally {
-//     dispatch(setCreateLoading(false));  // End loading for create
-//   }
-// };
-
-// Fetch customers based on company name (GET)
+//Fetch customers based on company name (GET)
 // export const fetchCustomerAsync = (companyName) => async (dispatch) => {
 //   dispatch(setLoading(true));
 //   try {
