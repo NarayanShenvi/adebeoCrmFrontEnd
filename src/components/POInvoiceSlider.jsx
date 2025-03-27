@@ -309,31 +309,46 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     setInvoiceLines(quoteItems);
     updateTotal(quoteItems);
   };
+  
 
-  console.log('invoiceLines:', invoiceLines);
   const handleSubmitProformaInvoice = () => {
-    console.log ("selected quote:",selectedQuoteDetails)
-    const proformaInvoiceData = {
-      customer_id: customerId,
-    //  preformaTag: 'PROFORMA_INVOICE_TAG',
-    preformaTag: `${invoiceLines
-      .map(line => `${line.productCode}(${line.quantity})`) // Add productCode and quantity for each line
-      .join('-')}`,  // Join them with a dash
-      quote_number: selectedQuoteDetails?.quote_number || null, // Add selected quote_id here
-      quote_tag: selectedQuoteDetails?.quote_tag || null, // Add selected quote_tag here 
-      items: invoiceLines.map(line => ({
-        description: line.description || "Sample Product",
-        quantity: line.quantity,
-        discount: line.discount,
-        unit_price: line.unitPrice,
-        sub_total: line.subtotal,
-        dr_status: line.drStatus,
-        product_id:line.productId
-      })),
-      gross_total: finalTotal,
-    };
-    dispatch(createPerforma(proformaInvoiceData));
+      console.log ("selected quote:",selectedQuoteDetails)
+      const proformaInvoiceData = {
+        customer_id: customerId,
+        preformaTag: 'PROFORMA_INVOICE_TAG',
+        quote_number: selectedQuoteDetails?.quote_number || null, // Add selected quote_id here
+        quote_tag: selectedQuoteDetails?.quote_tag || null, // Add selected quote_tag here 
+        items: invoiceLines.map(line => ({
+          description: line.description || "Sample Product",
+          quantity: line.quantity,
+          discount: line.discount,
+          unit_price: line.unitPrice,
+          sub_total: line.subtotal,
+          dr_status: line.drStatus,
+          product_id:line.productId
+        })),
+        gross_total: finalTotal,
+      };
+      dispatch(createPerforma(proformaInvoiceData));
+      // ✅ Reset the form fields after submission
+      setInvoiceLines([{
+      productCode: '',
+      productId: '',
+      description: '',
+      quantity: 1,
+      discount: 0,
+      subtotal: 0,
+      unitPrice: 0,
+      drStatus: '',
+  }]);
+
+  setTotal(0);
+  setFinalTotal(0);
+  setOverallDiscount(0);
+  setTaxAmount(0);
+  console.log("🔄 Form reset successfully!");
   };
+  
 
 
   const handlePageChange = (pageNumber) => {
@@ -439,16 +454,19 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                       </select>
                     )}
                   </td>
-                  <td>
+                   {/*CHANGES MADE */}
+                   <td>
                     {proformaType === "existing" ? (
                       <span>{line.quantity}</span>
                     ) : (
                       <input 
                       className="po-quantity-input"
-                        type="number" 
-                        min="1"
-                        value={line.quantity} 
-                        onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
+                      type="number"
+                      value={line.quantity || ""} // Allows placeholder to show when empty
+                      onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
+                      min="1"
+                      placeholder={`Quantity`} // Dynamic placeholder
+                      required
                       />
                     )}
                   </td>
@@ -456,15 +474,20 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
                     {proformaType === "existing" ? (
                       <span>{line.discount}</span>
                     ) : (
-                      <input 
-                      className="po-quantity-input"
-                      min="0"
-                        type="number" 
-                        value={line.discount} 
-                        onChange={(e) => handleLineChange(index, 'discount', e.target.value)}
-                      />
+                      <input
+  type="number"
+  className="po-quantity-input"
+  value={line.discount || ""}  // Shows placeholder when empty
+  onChange={(e) => handleLineChange(index, 'discount', e.target.value)}
+  min="0"
+  max={products.find(product => product._id === line.productId)?.maxDiscount || 100}
+  placeholder={`Discount`}
+  required
+/>
                     )}
                   </td>
+                  
+{/*TO HERE - bugs free */}
                    {/* New DR Status Column */}
                    <td>
   {proformaType === "existing" ? (
@@ -515,15 +538,16 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
             <span className="amount"> ₹&nbsp;{total.toFixed(2)}</span>
           </div>
           <div>
+            {/*CHANGES MADE */}
             <input 
               className="amount"
               type="number" 
               step="0.01"
               value={overallDiscount === 0 ? '' : overallDiscount}  
-              onChange={(e) => setOverallDiscount(parseFloat(e.target.value)|| 0)}
+              onChange={handleOverallDiscountChange}            
               disabled={proformaType === "existing"}
               placeholder="Enter Overall Discount"
-            />
+            />                  {/*TO HERE - bugs free */}
           </div>
           <div>
             <label className="label">Total:</label>

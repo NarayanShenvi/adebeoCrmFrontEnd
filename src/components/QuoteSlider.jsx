@@ -255,6 +255,23 @@ const calculateFinalTotal = (totalAmount, discount) => {
   
     console.log("📝 Dispatching createQuote action:", quoteData);
     dispatch(createQuote(quoteData));
+    // ✅ Reset the form fields after submission
+    setQuoteLines([{
+      productCode: '',
+      productId: '',
+      description: '',
+      quantity: 1,
+      discount: 0,
+      subtotal: 0,
+      unitPrice: 0,
+      drStatus: '',
+  }]);
+
+  setTotal(0);
+  setFinalTotal(0);
+  setOverallDiscount(0);
+  setTaxAmount(0);
+  console.log("🔄 Form reset successfully!");
   };
   
   
