@@ -18,6 +18,9 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
   const quoteState = useSelector((state) => state.quote); // Getting entire quote state
   const { quotes } = quoteState || {};
   const proformaCreationResponse = useSelector(state => state.proformaInvoice.successMessage); // Get success message from state
+ 
+
+  const [refPoValue, setRefPoValue] = useState(""); // ✅ Define the state {/* --added-27-3*/}
 
   // const { quotes, proformaInvoices, loading, error, currentPage, totalPages } = useSelector(
   //   (state) => state.proformaInvoice
@@ -396,8 +399,19 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     onChange={() => setProformaType("existing")} 
   />
   <label htmlFor="existing">From Existing Quotes</label>
-</div>
 
+</div>
+{/* from--added-27-3*/}
+<div className="input-container-ref">
+  <input 
+    type="text" 
+    placeholder="Enter Reference PO" 
+    value={refPoValue} 
+    onChange={(e) => setRefPoValue(e.target.value)} 
+    className="form-control-ref"
+  />
+</div>
+{/* to--added-27-3*/}
         {/* Proforma Invoice Selection */}
         <div className="proforma-invoice-create-section">
         

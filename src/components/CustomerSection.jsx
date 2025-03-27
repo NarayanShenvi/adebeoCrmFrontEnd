@@ -290,7 +290,8 @@ const CustomerSection = ({ customer}) => {
       }
     }
   };
-
+  const [subArea, setSubArea] = useState("");
+const [area, setArea] = useState("");
   // Toggle between Edit and Create mode
   const handleToggleEditMode = () => {
     setIsEditMode((prevMode) => {
@@ -584,6 +585,7 @@ const handleSubmitComment = () => {
   <Col md={6}>
     <Form.Group className="form-group">
       <Form.Label>Company Type</Form.Label>
+      {/* from--added-27-3*/}
       <Form.Select
   value={selected}
   onChange={(e) => setSelected(e.target.value)}
@@ -594,35 +596,37 @@ const handleSubmitComment = () => {
   <option value="Constructions">Constructions</option>
   <option value="Consultants">Consultants</option>
   <option value="Manufacturers">Manufacturers</option>
+  <option value="Others">Others</option>
+
 </Form.Select>
-{/* added com type - changes*/}
+{/* to--added-27-3*/}
     </Form.Group>
   </Col>
   <Col md={6}>
     {/* Nested row for Sub Area and Area with a smaller gap */}
+     {/* from--added-27-3*/}
     <Row className="g-2">
       <Col md={6}>
-        <Form.Group className="form-group">
-          <Form.Label>Sub Area</Form.Label>
-          <Form.Control
-           type="text"
-           value={selected}
-           onChange={(e) => setSelected(e.target.value)}
-           placeholder="Enter Sub Area"
-         />
-       </Form.Group> {/* chaged sub-area to ip field */}
+      <Form.Group className="form-group">
+      <Form.Label>Sub Area</Form.Label>
+      <Form.Control
+        type="text"
+        value={subArea}
+        onChange={(e) => setSubArea(e.target.value)}
+        placeholder="Enter Sub Area"
+      />
+    </Form.Group>
       </Col>
       <Col md={6}>
       <Form.Group className="form-group">
-  <Form.Label>Area</Form.Label>
-  <Form.Control
-    type="text"
-    value={selected}
-    onChange={(e) => setSelected(e.target.value)}
-    placeholder="Enter Area"
-  />
-</Form.Group> {/* chaged area to ip field */}
-
+      <Form.Label>Area</Form.Label>
+      <Form.Control
+        type="text"
+        value={area}
+        onChange={(e) => setArea(e.target.value)}
+        placeholder="Enter Area"
+      />
+    </Form.Group> {/* to--added-27-3*/}
       </Col>
     </Row>
   </Col>

@@ -1402,6 +1402,37 @@ html, body {
 .radio-group label:hover::before {
   border-color: #069631;
 }
+.form-control-ref {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 8px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+  width: 100%;
+  max-width: 250px;
+}
+input.form-control-ref:focus {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+  outline: none !important; /* Ensures no default outline */
+}
+
+.form-control-ref:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+.input-container-ref {
+  display: flex;
+  justify-content: flex-end; /* Aligns content to the right */
+  width: 100%; /* Ensures it takes full width */
+  margin-top: -40px;
+  margin-bottom: 20px;
+}
 
 /* General Table Styles */
 .po-invoice-table {
