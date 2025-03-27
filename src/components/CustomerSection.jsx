@@ -37,6 +37,19 @@ const CustomerSection = ({ customer}) => {
   const error = useSelector((state) => state.customers?.error || null);
   const successMessage = useSelector((state) => state.customers?.successMessage || '');
   const selectedCustomer = useSelector((state) => state.customers?.selectedCustomer || null);
+  
+  const indianStates = [
+    "Andaman & Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
+    "Chhattisgarh", "Dadra & Nagar Haveli and Daman & Diu", "Delhi", "Goa", "Gujarat",
+    "Haryana", "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", "Karnataka",
+    "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra",
+    "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha",
+    "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+    "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+  ];
+   {/* states added-changes*/}
+
+  const [selectedState, setSelectedState] = useState(""); // Add this if needed  {/* states added-changes*/}
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -537,13 +550,17 @@ const handleSubmitComment = () => {
     <Form.Group className="form-group">
       <Form.Label>Company Type</Form.Label>
       <Form.Select
-        value={selected}
-        onChange={(e) => setSelected(e.target.value)}
-      
-      >
-        <option value="">-- Test Type --</option>
-        
-      </Form.Select>
+  value={selected}
+  onChange={(e) => setSelected(e.target.value)}
+>
+  <option value="">-- Select Type --</option>
+  <option value="Architectural">Architectural</option>
+  <option value="Interior">Interior</option>
+  <option value="Constructions">Constructions</option>
+  <option value="Consultants">Consultants</option>
+  <option value="Manufacturers">Manufacturers</option>
+</Form.Select>
+{/* added com type - changes*/}
     </Form.Group>
   </Col>
   <Col md={6}>
@@ -552,28 +569,25 @@ const handleSubmitComment = () => {
       <Col md={6}>
         <Form.Group className="form-group">
           <Form.Label>Sub Area</Form.Label>
-          <Form.Select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            
-          >
-            <option value="">-- Test Sub Area --</option>
-            
-          </Form.Select>
-        </Form.Group>
+          <Form.Control
+           type="text"
+           value={selected}
+           onChange={(e) => setSelected(e.target.value)}
+           placeholder="Enter Sub Area"
+         />
+       </Form.Group> {/* chaged sub-area to ip field */}
       </Col>
       <Col md={6}>
-        <Form.Group className="form-group">
-          <Form.Label>Area</Form.Label>
-          <Form.Select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            
-          >
-            <option value="">-- Test Area --</option>
-      
-          </Form.Select>
-        </Form.Group>
+      <Form.Group className="form-group">
+  <Form.Label>Area</Form.Label>
+  <Form.Control
+    type="text"
+    value={selected}
+    onChange={(e) => setSelected(e.target.value)}
+    placeholder="Enter Area"
+  />
+</Form.Group> {/* chaged area to ip field */}
+
       </Col>
     </Row>
   </Col>
@@ -611,16 +625,19 @@ const handleSubmitComment = () => {
         </Form.Group>
       </Col>
       <Col md={4}>
-        <Form.Group className="form-group">
-          <Form.Label>State</Form.Label>
-          <Form.Select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            
-          >
-<option value="">--Test State --</option>            
-          </Form.Select>
-        </Form.Group>
+      <Form.Group className="form-group">
+  <Form.Label>State</Form.Label>
+  <Form.Select 
+    value={state.state} 
+    onChange={(e) => setState({ ...state, state: e.target.value })}
+  >
+    <option value="">-- Select State --</option>
+    {indianStates.map((stateName, index) => (
+      <option key={index} value={stateName}>{stateName}</option>
+    ))}
+  </Form.Select> {/* states added-changes*/}
+</Form.Group>
+
       </Col>
       <Col md={4}>
         <Form.Group className="form-group">
@@ -638,7 +655,7 @@ const handleSubmitComment = () => {
       </Col>
     </Row>
   </Col>
-</Row>
+</Row> 
 
         {/* Primary Email */}
         <Row className="g-5">
@@ -774,7 +791,11 @@ const handleSubmitComment = () => {
         </Form.Group>
         </Col>
       </Row>
-       {/* Read-Only Field */}
+        {/* Read-Only Field */}
+              {/* changed */}
+
+              <Row className="g-5">   
+       <Col md={6}>
        <Form.Group className="form-group">
           <Form.Label>Funnel Status</Form.Label>
           <Form.Select
@@ -788,6 +809,10 @@ const handleSubmitComment = () => {
             <option>Not Interested</option>
           </Form.Select>
         </Form.Group>
+        </Col>
+       </Row>
+        {/* Add other form fields similarly */}
+              {/* changed up to here */}
 
        
         {/* Add other form fields similarly */}

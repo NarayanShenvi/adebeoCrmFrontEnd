@@ -351,115 +351,119 @@ const ProductSection = () => {
     <Row className="g-2">
            <Col md={6}>
            <Form.Group className="form-group-prod">
-              <Form.Label className="required-label">Purchase Cost:</Form.Label>
+  <Form.Label className="required-label">Purchase Cost:</Form.Label>
   <Form.Control
     type="number"
     name="purchaseCost"
-    value={formData.purchaseCost}
-    onChange={handleChange}
-placeholder='Enter purchase cost'
-required
+    value={formData.purchaseCost || ""}
+    onChange={(e) => {
+      const value = e.target.value;
+      if (value === "" || parseFloat(value) >= 0) {
+        handleChange(e);
+      }
+    }}
+    min="0" // Prevents negative values
+    placeholder="Enter purchase cost"
+    required
   />
 </Form.Group>
+
 
            </Col>
            <Col md={6}>
            <Form.Group className="form-group-prod">
-              <Form.Label className="required-label">Sales Cost:</Form.Label>
-  <Form.Control
-    type="number"
-    name="salesCost"
-    value={formData.salesCost}
-    onChange={handleChange}
-placeholder='Enter sales cost'
-required
-  />
-</Form.Group>
+    <Form.Label className="required-label">Sales Cost:</Form.Label>
+    <Form.Control
+      type="number"
+      name="salesCost"
+      value={formData.salesCost || ""}
+      onChange={(e) => {
+        const value = e.target.value;
+        if (value === "" || parseFloat(value) >= 0) {
+          handleChange(e);
+        }
+      }}
+      min="0" // Prevents negative values
+      placeholder="Enter sales cost"
+      required
+    />
+  </Form.Group>
 </Col>
 </Row>
 </Col>
          </Row>     
          <Row className="g-5">   
-           <Col md={6}>
-           <Form.Group className="form-group-prod">
-              <Form.Label className="required-label">Email:</Form.Label>
-  <Form.Control
-    type="email"
-    name="email"
-    value={formData.email}
-    onChange={handleChange}
-placeholder='Enter email address'
-required
-  />
-</Form.Group>
-
-           </Col>
-           <Col md={6}>
-           <Form.Group className="form-group-prod">
+                    <Col md={6}>
+                    <Form.Group className="form-group-prod">
+                       <Form.Label className="required-label">Email:</Form.Label>
+           <Form.Control
+             type="email"
+             name="email"
+             value={formData.email}
+             onChange={handleChange}
+         placeholder='Enter email address'
+         required
+           />
+         </Form.Group>
+         
+                    </Col>
+                    <Col md={6}>
+                    <Form.Group className="form-group-prod">
   <Form.Label className="required-label">Max Discount:</Form.Label>
   <Form.Control
     type="number"
     name="maxDiscount"
-    value={formData.maxDiscount}
-    onChange={handleChange}
-placeholder='Enter maximum discount'
-required
-  />
-</Form.Group>
-
-           </Col>
-         </Row>     
-         <Row className="g-5">   
-           <Col md={6}>
-           <Form.Group className="form-group-prod">
-  <Form.Label className="required-label">DR Status:</Form.Label>
-  <Form.Select
-    name="drStatus"
-    value={formData.drStatus}
-    onChange={handleChange}
+    value={formData.maxDiscount || ""}
+    onChange={(e) => {
+      const value = e.target.value;
+      if (value === "" || parseFloat(value) >= 0) {
+        handleChange(e);
+      }
+    }}
+    min="0" // Prevents negative values
+    placeholder="Enter maximum discount"
     required
-  >
-    <option value="">Select Status</option>
-    <option value="pending">Approved</option>
-    <option value="rejected">Pending</option>
-    <option value="approved">Rejected</option>
-  </Form.Select>
-</Form.Group>
-
-           </Col>
-           <Col md={6}>
-           <Form.Group className="form-group-prod">
-  <Form.Label className="required-label">Duration:</Form.Label>
-  <div className="radio-group-prod">
-    {["1 Month", "3 Months", "6 Months", "1 Year", "2 Years", "3 Years", "Perpetual"].map((duration) => (
-      <div key={duration} className="radio-button-prod">
-        <input
-          type="radio"
-          id={`duration-${duration}`}
-          name="subscriptionDuration"
-          value={duration}
-          onChange={handleChange}
-          checked={formData.subscriptionDuration === duration}
-        />
-        <label htmlFor={`duration-${duration}`}>{duration}</label>
-      </div>
-    ))}
-  </div>
-</Form.Group>
-
-  </Col>
-         </Row> 
-         <Form.Group className="form-group-prod mt-4 custom-checkbox" controlId="productEnabled">
-  <Form.Check
-    type="checkbox"
-    label="Product Enabled"
-    name="prodisEnabled"
-    checked={formData.prodisEnabled}
-    onChange={handleChange}
-
   />
-</Form.Group>         
+</Form.Group>
+
+                       {/* changed  dr status removed*/}
          
+                    </Col>
+                  </Row>     
+                  <Row className="g-5"> 
+                    <Col md={6}>
+                    <Form.Group className="form-group-prod">
+           <Form.Label className="required-label">Duration:</Form.Label>
+           <div className="radio-group-prod">
+             {["1 Month", "3 Months", "6 Months", "1 Year", "2 Years", "3 Years", "Perpetual"].map((duration) => (
+               <div key={duration} className="radio-button-prod">
+                 <input
+                   type="radio"
+                   id={`duration-${duration}`}
+                   name="subscriptionDuration"
+                   value={duration}
+                   onChange={handleChange}
+                   checked={formData.subscriptionDuration === duration}
+                 />
+                 <label htmlFor={`duration-${duration}`}>{duration}</label>
+               </div>
+             ))}
+           </div>
+         </Form.Group>
+         
+           </Col>
+                  </Row> 
+                  <Form.Group className="form-group-prod mt-4 custom-checkbox" controlId="productEnabled">
+           <Form.Check
+             type="checkbox"
+             label="Product Enabled"
+             name="prodisEnabled"
+             checked={formData.prodisEnabled}
+             onChange={handleChange}
+         
+           />
+         </Form.Group>                  
+          {/* changed up to here */}
 
 
         <button type="submit" disabled={loading} className="submit-button-prod">

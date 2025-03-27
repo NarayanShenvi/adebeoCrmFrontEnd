@@ -141,98 +141,142 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     }
   }, [selectedQuoteDetails]);
 
-  const handleLineChange = (index, field, value) => {
-    const newInvoiceLines = [...invoiceLines];
-    newInvoiceLines[index][field] = value;
-  
-    if (field === 'quantity' || field === 'discount') {
-      const product = products.find(product => product._id === newInvoiceLines[index].productId);
-      if (product) {
-        const quantity = parseInt(newInvoiceLines[index].quantity, 10) || 1;
-        let discount = parseFloat(newInvoiceLines[index].discount) || 0;
-        const price = parseFloat(product.salesCost) || 0;
-        const productCode = product.productCode
-  
-        const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
-        newInvoiceLines[index].discount = validDiscount;
-  
-        const unitPrice = price;
-        const subtotal = (unitPrice - validDiscount) * quantity;
-  
-        newInvoiceLines[index].unitPrice = unitPrice;
-        newInvoiceLines[index].subtotal = subtotal;
-        newInvoiceLines[index].productCode = productCode;
-      }
-    }
-  
-    setInvoiceLines(newInvoiceLines);
-    updateTotal(newInvoiceLines);
-  };
-
-
-
-  const updateTotal = (lines) => {
-    const totalCost = lines.reduce((acc, line) => acc + line.subtotal, 0);
-    setTotal(totalCost);
-    calculateFinalTotal(totalCost, overallDiscount);
-  };
-
-  useEffect(() => {
-    // Log when the quotes are updated in the state
-    console.log('Quotes updated in Redux state:', quotes);
-  }, [quotes]); // This will log every time the `quotes` state changes
-
-  useEffect(() => {
- // console.log("Component current Performans", currentPerformas);
-}, [currentPerformas]);
-
- // const currentPerformas = Array.isArray(performas) ? performas.slice(indexOfFirstPerforma, indexOfLastPerforma) : [];
-  const calculateFinalTotal = (totalAmount, discount) => {
-    const discountedTotal = totalAmount - discount;
-    const tax = discountedTotal * 0.18;
-    setTaxAmount(tax);
-    setFinalTotal(discountedTotal + tax);
-  };
-
-  const handleAddProductRow = () => {
-    setInvoiceLines([
-      ...invoiceLines,
-      {
-        productId: '',
-        quantity: 1,
-        discount: 0,
-        subtotal: 0,
-        unitPrice: 0,
-        drStatus: '',
-      },
-    ]);
-  };
-
-  const handleProductSelect = (index, productId) => {
-    const product = products.find((product) => product._id === productId);
-    if (product) {
-      const quantity = parseInt(invoiceLines[index].quantity, 10) || 1;
-      let discount = parseFloat(invoiceLines[index].discount) || 0;
-      const price = parseFloat(product.salesCost) || 0;
-      const description = product.ProductDisplay;
-      const productCode = product.productCode;
-
-      const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
-  
-      const unitPrice = price;
-      const subtotal = (unitPrice - validDiscount) * quantity;
-      
-  
+   //changes made from here 
+    const handleLineChange = (index, field, value) => {
       const newInvoiceLines = [...invoiceLines];
-      newInvoiceLines[index].productId = productId;
-      newInvoiceLines[index].unitPrice = unitPrice;
-      newInvoiceLines[index].subtotal = subtotal;
-      newInvoiceLines[index].description = description;
-      newInvoiceLines[index].productCode = productCode;
+      newInvoiceLines[index][field] = value;
+    
+      if (field === 'quantity' || field === 'discount') {
+        const product = products.find(product => product._id === newInvoiceLines[index].productId);
+        if (product) {
+          const quantity = parseInt(newInvoiceLines[index].quantity, 10) || 1;
+          let discount = parseFloat(newInvoiceLines[index].discount) || 0;
+          const price = parseFloat(product.salesCost) || 0;
+    
+          const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
+          newInvoiceLines[index].discount = validDiscount;
+    
+          const unitPrice = price;
+          const subtotal = (unitPrice - validDiscount) * quantity;
+    
+          newInvoiceLines[index].unitPrice = unitPrice;
+          newInvoiceLines[index].subtotal = subtotal;
+        }
+      }
+      
+      if (field === 'discount') {
+        const product = products.find(product => product._id === newInvoiceLines[index].productId);
+  
+        if (!product) {
+            alert("💡 Please select a product first, before entering a discount!");
+            return; // Prevents further execution
+        }
+  
+        let discount = parseFloat(value) || 0;
+        const maxDiscount = parseFloat(product.maxDiscount) || 100; 
+  
+        if (discount < 0) {
+            alert("⛔ Discount cannot be negative!");
+            discount = 0;
+        } else if (discount > maxDiscount) {
+            alert(`🚫 Maximum discount allowed is ${maxDiscount}₹!`);
+            discount = maxDiscount;
+        }
+  
+        newInvoiceLines[index].discount = discount;
+    }
       setInvoiceLines(newInvoiceLines);
       updateTotal(newInvoiceLines);
-    }
-  };
+    };
+  
+  
+  
+   const updateTotal = (lines) => {
+       const totalCost = lines.reduce((acc, line) => acc + line.subtotal, 0);
+       setTotal(totalCost);
+       calculateFinalTotal(totalCost, overallDiscount);
+     };
+   
+     useEffect(() => {
+       // Log when the quotes are updated in the state
+       console.log('Quotes updated in Redux state:', quotes);
+     }, [quotes]); // This will log every time the `quotes` state changes
+   
+     useEffect(() => {
+    // console.log("Component current Performans", currentPerformas);
+   }, [currentPerformas]);
+   
+    // const currentPerformas = Array.isArray(performas) ? performas.slice(indexOfFirstPerforma, indexOfLastPerforma) : [];
+     const calculateFinalTotal = (totalAmount, discount) => {
+       const discountedTotal = totalAmount - discount;
+       const tax = discountedTotal * 0.18;
+       setTaxAmount(tax);
+       setFinalTotal(discountedTotal + tax);
+     };
+    const handleAddProductRow = () => {
+      setInvoiceLines([
+        ...invoiceLines,
+        {
+          productId: '',
+          quantity: 1,
+          discount: 0,
+          subtotal: 0,
+          unitPrice: 0,
+          drStatus: '',
+        },
+      ]);
+    };
+  
+    const handleProductSelect = (index, productId) => {
+      const product = products.find((product) => product._id === productId);
+      if (product) {
+        const quantity = parseInt(invoiceLines[index].quantity, 10) || 1;
+        let discount = parseFloat(invoiceLines[index].discount) || 0;
+        const price = parseFloat(product.salesCost) || 0;
+        const description = product.ProductDisplay;
+        const productCode = product.productCode;
+  
+        const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
+    
+        const unitPrice = price;
+        const subtotal = (unitPrice - validDiscount) * quantity;
+        
+    
+        const newInvoiceLines = [...invoiceLines];
+        newInvoiceLines[index].productId = productId;
+        newInvoiceLines[index].unitPrice = unitPrice;
+        newInvoiceLines[index].subtotal = subtotal;
+        newInvoiceLines[index].description = description;
+        newInvoiceLines[index].productCode = productCode;
+        setInvoiceLines(newInvoiceLines);
+        updateTotal(newInvoiceLines);
+      }
+    };
+    const handleOverallDiscountChange = (e) => {
+      let discountValue = parseFloat(e.target.value) || 0;
+      const maxOverallDiscount = 100; // Maximum allowed discount
+    
+      // Check if at least one product is selected
+      const hasProduct = invoiceLines.some(line => line.productId);
+    
+      if (!hasProduct) {  
+          alert("💡 Please select a product first, before entering a overall discount!");
+          return;
+      }
+    
+      if (discountValue < 0) {
+          alert("⛔ Overall Discount cannot be negative!");
+          discountValue = 0;
+      } else if (discountValue > maxOverallDiscount) {
+          alert(`🚫 Maximum allowed Overall Discount is ${maxOverallDiscount}₹!`);
+          discountValue = maxOverallDiscount;
+      }
+    
+      setOverallDiscount(discountValue);
+      calculateFinalTotal(total, discountValue);
+    };
+    //to here -- bugs free
+    
 
   const handleDeleteProductRow = (index) => {
     const newInvoiceLines = invoiceLines.filter((_, i) => i !== index);

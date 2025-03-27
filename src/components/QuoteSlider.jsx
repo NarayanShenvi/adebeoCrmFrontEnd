@@ -62,63 +62,21 @@ const QuoteSlider = ({ customerId, onClose }) => {
   }, [quoteCreationResponse]); // This will trigger when quoteCreationResponse updates
   
 
-  const handleLineChange = (index, field, value) => {
-    const newQuoteLines = [...quoteLines];
-    newQuoteLines[index][field] = value;
-  
-    if (field === 'quantity' || field === 'discount') {
-      const product = products.find(product => product._id === newQuoteLines[index].productId);
-      if (product) {
-        const quantity = parseInt(newQuoteLines[index].quantity, 10) || 1;
-        let discount = parseFloat(newQuoteLines[index].discount) || 0;
-        const price = parseFloat(product.salesCost) || 0;
-        const description = product.ProductDisplay;
-        const productCode = product.productCode;
-  
-        const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
-        newQuoteLines[index].discount = validDiscount;
-  
-        const unitPrice = price;
-        const subtotal = (unitPrice - validDiscount) * quantity;
-  
-        newQuoteLines[index].unitPrice = unitPrice;
-        newQuoteLines[index].subtotal = subtotal;
-        newQuoteLines[index].description = description;
-        newQuoteLines[index].productCode = productCode;
-      }
-    }
-  
-    setQuoteLines(newQuoteLines);
-    updateTotal(newQuoteLines);
-  };
-  
-  
-  const handleAddProductRow = () => {
-    setQuoteLines([
-      ...quoteLines,
-      {
-        productId: '',
-        description:'',
-        quantity: 1,
-        discount: 0,
-        subtotal: 0,
-        unitPrice: 0,
-        drStatus:'',
-      },
-    ]);
-  };
-
-  const handleProductSelect = (index, productId) => {
-    const newQuoteLines = [...quoteLines];
-    newQuoteLines[index].productId = productId;
-
-    const product = products.find(product => product._id === productId);
+ //changes made from here 
+ const handleLineChange = (index, field, value) => {
+  const newQuoteLines = [...quoteLines];
+  newQuoteLines[index][field] = value;
+   
+  if (field === 'quantity' || field === 'discount') {
+    const product = products.find(product => product._id === newQuoteLines[index].productId);
     if (product) {
       const quantity = parseInt(newQuoteLines[index].quantity, 10) || 1;
       let discount = parseFloat(newQuoteLines[index].discount) || 0;
       const price = parseFloat(product.salesCost) || 0;
-      const description = product.ProductDisplay || '';
+      const description = product.ProductDisplay;
+
       const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
+      newQuoteLines[index].discount = validDiscount;
 
       const unitPrice = price;
       const subtotal = (unitPrice - validDiscount) * quantity;
@@ -127,23 +85,105 @@ const QuoteSlider = ({ customerId, onClose }) => {
       newQuoteLines[index].subtotal = subtotal;
       newQuoteLines[index].description = description;
     }
+  }
+ 
+  if (field === 'discount') {
+    const product = products.find(product => product._id === newQuoteLines[index].productId);
 
-    setQuoteLines(newQuoteLines);
-    updateTotal(newQuoteLines);
-  };
+    if (!product) {
+        alert("💡 Please select a product first, before entering a discount!");
+        return; // Prevents further execution
+    }
+
+    let discount = parseFloat(value) || 0;
+    const maxDiscount = parseFloat(product.maxDiscount) || 100; 
+
+    if (discount < 0) {
+        alert("⛔ Discount cannot be negative!");
+        discount = 0;
+    } else if (discount > maxDiscount) {
+        alert(`🚫 Maximum discount allowed is ${maxDiscount}₹!`);
+        discount = maxDiscount;
+    }
+
+    newQuoteLines[index].discount = discount;
+}
+  setQuoteLines(newQuoteLines);
+  updateTotal(newQuoteLines);
+};
+
+
+const handleAddProductRow = () => {
+  setQuoteLines([
+    ...quoteLines,
+    {
+      productId: '',
+      description:'',
+      quantity: 1,
+      discount: 0,
+      subtotal: 0,
+      unitPrice: 0,
+      drStatus:'',
+    },
+  ]);
+};
+
+const handleProductSelect = (index, productId) => {
+  const newQuoteLines = [...quoteLines];
+  newQuoteLines[index].productId = productId;
+
+  const product = products.find(product => product._id === productId);
+  if (product) {
+    const quantity = parseInt(newQuoteLines[index].quantity, 10) || 1;
+    let discount = parseFloat(newQuoteLines[index].discount) || 0;
+    const price = parseFloat(product.salesCost) || 0;
+    const description = product.ProductDisplay || '';
+    const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
+
+    const unitPrice = price;
+    const subtotal = (unitPrice - validDiscount) * quantity;
+
+    newQuoteLines[index].unitPrice = unitPrice;
+    newQuoteLines[index].subtotal = subtotal;
+    newQuoteLines[index].description = description;
+  }
+
+  setQuoteLines(newQuoteLines);
+  updateTotal(newQuoteLines);
+};
 //changes made
 
 const updateTotal = (lines) => {
-  const totalCost = lines.reduce((acc, line) => acc + line.subtotal, 0);
-  setTotal(totalCost);
-  calculateFinalTotal(totalCost, overallDiscount);
+const totalCost = lines.reduce((acc, line) => acc + line.subtotal, 0);
+setTotal(totalCost);
+calculateFinalTotal(totalCost, overallDiscount);
 };
 
 const handleOverallDiscountChange = (e) => {
-  const discountValue = parseFloat(e.target.value) || 0;
-  setOverallDiscount(discountValue);
-  calculateFinalTotal(total, discountValue);
+let discountValue = parseFloat(e.target.value) || 0;
+const maxOverallDiscount = 100; // Maximum allowed discount
+
+// Check if at least one product is selected
+const hasProduct = quoteLines.some(line => line.productId);
+
+if (!hasProduct) {  
+    alert("💡 Please select a product first, before entering a overall discount!");
+    return;
+}
+
+if (discountValue < 0) {
+    alert("⛔ Overall Discount cannot be negative!");
+    discountValue = 0;
+} else if (discountValue > maxOverallDiscount) {
+    alert(`🚫 Maximum allowed Overall Discount is ${maxOverallDiscount}₹!`);
+    discountValue = maxOverallDiscount;
+}
+
+setOverallDiscount(discountValue);
+calculateFinalTotal(total, discountValue);
 };
+//to here -- bugs free
+
 
 const calculateFinalTotal = (totalAmount, discount) => {
   const discountedTotal = Math.max(0, totalAmount - discount); // Ensure it doesn't go negative

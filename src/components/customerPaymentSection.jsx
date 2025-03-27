@@ -5,6 +5,10 @@ import { FaCheckCircle } from "react-icons/fa"; // changed---Import the check-ci
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { RiInformation2Fill } from "react-icons/ri";
 import { generateInvoicePdfAsync } from '../redux/slices/customerPaymentSlice';
+import { FaFileDownload, FaFilePdf } from 'react-icons/fa'; // added
+import { CiFileOff } from "react-icons/ci"; // added
+import { FaDownload } from "react-icons/fa6";// added
+
 
 const CustomerPaymentSection = () => {
   const dispatch = useDispatch();
@@ -122,8 +126,9 @@ const CustomerPaymentSection = () => {
         <th>Status</th>
         <th>Paid Amount</th>
         <th>Comment</th>
-        <th>Actions</th>
-        <th>Download PDF</th>
+        <th>Action</th>
+        <th><FaDownload className='header-down'/>
+        </th>
         <th>Info</th> {/* New Info column */}
       </tr>
     </thead>
@@ -132,11 +137,10 @@ const CustomerPaymentSection = () => {
         <tr key={payment.invoice_number}>
            <td>
           <button 
-            className="pdf-gen-button" 
+className='cxpay'
             onClick={() => handleGeneratePDF(payment.invoice_number)} // Function to handle PDF generation
           >
-            Generate PDF
-          </button>
+ <FaFilePdf   title='Generate PDF' />     </button> 
         </td>
           <td>{payment.invoice_number}</td>
           <td>{payment.customer_name}</td>
@@ -145,12 +149,19 @@ const CustomerPaymentSection = () => {
           <td>{new Date(payment.invoice_date).toLocaleDateString()}</td>
           <td>{payment.payment_status}</td>
           <td>
-            <input
-              type="number"
-              value={payment.paid_amount}
-              onChange={(e) => handlePaidAmountChange(index, e.target.value)}
-              disabled={payment.payment_status === "Completed"}
-            />
+          <input
+  type="number"
+  value={payment.paid_amount || ""}
+  onChange={(e) => {
+    const value = e.target.value;
+    if (value === "" || parseFloat(value) >= 0) {
+      handlePaidAmountChange(index, value);
+    }
+  }}
+  min="0" // Prevents negative values
+  disabled={payment.payment_status === "Completed"}
+/>
+
           </td>
           <td>
             <textarea
@@ -180,10 +191,10 @@ const CustomerPaymentSection = () => {
           <td>
               {payment.pdf_link ? (
                 <a href={`${payment.base_url}${payment.pdf_link}`} target="_blank" rel="noopener noreferrer">
-                  Download PDF
-                </a>
+<FaFileDownload className='rowdown' title='Download PDF'/>
+</a>
               ) : (
-                "No PDF Available"
+<CiFileOff className='nopdf'title='No PDF Available'/>
               )}
             </td>
           <td>
