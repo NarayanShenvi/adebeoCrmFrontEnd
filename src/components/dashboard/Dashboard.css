@@ -271,12 +271,15 @@ html, body {
 }
 .funnel-table th:nth-child(1),
 .funnel-table td:nth-child(1) {
-  width: 10px; /* Fixed width */
+  width: 8px; /* Fixed width */
+}
+.funnel-table th:nth-child(3),
+.funnel-table td:nth-child(3) {
+  width: 1200px; /* Fixed width */
 }
 .funnel-table th:last-child,
 .funnel-table td:last-child {
-  width: 100%;
-  max-width: 1200px; /* Flexible width */
+  width: 400px;
 }
 /* Hover effect for table rows */
 .funnel-table tbody tr:hover {
@@ -2906,7 +2909,36 @@ a:hover {
   margin-top: 33%;
   margin-bottom: 20px;
 }
+/* Success message initially hidden */
+.alert-box-customer {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4caf50; /* Green success color */
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s;
+}
 
+/* ✅ Show alert only when Submit button is clicked */
+.comment-edit-modal-customer:has(.submitcomment-customer:active) .alert-box-customer {
+  opacity: 1;
+  visibility: visible;
+  animation: fadeOut 2s ease-in-out 2s forwards; /* Hide after 2s */
+}
+
+/* ✨ Animation to fade out */
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
 
 /* Responsive Design for customer */
 @media (max-width: 1024px) {
@@ -4171,7 +4203,7 @@ select option {
 
 .payments-table th:nth-child(1),
 .payments-table td:nth-child(1) {
-  width: 100px; /* Fixed width */
+  width: 150px; /* Fixed width */
 }
 .payments-table th:nth-child(2),
 .payments-table td:nth-child(2) {
@@ -4205,7 +4237,7 @@ select option {
 }
 .payments-table th:nth-child(10),
 .payments-table td:nth-child(10) {
-  width: 80px; /* Fixed width */
+  width: 50px; /* Fixed width */
 }
 
 .payments-table tbody tr:hover {

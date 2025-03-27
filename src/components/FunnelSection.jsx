@@ -246,7 +246,7 @@ const FunnelSection = () => {
            
    <td>{item.insertDate}</td>
    <td>{item.companyName}</td>
-   <td>{item.address.replace(/, /g, ',\n')}</td>
+   <td>{item.address}</td>
    <td>{item.city}</td>
    <td>{item.mobileNumber}</td>
    <td>{item.primaryEmail}</td>
