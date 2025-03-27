@@ -820,16 +820,37 @@ html, body {
   width: 50%;
   height: 100vh;
   background: white;
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
-  transition: right 0.8s ease-in-out; /* Adjust transition duration */
-  z-index: 9999;
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.3);
+  transition: right 0.5s ease-in-out;
+  z-index: 10000;
   overflow-y: auto;
   border-left: 2px solid black;
-  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
+/* Active Class to Show Slider */
+.quote-slider.open {
+  right: 0;
+}
+
+/* Background Blur Effect When Slider Opens */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* Dark background */
+  backdrop-filter: blur(5px); /* Light blur effect */
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  pointer-events: none;
+}
 .quote-slider.show {
   right: 0; /* Slide in */
   opacity: 1; /* Fade in */
@@ -1414,7 +1435,7 @@ html, body {
   font-weight: 800;
   pointer-events: auto;
   width: 100%;
-  max-width: 250px;
+  max-width: 230px;
 }
 input.form-control-ref:focus {
   border-color: rgba(6, 41, 66, 0.31) !important;
@@ -1425,6 +1446,20 @@ input.form-control-ref:focus {
 .form-control-ref:hover
 {
   background-color: rgba(52, 164, 245, 0.31);;
+}
+.ref
+{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding-left: 30px;
+  font-size: 14px;
+  color: #242323da;
+  user-select: none;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 700;
+  margin-right: 10px;
 }
 .input-container-ref {
   display: flex;
@@ -4465,64 +4500,89 @@ select option {
   .customer-payment-section {
     max-width: 100%;
     margin-left: 0;
-    padding: 10px;
+    padding: 15px;
   }
-
+  
   .payments-table {
-    min-width: 800px;
-  }
-
-  .payments-table th, 
-  .payments-table td {
-    font-size: 12px;
-    padding: 6px;
-  }
-}
-
-@media (max-width: 768px) {
-  .customer-payment-section {
-    padding: 10px;
-  }
-
-  .payments-table {
-    min-width: 700px;
+    min-width: 900px; /* Adjust for medium screens */
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   .payments-table th, 
   .payments-table td {
     font-size: 11px;
-    padding: 5px;
+    padding: 6px;
+  }
+
+  .payments-table input, 
+  .payments-table textarea {
+    font-size: 11px;
+    max-width: 80px;
   }
 }
 
-/* 🔹 Further Adjustments for Very Small Screens (Phones) */
-@media (max-width: 480px) {
-  .customer-payment-section {
-    padding: 5px;
+@media (max-width: 768px) {
+  .customer-payment-section h2 {
+    font-size: 18px;
+    margin-top: 3%;
   }
 
   .payments-table {
-    min-width: 100%;
+    min-width: 700px;
+    font-size: 10px;
   }
 
   .payments-table th, 
   .payments-table td {
+    padding: 5px;
     font-size: 10px;
-    padding: 6px;
   }
 
-  /* Compact Pagination */
+  .payments-table input, 
+  .payments-table textarea {
+    height: 30px;
+    font-size: 10px;
+    max-width: 70px;
+  }
+  
   .pagination-controls {
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-  }
-
-  .pagination-controls button {
-    font-size: 14px;
   }
 
   .pagination-controls span {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .customer-payment-section {
+    padding: 10px;
+  }
+
+  .customer-payment-section h2 {
+    font-size: 16px;
+  }
+
+  .payments-table {
+    min-width: 100%;
+    overflow-x: auto;
+  }
+
+  .payments-table th, 
+  .payments-table td {
+    padding: 4px;
+    font-size: 9px;
+  }
+
+  .payments-table input, 
+  .payments-table textarea {
+    font-size: 9px;
+    max-width: 60px;
+  }
+
+  .pagination-controls {
+    font-size: 10px;
   }
 }

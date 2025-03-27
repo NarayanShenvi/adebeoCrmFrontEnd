@@ -187,7 +187,7 @@ calculateFinalTotal(total, discountValue);
 
 const calculateFinalTotal = (totalAmount, discount) => {
   const discountedTotal = Math.max(0, totalAmount - discount); // Ensure it doesn't go negative
-  const tax = discountedTotal * 0.18; // 18% Tax
+  const tax = Math.round(discountedTotal * 0.18); // 18% Tax, rounded to nearest integer
   setTaxAmount(tax);
   setFinalTotal(discountedTotal + tax);
 };

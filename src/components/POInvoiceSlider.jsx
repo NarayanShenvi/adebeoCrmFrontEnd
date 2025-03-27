@@ -212,7 +212,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
     // const currentPerformas = Array.isArray(performas) ? performas.slice(indexOfFirstPerforma, indexOfLastPerforma) : [];
      const calculateFinalTotal = (totalAmount, discount) => {
        const discountedTotal = totalAmount - discount;
-       const tax = discountedTotal * 0.18;
+       const tax = Math.round(discountedTotal * 0.18); // 18% Tax, rounded to nearest integer
        setTaxAmount(tax);
        setFinalTotal(discountedTotal + tax);
      };
@@ -403,6 +403,7 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
 </div>
 {/* from--added-27-3*/}
 <div className="input-container-ref">
+  <label className='ref' >Ref PO</label>
   <input 
     type="text" 
     placeholder="Enter Reference PO" 
