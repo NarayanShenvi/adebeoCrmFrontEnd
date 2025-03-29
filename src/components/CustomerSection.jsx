@@ -74,7 +74,10 @@ const CustomerSection = ({ customer}) => {
     primaryLocality: '',
     secondaryLocality: '',
     state: '',
-    website: ''
+    website: '',
+    area:'',
+    subArea:'',
+    companyType:''
   });
   //--------------------Products Section update ------------------------
   // Accessing products state from Redux
@@ -160,7 +163,10 @@ const CustomerSection = ({ customer}) => {
         primaryLocality: selectedCustomer.primaryLocality || '',
         secondaryLocality: selectedCustomer.secondaryLocality || '',
         state: selectedCustomer.state || '',
-        website: selectedCustomer.website || ''
+        website: selectedCustomer.website || '',
+        area:selectedCustomer.area || '',
+        subArea:selectedCustomer.subArea || '',
+        companyType:selectedCustomer.companyType || ''
       });
 
       // Directly use the `products` array, which is already an array of product IDs (strings)
@@ -220,7 +226,10 @@ const CustomerSection = ({ customer}) => {
             primaryLocality: updatedCustomerData.primaryLocality || '',
             secondaryLocality: updatedCustomerData.secondaryLocality || '',
             state: updatedCustomerData.state || '',
-            website: updatedCustomerData.website || ''
+            website: updatedCustomerData.website || '',
+            area:updatedCustomerData.area || '',
+            subArea:updatedCustomerData.subArea || '',
+            companyType:updatedCustomerData.companyType || ''
           });
 
           // Clear form only after successful update
@@ -241,7 +250,10 @@ const CustomerSection = ({ customer}) => {
             primaryLocality: '',
             secondaryLocality: '',
             state: '',
-            website: ''
+            website: '',
+            area:'',
+            subArea:'',
+            companyType:''
           });
 
           // Optionally reset selected products
@@ -280,7 +292,10 @@ const CustomerSection = ({ customer}) => {
           primaryLocality: '',
           secondaryLocality: '',
           state: '',
-          website: ''
+          website: '',
+          area:'',
+          subArea:'',
+          companyType:''
         });
 
         // Optionally reset selected products after creation
@@ -290,8 +305,8 @@ const CustomerSection = ({ customer}) => {
       }
     }
   };
-  const [subArea, setSubArea] = useState("");
-const [area, setArea] = useState("");
+//  const [subArea, setSubArea] = useState("");
+//const [area, setArea] = useState("");
   // Toggle between Edit and Create mode
   const handleToggleEditMode = () => {
     setIsEditMode((prevMode) => {
@@ -315,7 +330,10 @@ const [area, setArea] = useState("");
           primaryLocality: '',
           secondaryLocality: '',
           state: '',
-          website: ''
+          website: '',
+          subArea:'',
+          area :'',
+          companyType:''
         });
 
         // Clear selected products when switching to create mode
@@ -390,8 +408,7 @@ const [area, setArea] = useState("");
   //   // Clear success message when toggling modes
   //   dispatch(clearSuccessMessage());
   // };
-  
-
+ 
   useEffect(() => {
     debouncedSearch(searchQuery);
   }, [searchQuery, debouncedSearch]);
@@ -587,18 +604,17 @@ const handleSubmitComment = () => {
       <Form.Label>Company Type</Form.Label>
       {/* from--added-27-3*/}
       <Form.Select
-  value={selected}
-  onChange={(e) => setSelected(e.target.value)}
->
-  <option value="">-- Select Type --</option>
-  <option value="Architectural">Architectural</option>
-  <option value="Interior">Interior</option>
-  <option value="Constructions">Constructions</option>
-  <option value="Consultants">Consultants</option>
-  <option value="Manufacturers">Manufacturers</option>
-  <option value="Others">Others</option>
+        value={state.companyType}
+        onChange={(e) => setState({...state, companyType: e.target.value})}
+      >
+        <option value="">Architectural</option>
+        <option value="Interior">Interior</option>
+        <option value="Constructions">Constructions</option>
+        <option value="Consultants">Consultants</option>
+        <option value="Manufacturers">Manufacturers</option>
+        <option value="Others">Others</option>
 
-</Form.Select>
+      </Form.Select>
 {/* to--added-27-3*/}
     </Form.Group>
   </Col>
@@ -608,22 +624,24 @@ const handleSubmitComment = () => {
     <Row className="g-2">
       <Col md={6}>
       <Form.Group className="form-group">
-      <Form.Label>Sub Area</Form.Label>
-      <Form.Control
-        type="text"
-        value={subArea}
-        onChange={(e) => setSubArea(e.target.value)}
-        placeholder="Enter Sub Area"
-      />
-    </Form.Group>
+        <Form.Label>Sub Area</Form.Label>
+        <Form.Control
+          type="text"
+          value={state.subArea}
+          onChange={(e) => setState({...state, subArea: e.target.value})}
+          placeholder="Enter Sub Area"
+        />
+     </Form.Group>
+     
       </Col>
       <Col md={6}>
       <Form.Group className="form-group">
       <Form.Label>Area</Form.Label>
       <Form.Control
         type="text"
-        value={area}
-        onChange={(e) => setArea(e.target.value)}
+        name="area"
+        value={state.area}
+        onChange={(e) => setState({...state, area: e.target.value})}
         placeholder="Enter Area"
       />
     </Form.Group> {/* to--added-27-3*/}
@@ -654,27 +672,28 @@ const handleSubmitComment = () => {
       <Col md={4}>
         <Form.Group className="form-group">
           <Form.Label>City</Form.Label>
-          <Form.Select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            
-          >
-<option value="">--Test City --</option>            
-          </Form.Select>
+            <Form.Control
+              type="text"
+              placeholder="Enter City name"
+              name="city"
+              value={state.city}
+              onChange={(e) => setState({ ...state, city: e.target.value })}
+              disabled={loading}
+            />
         </Form.Group>
       </Col>
       <Col md={4}>
       <Form.Group className="form-group">
-  <Form.Label>State</Form.Label>
-  <Form.Select 
-    value={state.state} 
-    onChange={(e) => setState({ ...state, state: e.target.value })}
-  >
-    <option value="">-- Select State --</option>
-    {indianStates.map((stateName, index) => (
-      <option key={index} value={stateName}>{stateName}</option>
-    ))}
-  </Form.Select> {/* states added-changes*/}
+        <Form.Label>State</Form.Label>
+        <Form.Select 
+          value={state.state} 
+          onChange={(e) => setState({ ...state, state: e.target.value })}
+        >
+        <option value="">-- Select State --</option>
+        {indianStates.map((stateName, index) => (
+          <option key={index} value={stateName}>{stateName}</option>
+        ))}
+       </Form.Select> {/* states added-changes*/}
 </Form.Group>
 
       </Col>
@@ -683,12 +702,12 @@ const handleSubmitComment = () => {
           <Form.Label>Pincode</Form.Label>
           <Form.Control
             type="text"
-            placeholder="--Test Pincode--"
+            placeholder="--Pincode--"
             name="pincode"
             value={state.pincode}
             onChange={(e) => setState({ ...state, pincode: e.target.value })}
             disabled={loading}
-            readOnly
+            
           />
         </Form.Group>
       </Col>
@@ -836,14 +855,13 @@ const handleSubmitComment = () => {
               <Row className="g-5">   
        <Col md={6}>
        <Form.Group className="form-group">
-          <Form.Label>Funnel Status</Form.Label>
+          <Form.Label>Funnel Type</Form.Label>
           <Form.Select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
+            value={state.funnelType}
+            onChange={(e) => setState ({...state, funnelType: e.target.value})}
             
           >
-            <option value="">State</option>
-            <option>Current</option>
+            <option value="">Current</option>
             <option>Future</option>
             <option>Not Interested</option>
           </Form.Select>

@@ -43,10 +43,10 @@ const proformaSlice = createSlice({
     });
     builder.addCase(fetchPerformasAsync.fulfilled, (state, action) => {
       state.loading = false;
-      const { performas, totalPages, currentPage } = action.payload;
+      const { performas, total_pages, page } = action.payload;
       state.performas = performas; 
-      state.totalPages = totalPages;
-      state.currentPage = currentPage;
+      state.totalPages = action.payload.pagination.total_pages;
+      state.currentPage = action.payload.pagination.page;
     });
     builder.addCase(fetchPerformasAsync.rejected, (state, action) => {
       state.loading = false;

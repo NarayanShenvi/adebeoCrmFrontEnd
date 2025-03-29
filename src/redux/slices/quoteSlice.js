@@ -225,10 +225,10 @@ const quoteSlice = createSlice({
       })
       .addCase(fetchQuotesAsync.fulfilled, (state, action) => {
         state.loading = false;
-        const { quotes, totalPages, currentPage } = action.payload;
+        const { quotes, total_pages, current_page } = action.payload;
         state.quotes = quotes;
-        state.totalPages = totalPages;
-        state.currentPage = currentPage;
+        state.totalPages =  action.payload.total_pages;
+        state.currentPage =  action.payload.current_page;
       })
       .addCase(fetchQuotesAsync.rejected, (state, action) => {
         state.loading = false;

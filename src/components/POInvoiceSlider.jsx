@@ -65,8 +65,8 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
   const indexOfLastQuote = currentPageState * itemsPerPage;
   const indexOfFirstQuote = indexOfLastQuote - itemsPerPage;
 //  console.log ("current ProformalInvoices are:", proformaInvoices)
-  const currentPerformas = Array.isArray(performas) ? performas.slice(indexOfFirstQuote, indexOfLastQuote) : [];
-
+//  const currentPerformas = Array.isArray(performas) ? performas.slice(indexOfFirstQuote, indexOfLastQuote) : [];
+const currentPerformas = performas;
   useEffect(() => {
     dispatch(fetchProductsAsync());
   }, [dispatch]);
@@ -318,8 +318,12 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
       console.log ("selected quote:",selectedQuoteDetails)
       const proformaInvoiceData = {
         customer_id: customerId,
-        preformaTag: 'PROFORMA_INVOICE_TAG',
+        //preformaTag: 'PROFORMA_INVOICE_TAG',
+        preformaTag: `${invoiceLines
+          .map(line => `${line.productCode}(${line.quantity})`) // Add productCode and quantity for each line
+          .join('-')}`,  // Join them with a dash
         quote_number: selectedQuoteDetails?.quote_number || null, // Add selected quote_id here
+        refPoValue : refPoValue || "", // Add ref po value in the Proforma
         quote_tag: selectedQuoteDetails?.quote_tag || null, // Add selected quote_tag here 
         items: invoiceLines.map(line => ({
           description: line.description || "Sample Product",

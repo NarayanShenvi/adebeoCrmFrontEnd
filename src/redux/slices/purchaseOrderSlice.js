@@ -90,7 +90,7 @@ export const createPurchaseOrder = createAsyncThunk(
     try {
       const response = await axios.post(`${API}/create_purchase_orders`, {
         proforma_id,
-        items: itemsWithDiscount,
+        items: itemsWithDiscount
       });
       return response.data;  // Assuming response contains the data after the order is created
     } catch (error) {

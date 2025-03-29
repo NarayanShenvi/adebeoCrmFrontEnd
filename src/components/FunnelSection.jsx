@@ -278,7 +278,7 @@ const sliderRef = useRef(null); // Create a ref for the slider
    <td>{item.insertDate}</td>
    <td>{item.companyName}</td>
    <td>{item.address}</td>
-   <td>{item.city}</td>
+   <td>{item.area}</td>
    <td>{item.mobileNumber}</td>
    <td>{item.primaryEmail}</td>
    <td>{item.products}</td>

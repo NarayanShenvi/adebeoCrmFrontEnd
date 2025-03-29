@@ -40,8 +40,8 @@ const CreatePurchaseOrder = () => {
 
   // Handle Discount Input Change
   const handleDiscountChange = useCallback((index, value) => {
-    if (value < 0 || value > 100) {
-      setError('Discount value must be between 0 and 100.');
+    if (value < 0 || value > 2000) {
+      setError('Discount value must be between 0 and 2000.');
       return;
     }
 
@@ -62,6 +62,8 @@ const CreatePurchaseOrder = () => {
     const itemsWithDiscount = items.map((item, index) => ({
       ...item,
       discount: discounts[index],
+      mode:selectedModes[index],
+      business_type:selectedTypes[index]
     }));
 
     try {
@@ -181,9 +183,9 @@ const CreatePurchaseOrder = () => {
               </thead>
               <tbody>
               {items.map((item, index) => {
-      const discountAmount = (discounts[index] / 100) * item.purchase_cost;
-      const total = item.purchase_cost * item.quantity - discountAmount;
-      const taxAmount = total * 0.18;
+      const discountAmount = (discounts[index]);
+      const total = (item.purchase_cost-discountAmount) * item.quantity;
+      const taxAmount = Math.ceil(total * 0.18);
       const grandTotal = total + taxAmount;
 
                   return (
@@ -209,6 +211,7 @@ const CreatePurchaseOrder = () => {
   >
     <option value="regular">Regular</option>
     <option value="lc">LC</option>
+    <option value="regular_mkt">Marketing</option>
   </select>
 </td>
 

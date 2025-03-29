@@ -74,9 +74,10 @@ const QuoteSlider = ({ customerId, onClose }) => {
       let discount = parseFloat(newQuoteLines[index].discount) || 0;
       const price = parseFloat(product.salesCost) || 0;
       const description = product.ProductDisplay;
-
+      const productCode = product.productCode;
       const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
       newQuoteLines[index].discount = validDiscount;
+      
 
       const unitPrice = price;
       const subtotal = (unitPrice - validDiscount) * quantity;
@@ -84,6 +85,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
       newQuoteLines[index].unitPrice = unitPrice;
       newQuoteLines[index].subtotal = subtotal;
       newQuoteLines[index].description = description;
+      newQuoteLines[index].productCode = productCode;
     }
   }
  
@@ -118,6 +120,7 @@ const handleAddProductRow = () => {
     ...quoteLines,
     {
       productId: '',
+      productCode:'',
       description:'',
       quantity: 1,
       discount: 0,
@@ -139,13 +142,14 @@ const handleProductSelect = (index, productId) => {
     const price = parseFloat(product.salesCost) || 0;
     const description = product.ProductDisplay || '';
     const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
-
+    const productCode = product.prodcutCode;
     const unitPrice = price;
     const subtotal = (unitPrice - validDiscount) * quantity;
 
     newQuoteLines[index].unitPrice = unitPrice;
     newQuoteLines[index].subtotal = subtotal;
     newQuoteLines[index].description = description;
+    newQuoteLines[index].productCode=productCode;
   }
 
   setQuoteLines(newQuoteLines);
@@ -197,15 +201,17 @@ const calculateFinalTotal = (totalAmount, discount) => {
     setQuoteLines(newQuoteLines);
     updateTotal(newQuoteLines); // Recalculate total after removal
   };
-
-  const indexOfLastQuote = currentPageState * itemsPerPage;
-  const indexOfFirstQuote = indexOfLastQuote - itemsPerPage;
-  const currentQuotes = Array.isArray(quotes) ? quotes.slice(indexOfFirstQuote, indexOfLastQuote) : [];
-
+  //const indexOfLastQuote = currentPageState * itemsPerPage;
+  //console.log("current indexOfLastQuote",indexOfLastQuote )
+  //const indexOfFirstQuote = indexOfLastQuote - itemsPerPage;
+  // console.log("current indexOfFirstQuote",indexOfFirstQuote )
+  //const currentQuotes = Array.isArray(quotes) ? quotes.slice(indexOfFirstQuote, indexOfLastQuote) : [];
+  const currentQuotes = quotes;
   const handlePageChange = (pageNumber) => {
     setCurrentPageState(pageNumber);
-    dispatch(fetchQuotesAsync({ page: pageNumber }));
+    dispatch(fetchQuotesAsync({ page: pageNumber, customer_id: customerId }));
   };
+  console.log("current quotes",currentQuotes )
 //changes made to disable button
   const handleSubmitQuote = () => {
     console.log("🔹 handleSubmitQuote function triggered!");
@@ -239,7 +245,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
     const quoteData = {
       customer_id: customerId,
    //   quoteTag: `QUOTE_TAG-${quoteLines.map(line => line.productCode).join('-')}`, // Adding productCode to the quoteTag
-        quoteTag: `${quoteLines.map(line => `${line.productCode}(${line.quantity})`).join('-')}`,  // Join them with a dash
+      quoteTag: `${quoteLines.map(line => `${line.productCode}(${line.quantity})`).join('-')}`,  // Join them with a dash
       items: quoteLines.map(line => ({
         description: line.description,
         prodcutCode: line.productCode,
