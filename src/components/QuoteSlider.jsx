@@ -19,7 +19,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
     productCode:'',
     productId: '',
     description:'',
-    quantity: 1,
+    quantity: 0,
     discount: 0,
     subtotal: 0,
     unitPrice: 0,  // Initial salesCost as unitPrice
@@ -66,7 +66,9 @@ const QuoteSlider = ({ customerId, onClose }) => {
  const handleLineChange = (index, field, value) => {
   const newQuoteLines = [...quoteLines];
   newQuoteLines[index][field] = value;
-   
+  const currentLine = newQuoteLines[index];
+
+  console.log('Quantity before processing:', currentLine.quantity);  // Debugging log  
   if (field === 'quantity' || field === 'discount') {
     const product = products.find(product => product._id === newQuoteLines[index].productId);
     if (product) {
@@ -88,7 +90,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
       newQuoteLines[index].productCode = productCode;
     }
   }
- 
+
   if (field === 'discount') {
     const product = products.find(product => product._id === newQuoteLines[index].productId);
 
@@ -122,7 +124,7 @@ const handleAddProductRow = () => {
       productId: '',
       productCode:'',
       description:'',
-      quantity: 1,
+      quantity: 0,
       discount: 0,
       subtotal: 0,
       unitPrice: 0,
@@ -241,9 +243,10 @@ const calculateFinalTotal = (totalAmount, discount) => {
     }
   
     console.log("✅ All validations passed, submitting the quote...");
-    
+    console.log("quote lines", quoteLines);
     const quoteData = {
       customer_id: customerId,
+     
    //   quoteTag: `QUOTE_TAG-${quoteLines.map(line => line.productCode).join('-')}`, // Adding productCode to the quoteTag
       quoteTag: `${quoteLines.map(line => `${line.productCode}(${line.quantity})`).join('-')}`,  // Join them with a dash
       items: quoteLines.map(line => ({
@@ -266,7 +269,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
       productCode: '',
       productId: '',
       description: '',
-      quantity: 1,
+      quantity: 0,
       discount: 0,
       subtotal: 0,
       unitPrice: 0,
@@ -313,27 +316,30 @@ const calculateFinalTotal = (totalAmount, discount) => {
           {quoteLines.map((line, index) => (
             <div key={index} className="quote-line">
               <div className="dropdown-container">
-                <select
-                  className="quote-select"
-                  value={line.productId}
-                  onChange={(e) => handleProductSelect(index, e.target.value)}
-                  required
-                >
-                  <option value="" disabled>Select a product</option>
-                  {products.map((product) => (
+              <select
+                className="quote-select"
+                value={line.productId}
+                onChange={(e) => handleProductSelect(index, e.target.value)}
+                required
+              >
+                <option value="" disabled>Select a Product</option>
+                {products && products.length > 0 ? (
+                  products.map((product) => (
                     <option key={product._id} value={product._id}>
                       {product.productName} ({product.productCode}) - {product.ProductDisplay}
                     </option>
-                  ))}
-                </select>
-              </div>
+                  ))
+                ) : (
+                  <option value="" disabled>No products available</option>  // Optional fallback if no products
+                )}
+              </select>
+            </div>
 
              <input
   type="number"
   className="quote-quantity-input"
   value={line.quantity || ""} // Allows placeholder to show when empty
   onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
-  min="1"
   placeholder={`Quantity`} // Dynamic placeholder
   required
 />
