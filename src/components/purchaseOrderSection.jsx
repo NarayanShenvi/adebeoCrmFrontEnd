@@ -59,13 +59,19 @@ const CreatePurchaseOrder = () => {
     }
 
     setLoading(true);
-    const itemsWithDiscount = items.map((item, index) => ({
-      ...item,
-      discount: discounts[index],
-      mode:selectedModes[index],
-      business_type:selectedTypes[index]
-    }));
-
+    // Ensure that if no value is selected for mode or type, we use the default
+    const itemsWithDiscount = items.map((item, index) => {
+      const mode = selectedModes[index] || 'regular';  // Fallback to 'regular' if not selected
+      const businessType = selectedTypes[index] || 'new';  // Fallback to 'new' if not selected
+  
+      return {
+        ...item,
+        discount: discounts[index],
+        mode: mode,
+        business_type: businessType
+      };
+    });
+    
     try {
       // Dispatch createPurchaseOrder action to handle order creation via Redux
       await dispatch(createPurchaseOrder({ proforma_id: selectedProforma, itemsWithDiscount }));
