@@ -105,6 +105,7 @@ const InvoiceSlider = ({ customerId, onClose }) => {
                 <tr>
                   <th>Order Number</th>
                   <th>Date</th>
+                  <th>Validity</th> 
                   <th>Quantity</th>
                   <th>Price</th>
                   <th>Total</th>
@@ -117,6 +118,7 @@ const InvoiceSlider = ({ customerId, onClose }) => {
                   <tr key={order._id}>
                     <td>{order.order_number}</td>
                     <td>{formatDate(order.order_date)}</td>
+                    <td>{formatDate(order.validity)}</td>
                     <td>{order.quantity}</td>
                     <td>₹&nbsp;{order.purchase_price}</td>
                     <td>₹&nbsp;{order.total_amount}</td>
