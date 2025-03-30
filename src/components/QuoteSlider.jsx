@@ -260,6 +260,8 @@ const calculateFinalTotal = (totalAmount, discount) => {
         product_id:line.productId
       })),
       gross_total: finalTotal,
+      overall_discount: overallDiscount, // Include the overall discount
+      tax_amount: taxAmount, // Include the tax amount
     };
   
     console.log("📝 Dispatching createQuote action:", quoteData);

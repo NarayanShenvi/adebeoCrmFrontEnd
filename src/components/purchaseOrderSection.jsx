@@ -15,6 +15,7 @@ const CreatePurchaseOrder = () => {
   const [selectedProforma, setSelectedProforma] = useState('');
   const [items, setItems] = useState([]);
   const [discounts, setDiscounts] = useState([]);
+  const [taxAmount, setTaxAmount] = useState([]);
   const [loading, setLoading] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [error, setError] = useState('');
@@ -63,12 +64,20 @@ const CreatePurchaseOrder = () => {
     const itemsWithDiscount = items.map((item, index) => {
       const mode = selectedModes[index] || 'regular';  // Fallback to 'regular' if not selected
       const businessType = selectedTypes[index] || 'new';  // Fallback to 'new' if not selected
-  
+      const purchaseCost = parseFloat(item.purchase_cost);  // Ensure it's a number
+      const quantity = parseFloat(item.quantity); // Ensure quantity is also a number
+
+      const discountAmount = Array.isArray(discounts[index]) ? discounts[index][0] : discounts[index];
+      //const discountAmount = discounts[index];
+      const totalBeforeTax = (purchaseCost - discountAmount) * quantity;
+      const taxAmount = Math.ceil(totalBeforeTax * 0.18); // 18% tax
+
       return {
         ...item,
         discount: discounts[index],
         mode: mode,
-        business_type: businessType
+        business_type: businessType,
+        tax_amount:taxAmount
       };
     });
     

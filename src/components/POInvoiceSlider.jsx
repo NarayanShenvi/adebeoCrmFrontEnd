@@ -121,6 +121,8 @@ const currentPerformas = performas;
         unitPrice: item.unitPrice,
         drStatus: item.drStatus,
       }));
+      setOverallDiscount(selectedQuoteDetails.overall_discount); // this has been added here to fetch the existing values
+      setTaxAmount(selectedQuoteDetails.tax_amount); // this has been added here to fetch the existing values
       setInvoiceLines(quoteItems);
       updateTotal(quoteItems);
     }
@@ -138,7 +140,8 @@ const currentPerformas = performas;
         drStatus: item.dr_status || "",
         productId: item.product_id || 0,  // Ensure product_id is used
       }));
-  
+      setOverallDiscount(selectedQuoteDetails.overall_discount); // this has been added here to fetch the existing values
+      setTaxAmount(selectedQuoteDetails.tax_amount); // this has been added here to fetch the existing values
       setInvoiceLines(quoteItems);
       updateTotal(quoteItems);
     }
@@ -210,8 +213,9 @@ const currentPerformas = performas;
    }, [currentPerformas]);
    
     // const currentPerformas = Array.isArray(performas) ? performas.slice(indexOfFirstPerforma, indexOfLastPerforma) : [];
-     const calculateFinalTotal = (totalAmount, discount) => {
-       const discountedTotal = totalAmount - discount;
+     const calculateFinalTotal = (totalAmount, overallDiscount) => {
+       console.log ("check overalldiscount here: ",overallDiscount );
+       const discountedTotal = totalAmount - overallDiscount;
        const tax = Math.round(discountedTotal * 0.18); // 18% Tax, rounded to nearest integer
        setTaxAmount(tax);
        setFinalTotal(discountedTotal + tax);
@@ -308,7 +312,8 @@ const currentPerformas = performas;
       drStatus: item.dr_status || "",
       productId:item.product_id||0
     }));
-  
+    setOverallDiscount(selectedQuote.overall_discount); // this has been added here to fetch the existing values
+    setTaxAmount(selectedQuote.tax_amount); // this has been added here to fetch the existing values
     setInvoiceLines(quoteItems);
     updateTotal(quoteItems);
   };
@@ -335,6 +340,8 @@ const currentPerformas = performas;
           product_id:line.productId
         })),
         gross_total: finalTotal,
+        overall_discount:overallDiscount,
+        tax_amount:taxAmount
       };
       dispatch(createPerforma(proformaInvoiceData));
       // ✅ Reset the form fields after submission
