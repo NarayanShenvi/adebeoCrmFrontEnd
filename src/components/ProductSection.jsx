@@ -301,22 +301,20 @@ const ProductSection = () => {
    </Row>     
          <Row className="g-5">
           <Col md={6}>
-           
-          <Form.Group className="form-group-prod">
-              <Form.Label className="required-label">Product Company Name:</Form.Label>
-  <Form.Control
-    type="text"
-    name="ProductCompanyName"
-    value={formData.ProductCompanyName}
-    onChange={handleChange}
-    placeholder='Enter product company name'
-    required
-                    />
-                </Form.Group>
-            
-            </Col>  
-            <Col md={6}>
             <Form.Group className="form-group-prod">
+              <Form.Label className="required-label">Product Company Name:</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="ProductCompanyName"
+                  value={formData.ProductCompanyName}
+                  onChange={handleChange}
+                  placeholder='Enter product company name'
+                  required
+                      />
+            </Form.Group>
+          </Col>  
+          <Col md={6}>
+          <Form.Group className="form-group-prod">
                 <Form.Label className="required-label">Sales Code:</Form.Label>
   <Form.Control
     type="text"

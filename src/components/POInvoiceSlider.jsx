@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdOutlineCancel, MdDelete } from "react-icons/md";
 import { fetchProductsAsync } from '../redux/slices/productSlice';
-import { createPerforma, fetchPerformasAsync } from '../redux/slices/proformaSlice';
+import { createPerforma, fetchPerformasAsync,resetProformaCreationResponse } from '../redux/slices/proformaSlice';
 import { fetchQuotesAsync } from '../redux/slices/quoteSlice';
 //import { createPerforma } from '../redux/slices/proformaSlice';
 import { FaSpinner, FaFilePdf } from 'react-icons/fa';
@@ -52,6 +52,10 @@ const POInvoiceSlider = ({ customerId, onClose }) => {
   useEffect(() => {
     if (proformaCreationResponse) {
       alert(proformaCreationResponse); // This will display the success message
+      dispatch(fetchPerformasAsync({ page: currentPageState, customer_id: customerId })); // this is to refresh the Previous performas table
+       // After dispatching, reset proformaCreationResponse to prevent it from triggering again
+      dispatch(resetProformaCreationResponse()); // Action to reset the response
+
     }
   }, [proformaCreationResponse]);
   

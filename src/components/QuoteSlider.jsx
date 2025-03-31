@@ -59,7 +59,9 @@ const QuoteSlider = ({ customerId, onClose }) => {
     console.log("Updated quote creation response:", quoteCreationResponse); // Add this log
     if (quoteCreationResponse) {
       alert(`Quote created successfully! PDF link: ${quoteCreationResponse.pdf_link}`);
-    }
+       // Refetch the quotes after creating the new quote
+       dispatch(fetchQuotesAsync({ page: 1, customer_id: customerId }));
+      }
   }, [quoteCreationResponse]); // This will trigger when quoteCreationResponse updates
   
 

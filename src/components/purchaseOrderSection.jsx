@@ -86,6 +86,8 @@ const CreatePurchaseOrder = () => {
       await dispatch(createPurchaseOrder({ proforma_id: selectedProforma, itemsWithDiscount }));
       if (orderStatus === 'success') {
         alert('Purchase Order Created Successfully!');
+        dispatch(fetchPurchaseOrders({ page: currentPage, rows_per_page: rowsPerPage }));
+        dispatch(fetchProformas());
       }
     } catch (error) {
       setError('Failed to create Purchase Order. Please try again.');

@@ -415,30 +415,52 @@ export const loadCustomerComments = (customerId) => {
   return async (dispatch) => {
     dispatch(setLoading(true));
     try {
-      const response = await axios.get(`${API}/get_adebeo_customer_comments/${customerId}`);
+      // Retrieve the token from localStorage
+      const token = localStorage.getItem('Access_Token');
+
+      // Make the GET request with Authorization header if token exists
+      const response = await axios.get(`${API}/get_adebeo_customer_comments/${customerId}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}, // Add token if it exists
+      });
+
       if (response.data && response.data.comments) {
         const mappedComments = response.data.comments.map((comment) => ({
           text: comment.comment,
           date: comment.date,
           name: comment.name,
         }));
+
+        // Dispatch the mapped comments to the Redux store
         dispatch(setCustomerComments(mappedComments));
       }
     } catch (err) {
+      // Dispatch error if something goes wrong
       dispatch(setError(err.message || "Error loading comments"));
     } finally {
+      // Set loading state to false once the request completes
       dispatch(setLoading(false));
     }
   };
 };
+
 
 // Post a new comment for a specific customer
 export const postCustomerComment = (customerId, commentText) => {
   return async (dispatch) => {
     dispatch(setLoading(true));
     try {
+      // Retrieve the token from localStorage
+      const token = localStorage.getItem('Access_Token');
+
+      // Prepare payload for posting the comment
       const payload = { comment: commentText, customer_id: customerId };
-      const response = await axios.post(`${API}/create_adebeo_customer_comments`, payload);
+
+      // Make the POST request with Authorization header if token exists
+      const response = await axios.post(`${API}/create_adebeo_customer_comments`, payload, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}, // Include Authorization header only if token exists
+      });
+
+      // If response contains comment data, dispatch it to Redux store
       if (response.data && response.data.comment) {
         dispatch(addCustomerComment(response.data.comment));
       }
@@ -449,6 +471,7 @@ export const postCustomerComment = (customerId, commentText) => {
     }
   };
 };
+
 
 // Create a new customer (POST)
 
