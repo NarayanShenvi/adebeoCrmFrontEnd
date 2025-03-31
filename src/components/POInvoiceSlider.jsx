@@ -115,6 +115,7 @@ const currentPerformas = performas;
       const quoteItems = selectedQuoteDetails.items.map(item => ({
         productId: item.productId,
         productCode: item.productCode,
+        salesCode:item.salesCode,
         quantity: item.quantity,
         discount: item.discount,
         subtotal: item.subtotal,
@@ -133,6 +134,7 @@ const currentPerformas = performas;
       const quoteItems = selectedQuoteDetails.items.map(item => ({
         description: item.description || "Unknown Product",
         productCode:item.productCode|| ' ',
+        salesCode:item.salesCode || 0,
         quantity: item.quantity || 0,
         discount: item.discount || 0,
         subtotal: item.sub_total || 0,
@@ -242,7 +244,7 @@ const currentPerformas = performas;
         const price = parseFloat(product.salesCost) || 0;
         const description = product.ProductDisplay;
         const productCode = product.productCode;
-  
+        const salesCode = product.salesCode;
         const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
     
         const unitPrice = price;
@@ -255,6 +257,7 @@ const currentPerformas = performas;
         newInvoiceLines[index].subtotal = subtotal;
         newInvoiceLines[index].description = description;
         newInvoiceLines[index].productCode = productCode;
+        newInvoiceLines[index].salesCode= salesCode;
         setInvoiceLines(newInvoiceLines);
         updateTotal(newInvoiceLines);
       }
@@ -305,6 +308,7 @@ const currentPerformas = performas;
     const quoteItems = selectedQuote.items.map(item => ({
       description: item.description || "Unknown Product",
       productCode:item.productCode || ' ',
+      salesCode:item.salesCode || 0,
       quantity: item.quantity || 0,
       discount: item.discount || 0,
       subtotal: item.sub_total || 0,
@@ -332,6 +336,7 @@ const currentPerformas = performas;
         quote_tag: selectedQuoteDetails?.quote_tag || null, // Add selected quote_tag here 
         items: invoiceLines.map(line => ({
           description: line.description || "Sample Product",
+          salesCode:line.salesCode,
           quantity: line.quantity,
           discount: line.discount,
           unit_price: line.unitPrice,
