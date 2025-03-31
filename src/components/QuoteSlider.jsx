@@ -4,7 +4,7 @@ import { MdOutlineCancel } from "react-icons/md"; // Correct import changes made
 import { fetchProductsAsync } from '../redux/slices/productSlice'; // Assuming you have this action set up
 import { createQuote, fetchQuotesAsync } from '../redux/slices/quoteSlice';  // Import the createQuote and fetchQuotesAsync actions
 import { MdAddBox, MdDelete  } from "react-icons/md";
-import { FaSpinner, FaFilePdf } from 'react-icons/fa';
+import { FaSpinner, FaFilePdf, FaHackerNewsSquare } from 'react-icons/fa';
 import {  FaChevronLeft, FaChevronRight } from "react-icons/fa"; //import statements are changed and some new imports are added
 
 const QuoteSlider = ({ customerId, onClose }) => {
@@ -17,6 +17,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
 
   const [quoteLines, setQuoteLines] = useState([{
     productCode:'',
+    salesCode:0,
     productId: '',
     description:'',
     quantity: 0,
@@ -77,6 +78,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
       const price = parseFloat(product.salesCost) || 0;
       const description = product.ProductDisplay;
       const productCode = product.productCode;
+      const salesCode = product.salesCode;
       const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
       newQuoteLines[index].discount = validDiscount;
       
@@ -88,6 +90,7 @@ const QuoteSlider = ({ customerId, onClose }) => {
       newQuoteLines[index].subtotal = subtotal;
       newQuoteLines[index].description = description;
       newQuoteLines[index].productCode = productCode;
+      newQuoteLines[index].salesCode = salesCode;
     }
   }
 
@@ -123,6 +126,7 @@ const handleAddProductRow = () => {
     {
       productId: '',
       productCode:'',
+      salesCode:'',
       description:'',
       quantity: 0,
       discount: 0,
@@ -145,6 +149,7 @@ const handleProductSelect = (index, productId) => {
     const description = product.ProductDisplay || '';
     const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
     const productCode = product.prodcutCode;
+    const salesCode = product.salesCode;
     const unitPrice = price;
     const subtotal = (unitPrice - validDiscount) * quantity;
 
@@ -152,6 +157,7 @@ const handleProductSelect = (index, productId) => {
     newQuoteLines[index].subtotal = subtotal;
     newQuoteLines[index].description = description;
     newQuoteLines[index].productCode=productCode;
+    newQuoteLines[index].salesCode=salesCode;
   }
 
   setQuoteLines(newQuoteLines);
@@ -252,6 +258,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
       items: quoteLines.map(line => ({
         description: line.description,
         prodcutCode: line.productCode,
+        salesCode:line.salesCode,
         quantity: line.quantity,
         discount: line.discount,
         unit_price: line.unitPrice,
