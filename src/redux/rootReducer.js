@@ -7,7 +7,9 @@ import  quoteReducer  from './slices/quoteSlice';
 import proformaReducer  from './slices/proformaSlice';
 import purchaseOderReducer from './slices/purchaseOrderSlice';
 import informationReducer from './slices/informationSlice';
-import customerPaymentReducer from './slices/customerPaymentSlice'
+import customerPaymentReducer from './slices/customerPaymentSlice';
+import createReports from './slices/reportSlice'
+import createUsers from './slices/userSlice'
 
 const rootReducer = combineReducers({
     //data: userReducer
@@ -18,7 +20,9 @@ const rootReducer = combineReducers({
     proformaInvoice:proformaReducer,
     purchaseOrder:purchaseOderReducer,
     information:informationReducer,
-    customerPayment:customerPaymentReducer
+    customerPayment:customerPaymentReducer,
+    report:createReports,
+    users:createUsers
 })
 
 export default rootReducer;
