@@ -46,13 +46,19 @@ export const fetchAdebeoOrders = createAsyncThunk(
   'information/fetchAdebeoOrders',
   async ({ customer_ID }) => {
     try {
-      const response = await axios.get(`${API}/get_adebeo_orders?customer_ID=${customer_ID}`);
+      // Retrieve the token from localStorage
+      const token = localStorage.getItem('Access_Token');
       
+      // Make the GET request with Authorization header if token exists
+      const response = await axios.get(`${API}/get_adebeo_orders?customer_ID=${customer_ID}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}, // Include Authorization header only if token exists
+      });
+
       // Check if the response is empty or if no orders are found for the customer
       if (response.status === 404 || response.data.message === "No orders found for this customer") {
         throw new Error("No orders found for this customer");
       }
-      
+
       return response.data;  // Return the orders if found
     } catch (error) {
       // Handle error here and propagate the message
@@ -60,6 +66,7 @@ export const fetchAdebeoOrders = createAsyncThunk(
     }
   }
 );
+
 
 const informationSlice = createSlice({
   name: 'information',
