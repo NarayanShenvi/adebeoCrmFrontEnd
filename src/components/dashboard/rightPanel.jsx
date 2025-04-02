@@ -10,6 +10,8 @@ import  CreatePurchaseOrder from '../purchaseOrderSection';
 import {fetchProformas} from '../../redux/slices/purchaseOrderSlice';
 import {fetchCustomerPaymentsAsync} from '../../redux/slices/customerPaymentSlice';
 import CustomerPaymentSection from '../customerPaymentSection';
+import Createreport from '../reportSection';
+import fetchReportsAsync from '../../redux/slices/reportSlice'
 import { returnStatement } from '@babel/types';
 
 const RightPanel = ({ selectedSection }) => {
@@ -42,6 +44,11 @@ const customerLoading = useSelector((state) => state.customer?.loading);
   const loadCutomerPayments =() =>  {
     dispatch(fetchCustomerPaymentsAsync());
   }
+
+  const loadReports =() =>  {
+  //  dispatch(fetchReportsAsync());
+  }
+
   useEffect(() => {
     if (selectedSection === 'funnel') {
       getFunnel(); // Load funnel data when 'funnel' section is selected
@@ -55,6 +62,9 @@ const customerLoading = useSelector((state) => state.customer?.loading);
         else if (selectedSection === 'cx_payment'){
         loadCutomerPayments();
       }
+        else if (selectedSection === 'reports'){
+        loadReports();
+        }
     }, [selectedSection, dispatch]);
 
   const renderSection = () => {
@@ -68,7 +78,9 @@ const customerLoading = useSelector((state) => state.customer?.loading);
       case 'purchase_orders':
         return <CreatePurchaseOrder/>;
       case 'cx_payment':
-        return <CustomerPaymentSection/>   
+        return <CustomerPaymentSection/>;
+      case 'reports':
+        return <Createreport/>;     
       default:
         return <div className='default_msg'>Select a section from the menu.</div>;
     }
