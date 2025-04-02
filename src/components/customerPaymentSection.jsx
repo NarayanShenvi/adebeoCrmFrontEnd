@@ -19,7 +19,13 @@ const CustomerPaymentSection = () => {
   const handleGeneratePDF = (invoiceNumber) => {
     dispatch(generateInvoicePdfAsync(invoiceNumber));
   };
+  const [showModal, setShowModal] = useState(false);
   
+    // Function to open the modal
+    const handleShow = () => setShowModal(true);
+  
+    // Function to close the modal
+    const handleClose = () => setShowModal(false);
   // useEffect(() => {
   //   if (error) {
   //     console.error('Error fetching payments:', error);  // Log the error to the console
@@ -105,6 +111,8 @@ const CustomerPaymentSection = () => {
     }
   };
 
+  
+    
   return (
     <div className="customer-payment-section">
       <h2>Customer Payments</h2>
@@ -197,16 +205,32 @@ className='cxpay'
 <CiFileOff className='nopdf'title='No PDF Available'/>
               )}
             </td>
-          <td>
-             <RiInformation2Fill   title=" Payment Information" className="action-icon-payment"   // Pass customer ID
-               />
-          </td>
+            <td>
+            <RiInformation2Fill
+          title="Payment Information"
+          className="action-icon-payment"
+          onClick={handleShow} // Opens modal
+         
+        />
+      </td>
        </tr>
       ))}
     </tbody>
   </table>
 )}
-
+ {/* Custom Modal */}
+ {/* Modal - Will only show when showModal is true */}
+ {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <h4>Payment Information</h4>
+            <p>Here are the payment details...</p>
+            <button className="close-button" onClick={handleClose}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Pagination controls */}
       {/* Show Pagination only if there are payments */}

@@ -2,10 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchActivityReport } from '../redux/slices/reportSlice'; // Path for your Redux slice
 import { fetchUsers } from '../redux/slices/userSlice'; // Import the users fetch action
+import { Form } from 'react-bootstrap';
+import Select from 'react-select'; // Import react-select
+import { Row, Col } from 'react-bootstrap';
+import { LuFileCheck2 } from "react-icons/lu";
+import {  FaChevronLeft, FaChevronRight } from "react-icons/fa"; //import statements are changed and some new imports are added
 
 const ReportSection = () => {
   const dispatch = useDispatch();
 
+  const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+  const [reportGenerated, setReportGenerated] = useState(false); // Track if the report is generated
+
+  const handleStartDateChange = (e) => {
+    const selectedDate = e.target.value;
+    if (selectedDate > today) {
+      alert("You cannot select a future date!");
+      e.target.value = startDate; // Reset to the previous value
+      return;
+    }
+    setStartDate(selectedDate);
+  };
+  
+  const handleEndDateChange = (e) => {
+    const selectedDate = e.target.value;
+    if (selectedDate > today) {
+      alert("You cannot select a future date!");
+      e.target.value = endDate; // Reset to the previous value
+      return;
+    }
+    setEndDate(selectedDate);
+  };
   // State for the filter inputs
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -66,122 +93,170 @@ const ReportSection = () => {
   };
 
   return (
-    <div>
-      <h2>Activity Report</h2>
+    <div className='report-section'>
+      <h3>Activity Report</h3>
 
       {/* Filter section at the top */}
-      <form onSubmit={handleSubmit} className="filter-form">
-        <div className="filter-item">
-          <label>Start Date</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
-          />
-        </div>
-        <div className="filter-item">
-          <label>End Date</label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            required
-          />
-        </div>
-        <div className="filter-item">
-          <label>Company Name</label>
-          <input
-            type="text"
-            placeholder="Search company name"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-          />
-        </div>
-        <div className="filter-item">
-          <label>Report Type</label>
-          <select
-            value={reportType}
-            onChange={(e) => setReportType(e.target.value)}
-          >
-            <option value="short">Short</option>
-            <option value="detailed">Detailed</option>
-          </select>
-        </div>
-        <div className="filter-item">
-          <label>User</label>
-          <select
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-          >
-            {/* Admin can see all users, else just show current user */}
-            {usersLoading ? (
-              <option>Loading users...</option>
-            ) : usersError ? (
-              <option>Error loading users</option>
-            ) : (
-              users.map((user) => (
-                <option key={user.username} value={user.username}>{user.username}</option>
-              ))
-            )}
-          </select>
-        </div>
+      <Form onSubmit={handleSubmit} className='filter-form'>
+      <Row className="g-3 align-items-center">
+  <Col xs="auto">
+    <Form.Label className="required-label">Start Date:</Form.Label>
+  </Col>
+  <Col>
+    <Form.Control
+      type="date"
+      value={startDate}
+      onChange={handleStartDateChange}
+      required
+      className="dates"
+      max={today} // Prevents future date selection in UI
+    />
+  </Col>
+  <Col xs="auto" className='datess'>
+    <Form.Label className="required-label">End Date:</Form.Label>
+  </Col>
+  <Col>
+    <Form.Control
+      type="date"
+      value={endDate}
+      onChange={handleEndDateChange}
+      required
+      className="dates"
+      max={today} // Prevents future date selection in UI
+    />
+  </Col>
+</Row>
 
-        {/* Submit button to fetch report */}
-        <button type="submit">Generate Report</button>
-      </form>
+    <Row className="g-4">
+  
+  <Col md={3}>
+    <Form.Group className="form-group">
+      <Form.Label>Report Type</Form.Label>
+      <Form.Select
+        value={reportType}
+        onChange={(e) => setReportType(e.target.value)}
+      > 
+        <option value="">Select Report Type</option>
+        <option value="short">Short</option>
+        <option value="detailed">Detailed</option>
+      </Form.Select>
+    </Form.Group>
+  </Col>
+  <Col md={5}>
+    <Form.Group className="form-group">
+      <Form.Label >Company Name</Form.Label>          
+      <Form.Control
+        type="text"
+        placeholder="Search company name"
+        value={companyName}
+        onChange={(e) => setCompanyName(e.target.value)}
+      />
+    </Form.Group>
+  </Col>
+  <Col md={3}>
+    <Form.Group className="form-group">
+      <Form.Label>User Name</Form.Label>
+      <Form.Select
+  value={user}
+  onChange={(e) => setUser(e.target.value)}
+>
+  <option value="">Select a user</option> {/* Default empty option */}
+  {usersLoading ? (
+    <option>Loading users...</option>
+  ) : usersError ? (
+    <option>Error loading users</option>
+  ) : (
+    users.map((user) => (
+      <option key={user.username} value={user.username}>
+        {user.username}
+      </option>
+    ))
+  )}
+</Form.Select>
 
-      {/* Loading and error state */}
-      {loading && <p>Loading report...</p>}
-      {error && <p>Error: {error}</p>}
+    </Form.Group>
+  </Col>
+  <Col  md={1}>
+    <Form.Group className="form-group">
+      <Form.Label className="invisible">&nbsp;</Form.Label> {/* Keeps button aligned */}
+      <button type="submit" className="report-button" title='Generate Report'><LuFileCheck2 className='filecheck'/>
+      </button>
+    </Form.Group>
+  </Col>
+</Row>
+      </Form><br></br><br></br>
+
+     {/* Loading and error state */}
+     {loading && (
+    <div className="loading-container-report">
+      <div className="loading-spinner-report"></div>
+      <p className="loading-message-report">Loading report...</p>
+  </div>
+)}
+
+{error && (
+    <div className="error-container-report">
+      <i className="bi bi-exclamation-triangle-fill error-icon-report"></i>
+      <p className="error-message-report">Error: {error}</p>
+  </div>
+)}
+
 
       {/* Report table section */}
       <div className="report-table">
-        <table>
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Company Name</th>
-              <th>Activity Type</th>
-              <th>Details</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {activities.length > 0 ? (
-              activities.map((activity, index) => (
+        {activities.length > 0 ? (
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Company Name</th>
+                <th>Activity Type</th>
+                <th>Details</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activities.map((activity, index) => (
                 <tr key={index}>
                   <td>{activity.insertBy}</td>
                   <td>{activity.company_name}</td>
                   <td>{activity.activityType}</td>
-                  <td>{activity.details}</td>
+                  <td>
+                    {activity.details.split(",").map((item, index) => (
+                      <span key={index}>
+                        {item}
+                        <br />
+                      </span>
+                    ))}
+                  </td>
                   <td>{new Date(activity.insertDate).toLocaleString()}</td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5">No activities found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          reportGenerated && !loading && (
+            <p className="no-activity-message">NO ACTIVITIES FOUND...</p>
+          )
+        )}
 
         {/* Pagination */}
-        <div className="pagination">
+        {activities.length > 0 && (
+        <div className="pagination-controls">
           <button
             onClick={() => handlePageChange(page - 1)}
             disabled={page === 1}
           >
-            Previous
+            <FaChevronLeft /> 
           </button>
-          <span>{page} of {totalPages}</span>
+          <span className='page-quote'>{page} of {totalPages}</span>
           <button
             onClick={() => handlePageChange(page + 1)}
             disabled={page === totalPages}
           >
-            Next
+            <FaChevronRight />
           </button>
-        </div>
+        </div> )}
       </div>
     </div>
   );
