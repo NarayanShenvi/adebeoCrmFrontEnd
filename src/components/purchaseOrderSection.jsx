@@ -163,7 +163,7 @@ const CreatePurchaseOrder = () => {
             {proformas.length > 0 ? (
               proformas.map((proforma) => (
                 <option key={proforma.proforma_id} value={proforma.proforma_id}>
-                  {proforma.proforma_tag} - {proforma.customer_name}
+                {proforma.proforma_id} - {proforma.proforma_tag} - {proforma.customer_name}
                 </option>
               ))
             ) : (
