@@ -256,7 +256,7 @@ export default funnelSlice.reducer;
 //   };
 // };
 
-export const loadFunneldata = (page = 1, limit = 500, companyName = "") => {
+export const loadFunneldata = (page = 1, limit = 10, companyName = "") => {
   return async (dispatch) => {
     dispatch(setLoading(true));
 
