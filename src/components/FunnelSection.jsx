@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadFunneldata, loadCustomerComments, postCustomerComment } from '../redux/slices/funnelSlice';
-import { setModalState } from '../redux/slices/funnelSlice';
+import { setModalState, } from '../redux/slices/funnelSlice';
 import { FaEye, FaPlusSquare, FaTasks, FaChevronLeft, FaChevronRight } from "react-icons/fa"; //import statements are changed and some new imports are added
 import { FaHandHoldingDollar, FaIndianRupeeSign, FaFileCircleCheck, FaFaceMeh  } from "react-icons/fa6";
 import './dashboard/Dashboard.css'; // Import the CSS fil
@@ -21,7 +21,7 @@ const FunnelSection = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [newComment, setNewComment] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(8); // Set default rows per page to 5
+  const [rowsPerPage, setRowsPerPage] = useState(10); // Set default rows per page to 5
   const [currentPage, setCurrentPage] = useState(1);
 
   const [showQuoteSlider, setShowQuoteSlider] = useState(false);
@@ -37,31 +37,35 @@ const sliderRef = useRef(null); // Create a ref for the slider
   const error = useSelector((state) => state.funnel.error);
   const customerComments = useSelector((state) => state.funnel.customerComments);
   const modalState = useSelector((state) => state.funnel.modalState);
-
-  const [totalPages, setTotalPages] = useState(1);
+  const totalPages = useSelector((state) => state.funnel.totalPages);
+  
+  //const [totalPages, setTotalPages] = useState(1);
  
   // Calculate page boundaries based on rows per page
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = funnelData.slice(indexOfFirstRow, indexOfLastRow);
+  //const currentRows = funnelData.slice(indexOfFirstRow, indexOfLastRow);
+  const currentRows = funnelData;
 
   // Handle pagination changes
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      setCurrentPage(currentPage + 1);//page = 1, limit = 10, companyName = ""
+      dispatch(loadFunneldata((currentPage+1), rowsPerPage, debouncedSearchTerm));
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
+      dispatch(loadFunneldata((currentPage-1), rowsPerPage, debouncedSearchTerm));
     }
   };
 
   // Recalculate total pages based on rows per page
-  useEffect(() => {
-    setTotalPages(Math.ceil(funnelData.length / rowsPerPage));
-  }, [funnelData, rowsPerPage]);
+  // useEffect(() => {
+  //   setTotalPages(Math.ceil(funnelData.length / rowsPerPage));
+  // }, [funnelData, rowsPerPage]);
 
   // Update page if the currentPage exceeds totalPages
   useEffect(() => {

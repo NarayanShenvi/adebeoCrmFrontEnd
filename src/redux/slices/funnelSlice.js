@@ -138,7 +138,7 @@ const initialState = {
     addComment: false,
   },
   pagination: {
-    page: 1,
+    currentPage: 1,
     totalPages: 1,
     totalRecords: 0,
     limit: 5,
@@ -150,9 +150,12 @@ const funnelSlice = createSlice({
   initialState,
   reducers: {
     funnelCustomers: (state, action) => {
+      state.loading = false;
+     // const { page, total_pages, total_records } = action.payload;
       state.funnelData = action.payload.data;
-      state.pagination.totalPages = action.payload.totalPages;
-      state.pagination.totalRecords = action.payload.totalRecords;
+      state.totalPages = action.payload.total_pages;
+      state.totalRecords = action.payload.total_records;
+      state.currentPage = action.payload.page;
       state.error = null;
     },
     setLoading: (state, action) => {
@@ -284,8 +287,9 @@ export const loadFunneldata = (page = 1, limit = 10, companyName = "") => {
         // Dispatch the data and pagination information to the store
         dispatch(funnelCustomers({
           data,
-          totalRecords: total_records,  // total records are the same for all pages
-          totalPages: total_pages,  // total pages based on the limit and total records
+          total_records,  // total records are the same for all pages
+          total_pages,  // total pages based on the limit and total records
+          page
         }));
 
         // Set the current page and total pages in the store for pagination

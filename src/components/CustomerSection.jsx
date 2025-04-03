@@ -86,7 +86,7 @@ const CustomerSection = ({ customer}) => {
   const errorProducts = useSelector((state) => state.products?.error || null);
 
   const [selectedProducts, setSelectedProducts] = useState([]);
-
+  const selectRef = useRef(null);
   // Fetch products on component mount
   useEffect(() => {
     dispatch(fetchProductsAsync());
@@ -108,7 +108,27 @@ const CustomerSection = ({ customer}) => {
   //   setSelectedProducts(selectedProducts);  // Update the `selectedProducts` state
   // };
 
-  const selectRef = useRef(null);
+  useEffect(() => {
+    if (!isEditMode) {
+      // Reset the customers list and selected customer when switching to Add mode
+      dispatch(clearCustomers()); // Reset the customers list
+      dispatch(setSelectedCustomer(null));  // Reset the selected customer
+      setState({
+        companyName: '',
+        address: '',
+        // Reset other form fields as needed
+      });
+    } else {
+      // For Edit Mode, load the previously selected customer's data
+      if (selectedCustomer) {
+        setState({
+          companyName: selectedCustomer.companyName,
+          address: selectedCustomer.address,
+          // Set other fields from selectedCustomer
+        });
+      }
+    }
+  }, [isEditMode, selectedCustomer, dispatch]);
 
   useEffect(() => {
     if (selectRef.current) {
@@ -258,6 +278,8 @@ const CustomerSection = ({ customer}) => {
 
           // Optionally reset selected products
           setSelectedProducts([]);
+          dispatch(resetSelectedCustomer());
+          dispatch(clearCustomers());
         } else {
           console.log("Error in resultAction:", resultAction);
           console.error("Error updating customer:", resultAction?.error || "Unknown error");
@@ -339,7 +361,8 @@ const CustomerSection = ({ customer}) => {
         // Clear selected products when switching to create mode
         setSelectedProducts([]); // Reset selected products
         dispatch(clearCustomers());
-
+        dispatch(resetSelectedCustomer());
+     
          // Dispatch action to clear the selected customer in Redux state
         //dispatch(resetSelectedCustomer());
 
@@ -531,29 +554,32 @@ const handleSubmitComment = () => {
       {error && <p className="error1">{error}</p>}
            {/* Search field for Edit mode */}
            {isEditMode && (
-          <div >
-            
-            <input
-              type="text"
-              className='search-field'
-              value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder="Search by company name"
-              disabled={loading}
-            />
-            <div className='search-field1'>
-              {loading ? (
-                <p className='CustomerLoading'>Loading...</p>
-              ) : customers.length > 0 ? (
-                <select
+            <div>
+              <input
+                type="text"
+                className='search-field'
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search by company name"
+                disabled={loading}
+              />
+              <div className='search-field1'>
+                {loading ? (
+                  <p className='CustomerLoading'>Loading...</p>
+                ) : customers.length > 0 ? (
+                  <select
                   onChange={(e) => {
                     const selectedCustomer = customers.find(
                       (customer) => customer._id === e.target.value
                     );
-                    dispatch(setSelectedCustomer(selectedCustomer));
+                    dispatch(setSelectedCustomer(selectedCustomer));  // Set the selected customer in the store
+                    setState({
+                      companyName: selectedCustomer.companyName,
+                      address: selectedCustomer.address,
+                      // Set other fields...
+                    });
                   }}
-                  value={selectedCustomer?._id || ''}
-
+                  value={selectedCustomer?._id || ''}  // Ensure the dropdown is controlled
                 >
                   <option value="" disabled>Select a customer</option>
                   {customers.map((customer) => (
@@ -562,30 +588,31 @@ const handleSubmitComment = () => {
                     </option>
                   ))}
                 </select>
-                
-              ) : (
-                <p className='NoCustomerssFound'>No customers found...</p>
-              )}
+                ) : (
+                  <p className='NoCustomersFound'>No customers found...</p>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
 
      
       {/* The Form is always visible in both modes */}
       <Form onSubmit={handleSubmit} className='customer-form'>
         <Row className="g-5">
           <Col md={6}>
-        <Form.Group className="form-group">
-          <Form.Label className="required-label">Company Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter company name"
-            name="companyName"
-            value={state.companyName}
-            onChange={(e) => setState({ ...state, companyName: e.target.value })}
-            disabled={loading} required
-          />
-        </Form.Group>
+          <Form.Group className="form-group">
+            <Form.Label className="required-label">Company Name</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter company name"
+              name="companyName"
+              value={state.companyName}  // Controlled form input
+              onChange={(e) => setState({ ...state, companyName: e.target.value })}
+              disabled={loading}
+              required
+            />
+          </Form.Group>
         </Col>
         <Col md={6}>
         <Form.Group className="form-group">
