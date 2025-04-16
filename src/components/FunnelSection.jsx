@@ -11,6 +11,8 @@ import QuoteSlider from './QuoteSlider'; // Adjust the path if needed
 import InvoiceSlider from './InformationSlider'; // Adjust the path if needed
 import POInvoiceSlider from './POInvoiceSlider'; // Adjust the path if needed
 import { RiInformation2Fill } from "react-icons/ri";
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 
 const FunnelSection = () => {
@@ -18,6 +20,107 @@ const FunnelSection = () => {
   const [selectedCustomerId, setSelectedCustomerId] = useState(null); // Track selected customer changes made
  
 //tableref part removed
+
+const [showTaskPopup, setShowTaskPopup] = useState(false);
+const [selectedTaskCustomerId, setSelectedTaskCustomerId] = useState(null);
+const [selectedDate, setSelectedDate] = useState(new Date());
+const [tasks, setTasks] = useState({});
+const [newTask, setNewTask] = useState('');
+const [taskTime, setTaskTime] = useState('');
+const [editingTaskId, setEditingTaskId] = useState(null);
+const newTaskObj = {
+  id: editingTaskId || Date.now(),
+  text: newTask,
+  time: taskTime,
+};
+const [visibleMonth, setVisibleMonth] = useState(new Date());
+const filteredMonthlyTasks = Object.entries(tasks)
+  .filter(([dateStr]) => {
+    const taskDate = new Date(dateStr);
+    return (
+      taskDate.getMonth() === visibleMonth.getMonth() &&
+      taskDate.getFullYear() === visibleMonth.getFullYear()
+    );
+  })
+  .flatMap(([dateStr, dayTasks]) =>
+    dayTasks.map(task => ({
+      ...task,
+      originalDateStr: dateStr // ✅ keep the readable date
+    }))
+  )
+  .sort((a, b) => new Date(b.originalDateStr) - new Date(a.originalDateStr));
+
+
+const handleAddTask = () => {
+  if (!newTask.trim()) return;
+
+  const dateKey = selectedDate.toDateString();
+  const newTaskObj = {
+    id: Date.now(),
+    text: newTask,
+    time: taskTime,
+  };
+
+  const updatedTasks = {
+    ...tasks,
+    [dateKey]: [newTaskObj, ...(tasks[dateKey] || [])],
+  };
+
+  setTasks(updatedTasks);
+  setNewTask('');
+  setTaskTime('');
+};
+
+
+const handleDeleteTask = (id, dateKey) => {
+  const updated = {
+    ...tasks,
+    [dateKey]: tasks[dateKey].filter(task => task.id !== id),
+  };
+  setTasks(updated);
+};
+
+const handleEditTask = (id, text, dateKey, time) => {
+  setEditingTaskId(id);
+  setNewTask(text);
+  setTaskTime(time || '');
+};
+
+
+
+const handleSaveEditedTask = () => {
+  const dateKey = selectedDate.toDateString();
+  const updated = tasks[dateKey].map((task) =>
+    task.id === editingTaskId
+      ? { ...task, text: newTask, time: taskTime }
+      : task
+  );
+  setTasks({ ...tasks, [dateKey]: updated });
+  setEditingTaskId(null);
+  setNewTask('');
+  setTaskTime('');
+};
+
+
+
+// Close popup if clicking outside
+const taskPopupRef = useRef();
+
+const handleCloseTaskPopup = (e) => {
+  if (taskPopupRef.current && !taskPopupRef.current.contains(e.target)) {
+    setShowTaskPopup(false);
+    setSelectedTaskCustomerId(null);
+  }
+};
+
+useEffect(() => {
+  document.addEventListener("mousedown", handleCloseTaskPopup);
+  return () => {
+    document.removeEventListener("mousedown", handleCloseTaskPopup);
+  };
+}, []);
+
+
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [newComment, setNewComment] = useState('');
@@ -292,7 +395,19 @@ const sliderRef = useRef(null); // Create a ref for the slider
     <FaEye onClick={() => handleShowComments(item._id)} title="View Comments" className="action-icon" />
     <FaPlusSquare onClick={() => handleAddComment(item._id)} title="Add Comment" className="action-icon" />
 
-     <FaTasks title="View Tasks" className="action-icon"/>
+    <FaTasks
+  title="View Tasks"
+  className="action-icon"
+  onClick={() => {
+    setSelectedTaskCustomerId(item._id);
+    setShowTaskPopup(true);
+  }}
+/>
+
+
+
+
+
      <span className="icon-gap"></span> {/* Gap between groups */}
      <FaHandHoldingDollar 
   title="Quotes" 
@@ -395,6 +510,87 @@ const sliderRef = useRef(null); // Create a ref for the slider
   />
 )}
 
+{/* Popup */}
+{showTaskPopup && selectedTaskCustomerId && (
+  <div className="task-popup-overlay" onClick={() => setShowTaskPopup(false)} ref={taskPopupRef}>
+    <div className="task-popup" onClick={(e) => e.stopPropagation()}>
+
+      {/* Left Side: Calendar & Day Tasks */}
+      <div className="task-popup-left">
+        <h3>Task Reminder for Customer ID: {selectedTaskCustomerId}</h3>
+
+        <Calendar
+  onChange={setSelectedDate}
+  value={selectedDate}
+  onActiveStartDateChange={({ activeStartDate }) => {
+    setVisibleMonth(activeStartDate);
+  }}
+  tileContent={({ date }) => {
+    const dateKey = date.toDateString();
+    const hasTasks = tasks[dateKey]?.length > 0;
+    return hasTasks ? <span className="dot" /> : null;
+  }}
+/>
+
+        <p>Selected Date: {selectedDate.toDateString()}</p>
+
+        <div className="task-entry">
+          <textarea
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
+            placeholder="Enter task details..."
+          />
+          <input
+            type="time"
+            value={taskTime}
+            onChange={(e) => setTaskTime(e.target.value)}
+            className="task-input"
+          />
+          {editingTaskId ? (
+            <button onClick={handleSaveEditedTask}>Save Task</button>
+          ) : (
+            <button onClick={handleAddTask}>Add Task</button>
+          )}
+        </div>
+
+        <div className="task-list">
+          {tasks[selectedDate.toDateString()]?.map((task) => (
+            <div key={task.id} className="task-item">
+              <span><strong>{task.time}</strong> - {task.text}</span>
+              <button onClick={() => handleEditTask(task.id, task.text, selectedDate.toDateString(), task.time)}>✏️</button>
+              <button onClick={() => handleDeleteTask(task.id, selectedDate.toDateString())}>🗑️</button>
+            </div>
+          ))}
+        </div>
+
+        <button className="close-btn" onClick={() => setShowTaskPopup(false)}>Close</button>
+      </div>
+
+      {/* ✅ Right Side: Monthly Task Slider */}
+      <div className="task-popup-right">
+  <h4>
+    Tasks for {visibleMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+  </h4>
+  <div className="monthly-task-list">
+    {filteredMonthlyTasks.length === 0 ? (
+      <p>No tasks for this month</p>
+    ) : (
+      filteredMonthlyTasks.map((task) => (
+        <div className="monthly-task-item" key={task.id}>
+          <strong>{task.originalDateStr} {task.time}</strong>
+          <div>{task.text}</div>
+        </div>
+      ))
+    )}
+  </div>
+</div>
+
+
+    </div>
+  </div>
+)}
+
+  
 
 
     </div>
