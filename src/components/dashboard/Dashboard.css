@@ -5139,3 +5139,42 @@ select option {
     font-size: 11px;
   }
 }
+.custom1-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight:700;
+  margin-top: 0.5rem;
+}
+
+.custom1-checkbox .form-check-input {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 4px solid #8bcfcf;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.custom1-checkbox .form-check-input:checked {
+  background-color: #50f075; /* Bootstrap's success green */
+  border: 1px solid #8bcfcf !important;
+}
+
+.custom1-checkbox .form-check-input:checked::before {
+  color: #fff;
+  position: absolute;
+  font-size: 14px;
+  left: 3px;
+  top: -1px;
+}
+
+.custom1-checkbox .form-check-label {
+  margin-left: 0.2rem;
+  cursor: pointer;
+  color: #343a40;
+}

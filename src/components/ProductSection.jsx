@@ -81,7 +81,19 @@ const ProductSection = () => {
     }));
   };
 
-
+  const handleCostChange  = (e) => {
+    const { name, value, type, checked } = e.target;
+  
+    if ((name === "costUSD" || name === "costINR") && (parseInt(value) < 1 || isNaN(value))) {
+      return; // Don't update state if value is less than 1
+    }
+  
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+  
   // Handle search input change for productName
   const handleSearchChange = async (e) => {
     const searchTerm = e.target.value;
@@ -428,29 +440,65 @@ const ProductSection = () => {
          
                     </Col>
                   </Row>     
-                  <Row className="g-5"> 
-                    <Col md={6}>
-                    <Form.Group className="form-group-prod">
-           <Form.Label className="required-label">Duration:</Form.Label>
-           <div className="radio-group-prod">
-             {["1 Month", "3 Months", "6 Months", "1 Year", "2 Years", "3 Years", "Perpetual"].map((duration) => (
-               <div key={duration} className="radio-button-prod">
-                 <input
-                   type="radio"
-                   id={`duration-${duration}`}
-                   name="subscriptionDuration"
-                   value={duration}
-                   onChange={handleChange}
-                   checked={formData.subscriptionDuration === duration}
-                 />
-                 <label htmlFor={`duration-${duration}`}>{duration}</label>
-               </div>
-             ))}
-           </div>
-         </Form.Group>
-         
-           </Col>
-                  </Row> 
+                  <Row className="g-5 align-items-end">
+      <Col md={6}>
+        <Form.Group className="form-group-prod">
+          <Form.Label className="required-label">Duration:</Form.Label>
+          <div className="radio-group-prod">
+            {["1 Month", "3 Months", "6 Months", "1 Year", "2 Years", "3 Years", "Perpetual"].map((duration) => (
+              <div key={duration} className="radio-button-prod">
+                <input
+                  type="radio"
+                  id={`duration-${duration}`}
+                  name="subscriptionDuration"
+                  value={duration}
+                  onChange={handleChange}
+                  checked={formData.subscriptionDuration === duration}
+                />
+                <label htmlFor={`duration-${duration}`}>{duration}</label>
+              </div>
+            ))}
+          </div>
+        </Form.Group>
+      </Col>
+
+      <Col md={6}>
+        <Form.Group className="form-group-prod">
+          <Form.Check
+            className="custom1-checkbox"
+            type="checkbox"
+            id="show-cost-fields"
+            label="Apply USD"
+            name="showCostFields"
+            checked={formData.showCostFields}
+            onChange={handleChange}
+            
+          />
+          {formData.showCostFields && (
+            <div className="d-flex gap-2 mt-2">
+              <Form.Control 
+  type="number"
+  placeholder="Price in USD"
+  name="costUSD"
+  value={formData.costUSD}
+  onChange={handleCostChange}
+  min="1"
+/>
+<Form.Control
+  type="number"
+  placeholder="INR Equivalent"
+  name="costINR"
+  value={formData.costINR}
+  onChange={handleCostChange}
+  min="1"
+/>
+
+
+            </div>
+          )}
+        </Form.Group>
+      </Col>
+    </Row>
                   <Form.Group className="form-group-prod mt-4 custom-checkbox" controlId="productEnabled">
            <Form.Check
              type="checkbox"
