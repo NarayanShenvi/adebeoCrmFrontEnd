@@ -13,20 +13,26 @@ import POInvoiceSlider from './POInvoiceSlider'; // Adjust the path if needed
 import { RiInformation2Fill } from "react-icons/ri";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-
+import TimePicker from 'react-time-picker';
+import 'react-time-picker/dist/TimePicker.css';
+import 'react-clock/dist/Clock.css';
 
 const FunnelSection = () => {
   const dispatch = useDispatch();
   const [selectedCustomerId, setSelectedCustomerId] = useState(null); // Track selected customer changes made
  
 //tableref part removed
+const [taskTime, setTaskTime] = useState("12:00");
 
+
+
+
+  
 const [showTaskPopup, setShowTaskPopup] = useState(false);
 const [selectedTaskCustomerId, setSelectedTaskCustomerId] = useState(null);
 const [selectedDate, setSelectedDate] = useState(new Date());
 const [tasks, setTasks] = useState({});
 const [newTask, setNewTask] = useState('');
-const [taskTime, setTaskTime] = useState('');
 const [editingTaskId, setEditingTaskId] = useState(null);
 const newTaskObj = {
   id: editingTaskId || Date.now(),
@@ -51,26 +57,64 @@ const filteredMonthlyTasks = Object.entries(tasks)
   .sort((a, b) => new Date(b.originalDateStr) - new Date(a.originalDateStr));
 
 
-const handleAddTask = () => {
-  if (!newTask.trim()) return;
+  const isValidTime = (time) => {
+    const match = /^(\d{2}):(\d{2})$/.exec(time);
+    if (!match) return false;
 
-  const dateKey = selectedDate.toDateString();
-  const newTaskObj = {
-    id: Date.now(),
-    text: newTask,
-    time: taskTime,
+    const hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+
+    return hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60;
   };
 
-  const updatedTasks = {
-    ...tasks,
-    [dateKey]: [newTaskObj, ...(tasks[dateKey] || [])],
+  const handleAddTask = () => {
+    if (!newTask.trim()) {
+      alert("❌ Please enter a task.");
+      return;
+    }
+  
+    if (!taskTime || typeof taskTime !== "string") {
+      alert("❌ Please select a valid time.");
+      return;
+    }
+  
+    const [hoursStr, minutesStr] = taskTime.split(":");
+    const hours = parseInt(hoursStr, 10);
+    const minutes = parseInt(minutesStr, 10);
+  
+    if (
+      isNaN(hours) || isNaN(minutes) ||
+      hours < 0 || hours > 23 ||
+      minutes < 0 || minutes > 59
+    ) {
+      alert("❌ Invalid time! Hours must be between 00–23 and minutes 00–59.");
+      return;
+    }
+  
+    const dateKey = selectedDate.toDateString();
+    const taskExists = tasks[dateKey]?.some(task => task.time === taskTime);
+  
+    if (taskExists) {
+      alert("❌ A task already exists at this time on the selected day.");
+      return;
+    }
+  
+    const newTaskObj = {
+      id: Date.now(),
+      text: newTask,
+      time: taskTime,
+    };
+  
+    const updatedTasks = {
+      ...tasks,
+      [dateKey]: [...(tasks[dateKey] || []), newTaskObj],
+    };
+  
+    setTasks(updatedTasks);
+    setNewTask("");
+    setTaskTime("12:00");
   };
-
-  setTasks(updatedTasks);
-  setNewTask('');
-  setTaskTime('');
-};
-
+  
 
 const handleDeleteTask = (id, dateKey) => {
   const updated = {
@@ -517,74 +561,94 @@ const sliderRef = useRef(null); // Create a ref for the slider
 
       {/* Left Side: Calendar & Day Tasks */}
       <div className="task-popup-left">
-        <h3>Task Reminder for Customer ID: {selectedTaskCustomerId}</h3>
+<div >
+        <h3>Task Reminder for Customer: </h3>
+        <p> Customer Name </p></div>
+        <div className="calendar-wrapper">
+  <Calendar
+    className="professional-pastel-calendar"
+    onChange={setSelectedDate}
+    value={selectedDate}
+    onActiveStartDateChange={({ activeStartDate }) => {
+      setVisibleMonth(activeStartDate);
+    }}
+    tileContent={({ date }) => {
+      const dateKey = date.toDateString();
+      const hasTasks = tasks[dateKey]?.length > 0;
+      return hasTasks ? <span className="dot" /> : null;
+    }}
+  />
+</div>
 
-        <Calendar
-  onChange={setSelectedDate}
-  value={selectedDate}
-  onActiveStartDateChange={({ activeStartDate }) => {
-    setVisibleMonth(activeStartDate);
-  }}
-  tileContent={({ date }) => {
-    const dateKey = date.toDateString();
-    const hasTasks = tasks[dateKey]?.length > 0;
-    return hasTasks ? <span className="dot" /> : null;
-  }}
-/>
 
-        <p>Selected Date: {selectedDate.toDateString()}</p>
+        <p className='seldate'>Selected Date: &nbsp; {selectedDate.toDateString()}</p>
 
         <div className="task-entry">
           <textarea
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             placeholder="Enter task details..."
-          />
-          <input
-            type="time"
-            value={taskTime}
-            onChange={(e) => setTaskTime(e.target.value)}
-            className="task-input"
-          />
+          />    <div className="time-picker-container">
+<TimePicker
+          value={taskTime}
+          onChange={setTaskTime}
+          format="HH:mm"
+          disableClock={true} // Disable clock icon
+        />
           {editingTaskId ? (
-            <button onClick={handleSaveEditedTask}>Save Task</button>
+            <button onClick={handleSaveEditedTask} className='taskbtn'>Save Task</button>
           ) : (
-            <button onClick={handleAddTask}>Add Task</button>
-          )}
+            <button
+  onClick={handleAddTask}
+  className="taskbtn"
+  disabled={!newTask.trim()}
+>
+  Add Task
+</button>
+
+          )} </div>
         </div>
 
-        <div className="task-list">
-          {tasks[selectedDate.toDateString()]?.map((task) => (
-            <div key={task.id} className="task-item">
-              <span><strong>{task.time}</strong> - {task.text}</span>
-              <button onClick={() => handleEditTask(task.id, task.text, selectedDate.toDateString(), task.time)}>✏️</button>
-              <button onClick={() => handleDeleteTask(task.id, selectedDate.toDateString())}>🗑️</button>
-            </div>
-          ))}
-        </div>
-
-        <button className="close-btn" onClick={() => setShowTaskPopup(false)}>Close</button>
       </div>
-
       {/* ✅ Right Side: Monthly Task Slider */}
       <div className="task-popup-right">
-  <h4>
-    Tasks for {visibleMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
-  </h4>
-  <div className="monthly-task-list">
-    {filteredMonthlyTasks.length === 0 ? (
-      <p>No tasks for this month</p>
-    ) : (
-      filteredMonthlyTasks.map((task) => (
-        <div className="monthly-task-item" key={task.id}>
-          <strong>{task.originalDateStr} {task.time}</strong>
-          <div>{task.text}</div>
+  <h4>Tasks for {selectedDate.toDateString()}</h4><br />
+
+  <div className="task-list">
+    {tasks[selectedDate.toDateString()]?.length > 0 ? (
+      [...tasks[selectedDate.toDateString()]].reverse().map((task) => (
+        <div key={task.id} className="task-item">
+          <span><strong>{task.time}</strong> - {task.text}</span>
+          <button
+            title="Edit Task"
+            onClick={() => handleEditTask(task.id, task.text, selectedDate.toDateString(), task.time)}
+          >
+            ✏️
+          </button>
+          <button
+            title="Delete Task"
+            onClick={() => handleDeleteTask(task.id, selectedDate.toDateString())}
+            disabled={editingTaskId === task.id}
+            style={{
+              opacity: editingTaskId === task.id ? 0.5 : 1,
+              cursor: editingTaskId === task.id ? "not-allowed" : "pointer"
+            }}
+          >
+            🗑️
+          </button>
         </div>
       ))
+    ) : (
+      <p>No tasks for this day.</p>
     )}
   </div>
 </div>
 
+
+
+<div>
+             <MdOutlineCancel onClick={() => setShowTaskPopup(false)} className="close-btn" title="Close" />
+             </div>
 
     </div>
   </div>

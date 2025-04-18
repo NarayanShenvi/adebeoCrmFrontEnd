@@ -4594,14 +4594,16 @@ select option {
   justify-content: center;
   align-items: center;
   z-index: 99;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
 
 .task-popup {
   background: white;
   padding: 20px;
   width: 400px;
-  border-radius: 10px;
+  border-radius: 5px !important;
   animation: slideIn 0.3s ease-out;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
 
 .task-entry textarea {
@@ -4636,9 +4638,12 @@ select option {
   from { transform: translateY(-20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+
+/*task-popup--funnel*/
 .task-popup {
   display: flex;
-  max-width: 1000px;
+  max-width: 900px !important;
   margin: auto;
   background: #fff;
   padding: 20px;
@@ -4662,12 +4667,7 @@ select option {
   border-radius: 8px;
 }
 
-.monthly-task-item {
-  margin-bottom: 10px;
-  background: #e6f4ff;
-  padding: 8px;
-  border-radius: 6px;
-}
+
 .task-popup-overlay {
   position: fixed;
   top: 0;
@@ -4688,66 +4688,199 @@ select option {
   border-radius: 12px;
   width: 90%;
   max-width: 1100px;
-  height: 90vh;
+  height: 86vh;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
+
 .task-popup-left {
-  flex: 2;
+  flex: 1.5;
   padding-right: 20px;
   overflow-y: auto;
 }
 
 .task-popup-right {
-  flex: 1;
-  background: #f9fafb;
+  flex: 1.8;
+  background-color: transparent;
   border-left: 1px solid #ddd;
   padding: 15px;
   overflow-y: auto;
-  max-height: 100%;
   border-radius: 0 12px 12px 0;
   box-sizing: border-box;
 }
-
-.task-popup h3,
+.task-popup h3
+{
+  text-align: left;
+  color: #07b1b1;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+.task-popup p
+{
+  text-align: left;
+  color: #037070;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+.task-popup-right p
+{
+  text-align: center;
+  color: #037070;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+.task-popup-left .seldate
+{
+  text-align: center;
+  color: #025858;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 32px;
+}
 .task-popup h4 {
-  margin-top: 0;
-  font-weight: 600;
+  text-align: center;
+  color: #07b1b1;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 25px;
 }
 
 .task-entry textarea {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
-  resize: vertical;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.task-input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.task-list,
-.monthly-task-list {
-  margin-top: 15px;
-}
-
-.task-item,
-.monthly-task-item {
-  background: #eef6ff;
+  border: 1px solid #6fe4e6;
+  border-radius: 2px;
   padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 10px;
   font-size: 14px;
+  transition: border-color 0.3s ease-in-out;
+  color: #1b1818;
+  font-size: 14px;
+  background-color: #d4d8d831;
+  resize: none; /* Disables resizing */
+  white-space: pre-wrap;
+}
+
+.task-entry textarea:focus {
+  border-color: #038486; /* Change border color on focus */
+  outline: none;
+}
+
+/* Container for Time Picker and Button */
+.time-picker-container {
+  display: flex;
+  flex-direction: column;  /* Stack the items vertically */
+  align-items: center;  /* Center the items horizontally */
+  gap: 15px;  /* Add space between time picker and button */
+  width: 100%;
+  max-width: 200px;  /* Adjust the width to your requirement */
+  margin: 0 auto;  /* Center the container */
+}
+
+/* Main TimePicker container */
+.react-time-picker {
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+/* Time Picker Input Box */
+.react-time-picker__wrapper {
+  background-color: #d4d8d831;
+  border: 1px solid #6fe4e6 !important;
+  border-radius: 2px;  /* Smooth rounded corners */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;  /* Set height for consistency */
+  padding: 5px 10px;  /* Add padding inside the input box */
+  cursor: pointer;  /* Pointer cursor for clickable area */
+  transition: background-color 0.3s, border 0.3s;  /* Smooth transition */
+}
+/* Time Input (the text field) - Hide input field but allow for time display */
+.react-time-picker__inputGroup__input {
+  background: transparent;  /* Remove background for input */
+  border: none;  /* Remove default border */
+  color: #007c91;  /* Text color */
+  font-size: 16px;  /* Adjust font size */
+  font-weight: bold;  /* Make text bold */
+  text-align: center;  /* Center-align the time */
+  pointer-events: none;  /* Disable manual input */
+}
+
+/* Focus effect to remove outline and cursor */
+.react-time-picker__inputGroup__input:focus {
+  outline: none;  /* Remove focus outline */
+  cursor: none;  /* Hide cursor */
+}
+
+/* Hide clock button */
+.react-time-picker__clock-button {
+  display: none;  /* Hide the clock icon */
+}
+
+/* Dropdown for Time Selection */
+.react-time-picker__wrapper ul {
+  background-color: #fff;  /* White background for the dropdown */
+  border: 1px solid #007c91;  /* Border for the dropdown */
+  border-radius: 8px;  /* Rounded corners */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);  /* Shadow for dropdown */
+  margin-top: 5px;  /* Space between input and dropdown */
+  z-index: 10;  /* Ensure dropdown appears above other content */
+}
+
+/* Time Option in the Dropdown */
+.react-time-picker__wrapper ul li {
+  padding: 10px 15px;  /* Padding inside each time option */
+  font-size: 16px;  /* Font size for each option */
+  cursor: pointer;  /* Pointer cursor for clickable options */
+  transition: background-color 0.2s;  /* Smooth transition for hover effect */
+}
+
+/* Hover effect on time options */
+.react-time-picker__wrapper ul li:hover {
+  background-color: #e0f7fa;  /* Light color on hover */
+}
+
+/* Focus on selected item */
+.react-time-picker__wrapper ul li.selected {
+  background-color: #008c9e;  /* Highlight selected option */
+  color: white;  /* White text for selected option */
+}
+
+.task-list{
+  margin-top: 15px;
+  max-width: 190%;
+}
+
+.task-item{
+  background-color: #dff8fc;
+  padding: 5px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 12px;
   position: relative;
+  max-width: 190%;
+}
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  word-wrap: break-word;
+}
+
+.task-item span {
+  flex: 1;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .task-item button {
@@ -4758,11 +4891,251 @@ select option {
 }
 
 .close-btn {
-  margin-top: 15px;
-  padding: 6px 12px;
-  background: #ff5f5f;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  color: rgb(216, 24, 24);
   cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  font-size: 19px;
+  font-weight: bolder;
+  margin-top: -10px;
+}
+.taskbtn {
+  position: relative;
+  background: none;
+  color: #038486; /* Indigo */
+  border: none;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 10px 0;
+  transition: color 0.3s ease;
+}
+
+.taskbtn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 3px;
+  width: 100%;
+  height: 4px;
+  background-color: #038486;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.taskbtn:hover::after {
+  transform: scaleX(1);
+}
+
+.taskbtn:hover {
+  color: #038486;
+}
+.taskbtn:disabled {
+  cursor: not-allowed;
+  color: #313131;
+  opacity: 0.6;
+}
+.task-item button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.calendar-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 240px !important; /* Smaller size */
+}
+
+.professional-pastel-calendar {
+  background: #ffffff;
+  font-family: "Segoe UI", sans-serif;
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  max-width: 100%;
+  border: 1px solid #b2ebf2;
+}
+
+/* Header navigation */
+.professional-pastel-calendar .react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  background-color: #e0f7fa;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.professional-pastel-calendar .react-calendar__navigation button {
+  background: none;
+  border: none;
+  color: #007c91;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 2px 4px;
+  transition: color 0.2s;
+}
+
+.professional-pastel-calendar .react-calendar__navigation button:hover {
+  color: #004d60;
+}
+
+/* Weekday headers */
+.professional-pastel-calendar .react-calendar__month-view__weekdays {
+  text-transform: uppercase;
+  font-size: 10px;
+  color: #00838f;
+  margin-bottom: 2px;
+}
+
+/* Day tiles */
+.professional-pastel-calendar .react-calendar__tile {
+  padding: 4px 0;
+  font-size: 11px;
+  border-radius: 8px;
+  background: #f9f9f9;
+  transition: all 0.2s;
+  height: 28px;
+}
+
+.professional-pastel-calendar .react-calendar__tile:hover {
+  background-color: #b2ebf2;
+  color: #004d60;
+}
+
+/* Today */
+.professional-pastel-calendar .react-calendar__tile--now {
+  background-color: #e0f2f1;
+  border: 1px solid #00acc1;
+  color: #006064;
+}
+
+/* Selected date */
+.professional-pastel-calendar .react-calendar__tile--active {
+  background-color: #b2ebf2;
+  color: #004d60;
+  font-weight: bold;
+}
+
+/* Task dot */
+.professional-pastel-calendar .dot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  background-color: #007c91;
+  border-radius: 50%;
+  margin: -2px auto 0;
+}
+
+/* -------- Responsive CSS for Smaller Screens -------- */
+
+/* -------- Responsive: 1024px -------- */
+@media (max-width: 1024px) {
+  .task-popup {
+    flex-direction: column;
+    height: auto;
+    padding: 15px;
+  }
+
+  .task-popup-left, .task-popup-right {
+    width: 100%;
+    padding: 10px;
+    flex: 1;
+  }
+
+  .calendar-wrapper {
+    max-width: 100% !important;
+    margin-bottom: 15px;
+  }
+
+  .task-popup-right {
+    border-left: none;
+    border-top: 1px solid #ddd;
+    border-radius: 0;
+  }
+}
+
+/* -------- Responsive: 768px -------- */
+@media (max-width: 768px) {
+  .task-popup {
+    padding: 10px;
+  }
+
+  .task-popup-left, .task-popup-right {
+    padding: 8px;
+  }
+
+  .task-entry textarea {
+    font-size: 13px;
+  }
+
+  .react-time-picker__wrapper {
+    height: 36px;
+    padding: 4px 8px;
+  }
+
+  .task-item {
+    font-size: 11px;
+  }
+
+  .taskbtn {
+    font-size: 12px;
+  }
+
+  .task-popup h4,
+  .task-popup h3,
+  .task-popup p {
+    font-size: 13px;
+  }
+}
+
+/* -------- Responsive: 480px -------- */
+@media (max-width: 480px) {
+  .task-popup {
+    padding: 8px;
+  }
+
+  .task-popup-left, .task-popup-right {
+    padding: 6px;
+  }
+
+  .task-entry textarea {
+    font-size: 12px;
+  }
+
+  .react-time-picker__wrapper {
+    height: 32px;
+    padding: 4px 6px;
+  }
+
+  .react-time-picker__inputGroup__input {
+    font-size: 14px;
+  }
+
+  .task-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 10px;
+  }
+
+  .task-item button {
+    font-size: 14px;
+  }
+
+  .task-popup h4,
+  .task-popup h3,
+  .task-popup p {
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .calendar-wrapper {
+    max-width: 100% !important;
+  }
+
+  .taskbtn {
+    font-size: 11px;
+  }
 }
