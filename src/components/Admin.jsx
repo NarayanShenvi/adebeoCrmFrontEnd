@@ -16,7 +16,7 @@ import {
 import {
   addProductCategoryAsync,
   resetSuccessMessage as resetCategorySuccessMessage,
-} from '../redux/slices/addProductCategorySlice';
+} from '../redux/slices/addProductCategoy';
 import './dashboard/Dashboard.css'; // Import the CSS fil
 
 
