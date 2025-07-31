@@ -13,6 +13,7 @@ import CustomerPaymentSection from '../customerPaymentSection';
 import Createreport from '../reportSection';
 import fetchReportsAsync from '../../redux/slices/reportSlice'
 import { returnStatement } from '@babel/types';
+import Admin from '../../components/Admin';
 
 const RightPanel = ({ selectedSection }) => {
   const dispatch = useDispatch();
@@ -80,7 +81,10 @@ const customerLoading = useSelector((state) => state.customer?.loading);
       case 'cx_payment':
         return <CustomerPaymentSection/>;
       case 'reports':
-        return <Createreport/>;     
+        return <Createreport/>;
+      case 'admin':
+        return <Admin />; // ✅ Add this line
+     
       default:
         return <div className='default_msg'>Select a section from the menu.</div>;
     }

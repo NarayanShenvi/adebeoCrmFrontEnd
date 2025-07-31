@@ -562,8 +562,8 @@ const sliderRef = useRef(null); // Create a ref for the slider
       {/* Left Side: Calendar & Day Tasks */}
       <div className="task-popup-left">
 <div >
-        <h3>Task Reminder for Customer: </h3>
-        <p> Customer Name </p></div>
+        <h3>Task Reminder for Customer: </h3><br></br>
+        <p> </p></div>
         <div className="calendar-wrapper">
   <Calendar
     className="professional-pastel-calendar"

@@ -10,14 +10,19 @@ import { HiSave } from "react-icons/hi";
 import { FaSpinner } from 'react-icons/fa';
 import { BiSolidMessageSquareEdit } from "react-icons/bi";
 import { HiSquaresPlus } from "react-icons/hi2";//to here
+import { MdAddBox, MdDelete  } from "react-icons/md";
+
+
 
 const ProductSection = () => {
   const dispatch = useDispatch();
   const { products, productToEdit, loading, error } = useSelector((state) => state.products);
   const successMessage = useSelector((state) => state.products?.successMessage || ''); // chenges --added just to check whether it works or not
-  
-  const [mode, setMode] = useState('add');  // Mode: 'add' or 'edit'
-  const [formData, setFormData] = useState({
+  const [mode, setMode] = useState('add');
+  const [isCombo, setIsCombo] = useState(false);
+const [comboProducts, setComboProducts] = useState([
+  { name: '', quantity: 1 }
+]);  const [productList, setProductList] = useState([]);  const [formData, setFormData] = useState({
     productName: '',
     productCode: '',
     ProductDisplay: '',
@@ -38,10 +43,39 @@ const ProductSection = () => {
     maxDiscount: '',
     prodisEnabled: false,
     subscriptionDuration: "1 Year", // Set default value here
+    showCostFields: false,
+    costUSD: '',
+    costINR: ''
   });
   
   const [searchResults, setSearchResults] = useState([]); // For holding search results
+  const [singleFormData, setSingleFormData] = useState({
+   productName: '',
+    productCode: '',
+    ProductDisplay: '',
+    ProductCompanyName: '',
+    Contact: '',
+    address: '',
+    companyGstin: '',
+    primaryLocality: '',
+    secondaryLocality: '',
+    city: '',
+    state: '',
+    pincode: '',
+    email: '',
+    salesCode: '',
+    purchaseCost: '',
+    salesCost: '',
+    drStatus: '',  // ✅ Added this
+    maxDiscount: '',
+    prodisEnabled: false,
+    subscriptionDuration: "1 Year", // Set default value here
+    showCostFields: false,
+    costUSD: '',
+    costINR: ''
+});
 
+  
   // Effect to reset form if switching between add/edit modes
   useEffect(() => {
     if (mode === 'edit' && productToEdit) {
@@ -68,10 +102,75 @@ const ProductSection = () => {
         maxDiscount: '',
         prodisEnabled: false,
         subscriptionDuration: '1 Year', // ✅ Add default value here
-
+        showCostFields: false,
+        costUSD: '',
+        costINR: ''
       });
     }
   }, [mode, productToEdit]);
+
+ 
+  useEffect(() => {
+    if (isCombo) {
+      axios.get(`${API}/load_edit_adebeo_products`).then(res => {
+        setProductList(res.data.data || []);
+      }).catch(err => console.error("Failed to fetch product list", err));
+    }
+  }, [isCombo]);
+
+ useEffect(() => {
+  if (isCombo) {
+    const total = comboProducts.reduce(
+      (acc, item) =>
+        acc + (parseFloat(item.salesCost || 0) * parseFloat(item.quantity || 0)),
+      0
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      salesCost: total.toFixed(2),
+    }));
+  }
+}, [comboProducts, isCombo]);
+ 
+
+const handleComboChange = (index, field, value) => {
+  const updated = [...comboProducts];
+
+  if (field === 'name') {
+    const selected = productList.find(prod => prod._id === value);
+    if (selected) {
+      updated[index] = {
+        ...updated[index],
+        name: selected._id,
+        productName: selected.productName,
+        quantity: updated[index].quantity || 1,
+        salesCost: parseFloat(selected.salesCost || 0), // ✅ get price from real product
+      };
+    }
+  } else if (field === 'quantity') {
+    updated[index][field] = parseInt(value) || 0;
+  }
+
+  setComboProducts(updated);
+
+  // Save combo to formData
+  setFormData(prev => ({
+    ...prev,
+    productName: JSON.stringify(updated), // for backend
+  }));
+};
+
+
+  const addComboRow = () => setComboProducts([...comboProducts, { name: '', quantity: 1 }]);
+  const removeComboRow = (index) => {
+    const updated = comboProducts.filter((_, i) => i !== index);
+    setComboProducts(updated);
+    setFormData(prev => ({
+      ...prev,
+      productName: JSON.stringify(updated)
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -80,6 +179,7 @@ const ProductSection = () => {
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
+
 
   const handleCostChange  = (e) => {
     const { name, value, type, checked } = e.target;
@@ -129,18 +229,90 @@ const ProductSection = () => {
       dispatch(addProductAsync(formData));  // Add new product if in Add mode
     }
   };
+  
 
   return (
 <div className="product-section">
 <h3>{mode === 'add' ? 'Add New Product' : 'Edit Product'}</h3>
       
-<div onClick={() => setMode(mode === 'add' ? 'edit' : 'add')}>
+<div
+  onClick={() => {
+    if (mode === 'add') {
+      // ✅ Switching to Edit Mode
+      setMode('edit');
+      setComboProducts([{ name: '', quantity: 1 }]); // Clear combo inputs
+     
+    } else {
+      // ✅ Switching to Add Mode
+      setMode('add');
+      setComboProducts([{ name: '', quantity: 1 }]); // Clear combo inputs
+      
+    }
+  }}
+>
   {mode === 'add' ? (
     <BiSolidMessageSquareEdit title="Switch to Edit Products" className="toggle-icon-prod" />
   ) : (
     <HiSquaresPlus title="Switch to Add Products" className="toggle-icon-prod" />
   )}
 </div>
+
+
+  <div className="radio-prod">
+  <label>
+    <input
+  type="radio"
+  checked={!isCombo}
+  onChange={() => {
+    // Save current combo data before switching (optional)
+    setIsCombo(false);
+    
+    // Restore saved single product form data
+    setFormData(singleFormData);
+  }}
+/> Single Product
+  </label>
+  <label>
+    <input
+  type="radio"
+  checked={isCombo}
+  onChange={() => {
+    // Save current single product form before switching
+    setSingleFormData(formData);
+
+    setIsCombo(true);
+    
+    // Clear main formData so combo product list doesn't leak into it
+    setFormData({
+       productName: '',
+    productCode: '',
+    ProductDisplay: '',
+    ProductCompanyName: '',
+    Contact: '',
+    address: '',
+    companyGstin: '',
+    primaryLocality: '',
+    secondaryLocality: '',
+    city: '',
+    state: '',
+    pincode: '',
+    email: '',
+    salesCode: '',
+    purchaseCost: '',
+    salesCost: '',
+    drStatus: '',  // ✅ Added this
+    maxDiscount: '',
+    prodisEnabled: false,
+    subscriptionDuration: "1 Year", // Set default value here
+    showCostFields: false,
+    costUSD: '',
+    costINR: ''
+    });
+  }}
+/> Combo Product
+  </label>
+</div>
+
 {successMessage && <p className="success-prod">{successMessage}</p>}
       {error && <p className="error-prod">{error}</p>}
 
@@ -176,18 +348,78 @@ const ProductSection = () => {
       <Form onSubmit={handleSubmit}className='product-form'>
       <Row className="g-5">
       <Col md={6}>
-      <Form.Group className="form-group-prod">
+    <Form.Group className="form-group-prod">
   <Form.Label className="required-label">Product Name:</Form.Label>
-  <Form.Control
-    type="text"
-    name="productName"
-    value={formData.productName}
-    onChange={handleChange}
-    disabled={mode === "edit"} // Disable editing in Edit mode
-    placeholder='Enter product name'
-    required
-  />
+
+  {!isCombo ? (
+    <Form.Control
+      type="text" 
+      name="productName"
+      value={formData.productName}
+      onChange={handleChange}
+      disabled={mode === "edit"}
+      placeholder="Enter product name"
+      required
+    />
+  ) : (
+    <div>
+       {comboProducts.map((item, idx) => (
+<div key={idx} className="d-flex gap-2 align-items-center mb-1">
+          <select
+            disabled={mode === "edit"} 
+  className="form-control"
+  value={item.name}
+  onChange={e => handleComboChange(idx, 'name', e.target.value)}
+>
+  <option value="">Select Product</option>
+  {productList.map((product) => {
+  const alreadySelected = comboProducts.some(
+    (row, i) => i !== idx && row.name === product._id
+  );
+  return (
+    <option
+      key={product._id}
+      value={product._id}
+      disabled={alreadySelected}
+    >
+      {product.productName}
+    </option>
+  );
+})}
+
+</select>
+
+         <input
+            type="number"
+            disabled={mode === "edit"}  
+            className="form-control w-25"
+            value={item.quantity}
+            min={1}
+            onChange={(e) => handleComboChange(idx, 'quantity', e.target.value)}
+          />
+
+          <MdAddBox
+  className={`add-prod ${mode === 'edit' ? 'disabled-icon' : ''}`}
+  size={20}
+  onClick={mode === 'edit' ? undefined : addComboRow}
+  title={mode === 'edit' ? "Disabled in Edit Mode" : "Add Product"}
+  style={{ cursor: mode === 'edit' ? 'not-allowed' : 'pointer', opacity: mode === 'edit' ? 0.5 : 1 }}
+/>
+
+<MdDelete
+  className={`delete-prod ${mode === 'edit' ? 'disabled-icon' : ''}`}
+  size={20}
+  onClick={mode === 'edit' ? undefined : () => removeComboRow(idx)}
+  title={mode === 'edit' ? "Disabled in Edit Mode" : "Delete Product"}
+  style={{ cursor: mode === 'edit' ? 'not-allowed' : 'pointer', opacity: mode === 'edit' ? 0.5 : 1 }}
+/>
+
+        </div>
+      ))} 
+    </div>
+  )}
 </Form.Group>
+
 </Col>
 <Col md={6}>
 <Form.Group className="form-group-prod">
@@ -202,6 +434,7 @@ const ProductSection = () => {
         </Col>
         </Row>
 
+         
         <Row className="g-5">
   <Col md={6}>
   <Form.Group className="form-group-prod"> 
@@ -381,23 +614,28 @@ const ProductSection = () => {
 
            </Col>
            <Col md={6}>
-           <Form.Group className="form-group-prod">
-    <Form.Label className="required-label">Sales Cost:</Form.Label>
-    <Form.Control
-      type="number"
-      name="salesCost"
-      value={formData.salesCost || ""}
-      onChange={(e) => {
+          <Form.Group className="form-group-prod">
+  <Form.Label className="required-label">Sales Cost:</Form.Label>
+  <Form.Control
+    type="number"
+    name="salesCost"
+    value={formData.salesCost || ""}
+    onChange={(e) => {
+      if (!isCombo) {
         const value = e.target.value;
         if (value === "" || parseFloat(value) >= 0) {
-          handleChange(e);
+          setFormData((prev) => ({ ...prev, salesCost: value }));
         }
-      }}
-      min="0" // Prevents negative values
-      placeholder="Enter sales cost"
-      required
-    />
-  </Form.Group>
+      }
+    }}
+    min="0"
+    placeholder="Enter sales cost"
+    required
+  />
+</Form.Group>
+
+
+  
 </Col>
 </Row>
 </Col>
@@ -536,3 +774,19 @@ const ProductSection = () => {
 };
 
 export default ProductSection;
+
+
+
+  
+
+  
+  
+   
+    
+
+      
+        
+        
+        
+
+
