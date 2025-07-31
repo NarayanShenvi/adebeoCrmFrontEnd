@@ -10,6 +10,8 @@ import informationReducer from './slices/informationSlice';
 import customerPaymentReducer from './slices/customerPaymentSlice';
 import createReports from './slices/reportSlice'
 import createUsers from './slices/userSlice'
+import addusers from './slices/adminUserSlice'
+import addProductCategoryreducer from './slices/addProductCategoy'
 
 const rootReducer = combineReducers({
     //data: userReducer
@@ -22,7 +24,9 @@ const rootReducer = combineReducers({
     information:informationReducer,
     customerPayment:customerPaymentReducer,
     report:createReports,
-    users:createUsers
+    users:createUsers,
+    addusers:addusers,
+    productCategory:addProductCategoryreducer
 })
 
 export default rootReducer;

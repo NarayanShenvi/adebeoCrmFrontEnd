@@ -8,8 +8,17 @@ import InvoiceStatus from './InvoiceStatus';
 import PurchaseOrderStatus from './PurchaseOrderStatus';
 import PurchaseReport from './PurchaseReport';
 import SalesReport from './SalesReport';
-
+import {
+  addAdminUserAsync,
+  fetchAllUsersAsync,
+  resetAdminUserState,
+} from '../redux/slices/adminUserSlice'; 
+import {
+  addProductCategoryAsync,
+  resetSuccessMessage as resetCategorySuccessMessage,
+} from '../redux/slices/addProductCategorySlice';
 import './dashboard/Dashboard.css'; // Import the CSS fil
+
 
 const Admin = () => {
   const [selected, setSelected] = useState('');
