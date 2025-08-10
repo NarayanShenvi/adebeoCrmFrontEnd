@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
-import './dashboard/Dashboard.css'; // Import the CSS fil
+import React, { useState, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { addAdminUserAsync } from '../redux/slices/adminUserSlice';
+import { Form, Row, Col } from 'react-bootstrap';
+import { HiSave } from "react-icons/hi";
+import { FaSpinner } from 'react-icons/fa';
+import './dashboard/Dashboard.css';
 
 const CreateUsers = () => {
-  const [formData, setFormData] = useState({
-    userName: '',
-    personalEmail: '',
-    mobile: '',
-    officialEmail: '',
-    address: '',
-    password: ''
-  });
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  
+  const formRef = useRef(null);
+
+  const initialState = {
+  userName: '',
+  personalEmail: '',
+  mobile: '',
+  officialEmail: '',
+  address: '',
+  password: '',
+  role: ''
+};
+
+const [formData, setFormData] = useState(initialState);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,103 +33,158 @@ const CreateUsers = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+
+
+  const resetForm = () => {
+    setFormData({ ...initialState }); // trigger re-render by cloning the object
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const { userName, personalEmail, mobile, password } = formData;
+    const { userName, password, role } = formData;
 
-    if (!userName || !personalEmail || !mobile || !password) {
+    if (!userName || !password || !role) {
       alert('Please fill in all required fields.');
+      setLoading(false);
       return;
     }
 
-    // You can send formData to your backend here
-    console.log('Submitted User Data:', formData);
-    alert('User created successfully!');
+    try {
+      const action = await dispatch(
+        addAdminUserAsync({
+          username: userName,
+          password,
+          role
+        })
+      );
+      unwrapResult(action);
 
-    // Reset form
-    setFormData({
-      userName: '',
-      personalEmail: '',
-      mobile: '',
-      officialEmail: '',
-      address: '',
-      password: ''
-    });
+      alert('User created successfully!');
+
+            resetForm(); // clear form
+
+    } catch (err) {
+      let msg = '';
+      if (typeof err === 'string') {
+        msg = err;
+      } else if (err?.message) {
+        msg = err.message;
+      } else if (err?.payload) {
+        if (typeof err.payload === 'string') msg = err.payload;
+        else if (err.payload.message) msg = err.payload.message;
+      } else {
+        msg = 'Request failed with status code 400';
+      }
+
+      if (/status code 400/i.test(msg) || /request failed with status code 400/i.test(msg)) {
+        alert('User already exists.');
+      } else if (/(already\s*exists|duplicate|user\s*exists)/i.test(msg)) {
+        alert('User already exists.');
+      } else {
+        alert(msg);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="create-user-container">
-      <h2>Create New Employee</h2>
-      <form className="create-user-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>User Name *</label>
-          <input
+    <div className="user-section" >
+      <h3>Create New User</h3>
+      <Form className="create-user-form" onSubmit={handleSubmit} ref={formRef}>
+        <Form.Group className="form-group-user">
+          <Form.Label className="required-label">User Name </Form.Label>
+          <Form.Control
             type="text"
             name="userName"
             value={formData.userName}
             onChange={handleChange}
+            placeholder="Enter user name"
             required
           />
-        </div>
+        </Form.Group>
 
-        <div className="form-group">
-          <label>Personal Email *</label>
-          <input
+        <Form.Group className="form-group-user">
+          <Form.Label>Personal Email</Form.Label>
+          <Form.Control
             type="email"
+            placeholder="Enter personal email address"
             name="personalEmail"
             value={formData.personalEmail}
             onChange={handleChange}
-            required
           />
-        </div>
+        </Form.Group>
 
-        <div className="form-group">
-          <label>Mobile Number *</label>
-          <input
-            type="tel"
-            name="mobile"
-            value={formData.mobile}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Official Email</label>
-          <input
+        <Form.Group className="form-group-user">
+          <Form.Label>Official Email</Form.Label>
+          <Form.Control
             type="email"
             name="officialEmail"
+            placeholder="Enter official email address"
             value={formData.officialEmail}
             onChange={handleChange}
           />
-        </div>
+        </Form.Group>
 
-        <div className="form-group">
-          <label>Address</label>
-          <textarea
+        <Form.Group className="form-group-user">
+          <Form.Label>Phone</Form.Label>
+          <Form.Control
+            type="tel"
+            name="mobile"
+            placeholder="Enter phone number"
+            value={formData.mobile}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <Form.Group className="form-group-user">
+          <Form.Label>Address</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={1}
+            placeholder="Enter address"
             name="address"
             value={formData.address}
             onChange={handleChange}
-            rows="2"
-          ></textarea>
-        </div>
+          />
+        </Form.Group>
 
-        <div className="form-group">
-          <label>Password *</label>
-          <input
+        <Form.Group className="form-group-user">
+          <Form.Label className="required-label">User Password </Form.Label>
+          <Form.Control
             type="password"
             name="password"
+            placeholder="Enter user password"
             value={formData.password}
             onChange={handleChange}
             required
           />
-        </div>
+        </Form.Group>
 
-        <div className="form-actions">
-          <button type="submit">Create User</button>
-        </div>
-      </form>
+        <Form.Group className="form-group-user">
+          <Form.Label className="required-label">Role</Form.Label>
+          <Form.Select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select User Type</option>
+            <option value="User">User</option>
+            <option value="Tech">Tech</option>
+          </Form.Select>
+        </Form.Group>
+
+        <button type="submit" disabled={loading} className="submit-button-user">
+          {loading ? (
+            <FaSpinner className="spinner" size={20} title="Submitting..." />
+          ) : (
+            <HiSave size={24} title="Create User" className="NewProduct" />
+          )}
+        </button>
+      </Form>
     </div>
   );
 };

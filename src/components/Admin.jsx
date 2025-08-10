@@ -8,21 +8,13 @@ import InvoiceStatus from './InvoiceStatus';
 import PurchaseOrderStatus from './PurchaseOrderStatus';
 import PurchaseReport from './PurchaseReport';
 import SalesReport from './SalesReport';
-import {
-  addAdminUserAsync,
-  fetchAllUsersAsync,
-  resetAdminUserState,
-} from '../redux/slices/adminUserSlice'; 
-import {
-  addProductCategoryAsync,
-  resetSuccessMessage as resetCategorySuccessMessage,
-} from '../redux/slices/addProductCategoy';
+import ProductCategory from './ProductCategory';
+
 import './dashboard/Dashboard.css'; // Import the CSS fil
 
 
 const Admin = () => {
   const [selected, setSelected] = useState('');
-
   const renderContent = () => {
     switch (selected) {
       case 'CreateUsers': return <CreateUsers />;
@@ -34,7 +26,9 @@ const Admin = () => {
       case 'PurchaseOrderStatus': return <PurchaseOrderStatus />;
       case 'PurchaseReport': return <PurchaseReport />;
       case 'SalesReport': return <SalesReport />;
-      default: return <div style={{ padding: '20px' }}>Please select a menu option.</div>;
+      case 'ProductCategory': return <ProductCategory />;
+
+default: return <div className="default-message-admin">Please select a menu option.</div>;
     }
   };
 
@@ -56,6 +50,7 @@ const Admin = () => {
         <button onClick={() => setSelected('PerformaInvoiceStatus')}>Performa Invoice</button>
         <button onClick={() => setSelected('InvoiceStatus')}>Invoice Status</button>
         <button onClick={() => setSelected('PurchaseOrderStatus')}>PO Status</button>
+        
 
         <div className="dropdown">
           <button className="dropbtn">Report</button>
@@ -64,6 +59,8 @@ const Admin = () => {
             <a onClick={() => setSelected('SalesReport')}>Sales Report</a>
           </div>
         </div>
+
+         <button onClick={() => setSelected('ProductCategory')}>Product  Category</button>
       </div>
 
       {/* SCREEN BELOW */}

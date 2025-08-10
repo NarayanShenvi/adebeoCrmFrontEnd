@@ -17,7 +17,7 @@ export const addAdminUserAsync = createAsyncThunk(
         {
           username: username.toLowerCase(),
           password,
-          role,
+          role, // "Admin", "User", or "Tech"
         },
         {
           headers: {
@@ -26,7 +26,7 @@ export const addAdminUserAsync = createAsyncThunk(
         }
       );
 
-      return response.data;  // Adjust based on backend response
+      return response.data; // Adjust based on backend response
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || error.message
@@ -51,7 +51,7 @@ export const fetchAllUsersAsync = createAsyncThunk(
         },
       });
 
-      return response.data.users || [];  // Adjust based on backend shape
+      return response.data.users || []; // Adjust based on backend shape
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || error.message

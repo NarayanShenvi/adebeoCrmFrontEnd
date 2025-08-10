@@ -5,10 +5,9 @@ import API from '../../config/config';
 // Async thunk to add a product category
 export const addProductCategoryAsync = createAsyncThunk(
   'productCategory/addProductCategory',
-  async (categoryData, thunkAPI) => {
+  async (categoryData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('Access_Token');
-
       const response = await axios.post(
         `${API}/addcategory`,
         categoryData,
@@ -16,11 +15,38 @@ export const addProductCategoryAsync = createAsyncThunk(
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
-
-      return response.data; // expecting something like { message: "Category added successfully" }
+      return response.data; // Backend should return { message: "...", category: {...} }
     } catch (error) {
-      // Throw error with backend message if available
-      throw new Error(error.response ? error.response.data.message : error.message);
+      let msg = '';
+
+      // Pass backend message if available
+      if (error.response?.data?.message) {
+        msg = error.response.data.message;
+      } else if (error.message) {
+        msg = error.message;
+      } else {
+        msg = "Failed to add category";
+      }
+
+      return rejectWithValue(msg);
+    }
+  }
+);
+
+// Async thunk to fetch all categories
+export const fetchCategoriesAsync = createAsyncThunk(
+  'productCategory/fetchCategories',
+  async (_, thunkAPI) => {
+    try {
+      const token = localStorage.getItem('Access_Token');
+      const response = await axios.get(`${API}/getAllCategories`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch categories"
+      );
     }
   }
 );
@@ -30,8 +56,9 @@ const productCategorySlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    successMessage: '', // Store success message from API
-    lastAddedCategory: null, // Optionally store the added category data or id
+    successMessage: '',
+    lastAddedCategory: null,
+    categories: [],
   },
   reducers: {
     resetSuccessMessage: (state) => {
@@ -42,6 +69,7 @@ const productCategorySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // ADD CATEGORY
       .addCase(addProductCategoryAsync.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -50,15 +78,28 @@ const productCategorySlice = createSlice({
       .addCase(addProductCategoryAsync.fulfilled, (state, action) => {
         state.loading = false;
         state.successMessage = action.payload.message || "Category added successfully";
-        state.lastAddedCategory = action.payload.category || null;  // optional
+        state.lastAddedCategory = action.payload.category || null;
       })
       .addCase(addProductCategoryAsync.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to add category";
+        state.error = action.payload || "Failed to add category";
+      })
+
+      // FETCH CATEGORIES
+      .addCase(fetchCategoriesAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCategoriesAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.categories = action.payload;
+      })
+      .addCase(fetchCategoriesAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch categories";
       });
   },
 });
 
 export const { resetSuccessMessage } = productCategorySlice.actions;
-
 export default productCategorySlice.reducer;

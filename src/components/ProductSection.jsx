@@ -11,8 +11,13 @@ import { FaSpinner } from 'react-icons/fa';
 import { BiSolidMessageSquareEdit } from "react-icons/bi";
 import { HiSquaresPlus } from "react-icons/hi2";//to here
 import { MdAddBox, MdDelete  } from "react-icons/md";
+import { fetchCategoriesAsync } from '../redux/slices/addProductCategoy';
+import Select from 'react-select';
 
-
+import {
+  addProductCategoryAsync,
+  resetSuccessMessage as resetCategorySuccessMessage,
+} from '../redux/slices/addProductCategoy';
 
 const ProductSection = () => {
   const dispatch = useDispatch();
@@ -41,11 +46,14 @@ const [comboProducts, setComboProducts] = useState([
     salesCost: '',
     drStatus: '',  // ✅ Added this
     maxDiscount: '',
+    type: "product",
     prodisEnabled: false,
     subscriptionDuration: "1 Year", // Set default value here
     showCostFields: false,
     costUSD: '',
-    costINR: ''
+    costINR: '',
+  category: [], // <-- make sure it's an array
+
   });
   
   const [searchResults, setSearchResults] = useState([]); // For holding search results
@@ -68,11 +76,14 @@ const [comboProducts, setComboProducts] = useState([
     salesCost: '',
     drStatus: '',  // ✅ Added this
     maxDiscount: '',
+    type: "product",
     prodisEnabled: false,
     subscriptionDuration: "1 Year", // Set default value here
     showCostFields: false,
     costUSD: '',
-    costINR: ''
+    costINR: '',
+  category: [], // <-- make sure it's an array
+
 });
 
   
@@ -100,14 +111,29 @@ const [comboProducts, setComboProducts] = useState([
         salesCost: '',
         drStatus: '',  // ✅ Added this
         maxDiscount: '',
+        type: "product",
         prodisEnabled: false,
         subscriptionDuration: '1 Year', // ✅ Add default value here
         showCostFields: false,
         costUSD: '',
-        costINR: ''
+        costINR: '',
+  category: [], // <-- make sure it's an array
+
       });
     }
   }, [mode, productToEdit]);
+ 
+  const [loadingCategories, setLoadingCategories] = useState(false);
+const [errorCategories, setErrorCategories] = useState('');
+
+  const [selectedCategories, setSelectedCategories] = useState([]);
+const handleCategorySelect = (selectedOptions) => {
+  setSelectedCategories(
+    selectedOptions ? selectedOptions.map(opt => opt.value) : []
+  );
+};
+
+
 
  
   useEffect(() => {
@@ -133,6 +159,15 @@ const [comboProducts, setComboProducts] = useState([
   }
 }, [comboProducts, isCombo]);
  
+useEffect(() => {
+  dispatch(fetchCategoriesAsync());
+}, [dispatch]);
+
+
+useEffect(() => {
+  dispatch(fetchCategoriesAsync());
+}, [dispatch]);
+const { categories = [] } = useSelector((state) => state.productCategory || {});
 
 const handleComboChange = (index, field, value) => {
   const updated = [...comboProducts];
@@ -173,12 +208,12 @@ const handleComboChange = (index, field, value) => {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+  console.log("handleChange:", e.target.name, e.target.value);
+  setFormData((prevData) => ({
+    ...prevData,
+    [e.target.name]: e.target.type === 'checkbox' ? e.target.checked : e.target.value,
+  }));
+};
 
 
   const handleCostChange  = (e) => {
@@ -221,15 +256,31 @@ const handleComboChange = (index, field, value) => {
     setSearchResults([]);  // Clear search results
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (mode === 'edit') {
-      dispatch(updateProductAsync(formData));  // Update product if in Edit mode
+ const handleSubmit = (e) => {
+  e.preventDefault();
+  if (mode === 'edit') {
+    dispatch(updateProductAsync(formData));  // Update product if in Edit mode
+  } else {
+    if (!isCombo) {
+      const payload = {
+        ...formData,
+        category: formData.category,  // Ensure category is included for single products
+      };
+      dispatch(addProductAsync(payload));
     } else {
-      dispatch(addProductAsync(formData));  // Add new product if in Add mode
+      dispatch(addProductAsync(formData)); // For combo products
     }
-  };
-  
+  }
+};
+
+  const handleMultiSelectChange = (e) => {
+  const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+  setFormData((prev) => ({
+    ...prev,
+    category: selectedOptions,
+  }));
+};
+
 
   return (
 <div className="product-section">
@@ -302,11 +353,14 @@ const handleComboChange = (index, field, value) => {
     salesCost: '',
     drStatus: '',  // ✅ Added this
     maxDiscount: '',
+    type: "product",
     prodisEnabled: false,
     subscriptionDuration: "1 Year", // Set default value here
     showCostFields: false,
     costUSD: '',
-    costINR: ''
+    costINR: '',
+  category: [], // <-- make sure it's an array
+
     });
   }}
 /> Combo Product
@@ -346,94 +400,134 @@ const handleComboChange = (index, field, value) => {
       )}
 
       <Form onSubmit={handleSubmit}className='product-form'>
-      <Row className="g-5">
-      <Col md={6}>
-    <Form.Group className="form-group-prod">
-  <Form.Label className="required-label">Product Name:</Form.Label>
+       <Row className="g-5">
+    <Col md={6}>
+      <Form.Group className="form-group-prod">
+        <Form.Label className="required-label">Product Name:</Form.Label>
 
-  {!isCombo ? (
-    <Form.Control
-      type="text" 
-      name="productName"
-      value={formData.productName}
-      onChange={handleChange}
-      disabled={mode === "edit"}
-      placeholder="Enter product name"
-      required
-    />
-  ) : (
-    <div>
-       {comboProducts.map((item, idx) => (
-<div key={idx} className="d-flex gap-2 align-items-center mb-1">
-          <select
-            disabled={mode === "edit"} 
-  className="form-control"
-  value={item.name}
-  onChange={e => handleComboChange(idx, 'name', e.target.value)}
->
-  <option value="">Select Product</option>
-  {productList.map((product) => {
-  const alreadySelected = comboProducts.some(
-    (row, i) => i !== idx && row.name === product._id
-  );
-  return (
-    <option
-      key={product._id}
-      value={product._id}
-      disabled={alreadySelected}
-    >
-      {product.productName}
-    </option>
-  );
-})}
-
-</select>
-
-         <input
-            type="number"
-            disabled={mode === "edit"}  
-            className="form-control w-25"
-            value={item.quantity}
-            min={1}
-            onChange={(e) => handleComboChange(idx, 'quantity', e.target.value)}
+        {!isCombo ? (
+          <Form.Control
+            type="text"
+            name="productName"
+            value={formData.productName}
+            onChange={handleChange}
+            disabled={mode === "edit"}
+            placeholder="Enter product name"
+            required
           />
+        ) : (
+          <div>
+            {comboProducts.map((item, idx) => (
+              <div key={idx} className="d-flex gap-2 align-items-center mb-1">
+                <select
+                  disabled={mode === "edit"}
+                  className="form-control"
+                  value={item.name}
+                  onChange={e => handleComboChange(idx, 'name', e.target.value)}
+                >
+                  <option value="">Select Product</option>
+                  {productList.map((product) => {
+                    const alreadySelected = comboProducts.some(
+                      (row, i) => i !== idx && row.name === product._id
+                    );
+                    return (
+                      <option
+                        key={product._id}
+                        value={product._id}
+                        disabled={alreadySelected}
+                      >
+                        {product.productName}
+                      </option>
+                    );
+                  })}
+                </select>
 
-          <MdAddBox
-  className={`add-prod ${mode === 'edit' ? 'disabled-icon' : ''}`}
-  size={20}
-  onClick={mode === 'edit' ? undefined : addComboRow}
-  title={mode === 'edit' ? "Disabled in Edit Mode" : "Add Product"}
-  style={{ cursor: mode === 'edit' ? 'not-allowed' : 'pointer', opacity: mode === 'edit' ? 0.5 : 1 }}
-/>
+                <input
+                  type="number"
+                  disabled={mode === "edit"}
+                  className="form-control w-25"
+                  value={item.quantity}
+                  min={1}
+                  onChange={(e) => handleComboChange(idx, 'quantity', e.target.value)}
+                />
 
-<MdDelete
-  className={`delete-prod ${mode === 'edit' ? 'disabled-icon' : ''}`}
-  size={20}
-  onClick={mode === 'edit' ? undefined : () => removeComboRow(idx)}
-  title={mode === 'edit' ? "Disabled in Edit Mode" : "Delete Product"}
-  style={{ cursor: mode === 'edit' ? 'not-allowed' : 'pointer', opacity: mode === 'edit' ? 0.5 : 1 }}
-/>
+                <MdAddBox
+                  className={`add-prod ${mode === 'edit' ? 'disabled-icon' : ''}`}
+                  size={20}
+                  onClick={mode === 'edit' ? undefined : addComboRow}
+                  title={mode === 'edit' ? "Disabled in Edit Mode" : "Add Product"}
+                  style={{
+                    cursor: mode === 'edit' ? 'not-allowed' : 'pointer',
+                    opacity: mode === 'edit' ? 0.5 : 1
+                  }}
+                />
 
-        </div>
-      ))} 
-    </div>
+                <MdDelete
+                  className={`delete-prod ${mode === 'edit' ? 'disabled-icon' : ''}`}
+                  size={20}
+                  onClick={mode === 'edit' ? undefined : () => removeComboRow(idx)}
+                  title={mode === 'edit' ? "Disabled in Edit Mode" : "Delete Product"}
+                  style={{
+                    cursor: mode === 'edit' ? 'not-allowed' : 'pointer',
+                    opacity: mode === 'edit' ? 0.5 : 1
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </Form.Group>
+
+      {/* ✅ Product Category Dropdown - only shown when not a combo */}
+      {!isCombo && (
+       <Form.Group className="form-group-prod">
+  <Form.Label className="required-label">Choose Categories</Form.Label>
+  {loadingCategories ? (
+    <p>Loading Categories...</p>
+  ) : errorCategories ? (
+    <p style={{ color: 'red' }}>{errorCategories}</p>
+  ) : (
+    <Select
+      key="categories-select"
+      isMulti
+      name="categories"
+      options={categories.map(category => ({
+        label: category.name,
+        value: category._id
+      }))}
+      value={categories
+        .filter(category => selectedCategories.includes(category._id))
+        .map(category => ({
+          label: category.name,
+          value: category._id
+        }))}
+      onChange={handleCategorySelect}
+      getOptionLabel={(e) => e.label}
+      getOptionValue={(e) => e.value}
+      className="basic-multi-select"
+      classNamePrefix="select"
+    />
   )}
 </Form.Group>
 
-</Col>
-<Col md={6}>
-<Form.Group className="form-group-prod">
-          <Form.Label className="required-label">Address:</Form.Label>
-        <Form.Control as="textarea" rows={1} placeholder="Enter address" 
-        name="address"
-        value={formData.address}
-        onChange={handleChange}
-        required
-        /> 
-        </Form.Group>
-        </Col>
-        </Row>
+      )}
+    </Col>
 
+    <Col md={6}>
+      <Form.Group className="form-group-prod">
+        <Form.Label className="required-label">Address:</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={5}
+          placeholder="Enter address"
+          name="address"
+          value={formData.address}
+          onChange={handleChange}
+          required
+        />
+      </Form.Group>
+    </Col>
+  </Row>
          
         <Row className="g-5">
   <Col md={6}>
@@ -595,37 +689,34 @@ const handleComboChange = (index, field, value) => {
            <Col md={6}>
            <Form.Group className="form-group-prod">
   <Form.Label className="required-label">Purchase Cost:</Form.Label>
+  <Form.Group>
   <Form.Control
     type="number"
     name="purchaseCost"
-    value={formData.purchaseCost || ""}
-    onChange={(e) => {
-      const value = e.target.value;
-      if (value === "" || parseFloat(value) >= 0) {
-        handleChange(e);
-      }
-    }}
-    min="0" // Prevents negative values
+    value={formData.purchaseCost ?? ""}
+    onChange={(e) => handleChange(e)}
     placeholder="Enter purchase cost"
     required
+    min={0}
+    step="0.01"
   />
+</Form.Group>
+
 </Form.Group>
 
 
            </Col>
            <Col md={6}>
-          <Form.Group className="form-group-prod">
+         <Form.Group className="form-group-prod">
   <Form.Label className="required-label">Sales Cost:</Form.Label>
   <Form.Control
     type="number"
     name="salesCost"
     value={formData.salesCost || ""}
     onChange={(e) => {
-      if (!isCombo) {
-        const value = e.target.value;
-        if (value === "" || parseFloat(value) >= 0) {
-          setFormData((prev) => ({ ...prev, salesCost: value }));
-        }
+      const value = e.target.value;
+      if (value === "" || parseFloat(value) >= 0) {
+        setFormData((prev) => ({ ...prev, salesCost: value }));
       }
     }}
     min="0"
@@ -635,49 +726,83 @@ const handleComboChange = (index, field, value) => {
 </Form.Group>
 
 
+
   
 </Col>
 </Row>
 </Col>
          </Row>     
-         <Row className="g-5">   
-                    <Col md={6}>
-                    <Form.Group className="form-group-prod">
-                       <Form.Label className="required-label">Email:</Form.Label>
-           <Form.Control
-             type="email"
-             name="email"
-             value={formData.email}
-             onChange={handleChange}
-         placeholder='Enter email address'
-         required
-           />
-         </Form.Group>
-         
-                    </Col>
-                    <Col md={6}>
-                    <Form.Group className="form-group-prod">
-  <Form.Label className="required-label">Max Discount:</Form.Label>
-  <Form.Control
-    type="number"
-    name="maxDiscount"
-    value={formData.maxDiscount || ""}
-    onChange={(e) => {
-      const value = e.target.value;
-      if (value === "" || parseFloat(value) >= 0) {
-        handleChange(e);
-      }
-    }}
-    min="0" // Prevents negative values
-    placeholder="Enter maximum discount"
-    required
+         <Row className="g-5">
+  <Col md={6}>
+    <Form.Group className="form-group-prod">
+      <Form.Label className="required-label">Email:</Form.Label>
+      <Form.Control
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="Enter email address"
+        required
+      />
+    </Form.Group>
+  </Col>
+
+  <Col md={6}>
+    {/* Nested row for Max Discount and Type with a smaller gap */}
+    <Row className="g-2">
+      <Col md={6}>
+        <Form.Group className="form-group-prod">
+          <Form.Label className="required-label">Max Discount:</Form.Label>
+          <Form.Group>
+            <Form.Control
+              type="number"
+              name="maxDiscount"
+              value={formData.maxDiscount || ""}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || parseFloat(value) >= 0) {
+                  handleChange(e);
+                }
+              }}
+              min="0"
+              placeholder="Enter maximum discount"
+              required
+            />
+          </Form.Group>
+        </Form.Group>
+      </Col>
+
+      <Col md={6}>
+        <Form.Group className="form-group-prod">
+          <Form.Label className="required-label">Type:</Form.Label>
+          <Form.Group className="crm-type-radio">
+  <Form.Check
+    inline
+    type="radio"
+    id="type-product"
+    name="type"
+    label="Product"
+    value="product"
+    checked={formData.type === "product"}
+    onChange={handleChange}
+  />
+  <Form.Check
+    inline
+    type="radio"
+    id="type-service"
+    name="type"
+    label="Service"
+    value="service"
+    checked={formData.type === "service"}
+    onChange={handleChange}
   />
 </Form.Group>
 
-                       {/* changed  dr status removed*/}
-         
-                    </Col>
-                  </Row>     
+        </Form.Group>
+      </Col>
+    </Row>
+  </Col>
+</Row>
                   <Row className="g-5 align-items-end">
       <Col md={6}>
         <Form.Group className="form-group-prod">

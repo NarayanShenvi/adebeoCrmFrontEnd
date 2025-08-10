@@ -3206,7 +3206,6 @@ a:hover {
 /* Form Group */
 .product-section .form-group-prod {
   display: flex;
-  display: flex;
   flex-direction: column;
   pointer-events: auto;
   position: relative;
@@ -3272,6 +3271,31 @@ a:hover {
 .product-form .form-select:hover
 {
   background-color: rgba(52, 164, 245, 0.31);
+}
+
+.product-form .basic-multi-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31); /* Light background color */
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;                 /* Text color */
+  font-weight: 800;               /* Font weight */
+  pointer-events: auto;           /* Enables interaction */
+  width: 100%;                    /* Ensures the select input takes full width */
+  box-sizing: border-box;         /* Includes padding and border in width calculation */
+}
+
+/* Hover and Focus states for Select */
+.product-form .basic-multi-select:hover {
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.product-form .basic-multi-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
 }
 /* Custom Checkbox Container */
 .custom-checkbox {
@@ -3362,6 +3386,54 @@ a:hover {
   background-color: rgba(184, 208, 226, 0.39);
   border-color: #2a2b2b59;
 }
+
+/* Box-style radio buttons for CRM */
+.crm-type-radio {
+  display: flex;
+  gap: 5px;
+}
+
+.crm-type-radio .form-check {
+  margin: 0;
+}
+
+.crm-type-radio .form-check-input {
+  display: none; /* hide default radio */
+}
+
+.crm-type-radio .form-check-label {
+  min-width: 110px; /* optional fixed width */
+  display: inline-flex;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: rgba(134, 195, 238, 0.31);
+  transition: all 0.2s;
+  cursor: pointer;
+  padding-top:8px ;
+}
+
+/* Hover effect */
+.crm-type-radio .form-check-label:hover {
+    background-color: rgba(103, 183, 240, 0.753);
+}
+
+/* Selected state */
+.crm-type-radio .form-check-input:checked + .form-check-label {
+  background-color: #50f075;
+  border-color: rgb(5, 158, 18);
+  border: none;
+  color: #fff;
+  font-weight: 900;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 8px;
+  padding-top:8px ;
+}
+
 
 
 /* Search Field (for Edit Mode) */
@@ -4636,10 +4708,552 @@ select option {
     font-size: 10px;
   }
 }
+
+
+/* Report Section */
+.report-section {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 40px);
+  max-height: 100vh; 
+  background-color: #feffff;
+  margin-left: 140px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  width: 100%;
+}
+
+.report-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 25px;
+  margin-bottom: 7%;
+}
+
+/* Filter Form */
+.filter-form 
+{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 900px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+.report-section .form-group {
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  margin-top: 15px;
+}
+
+.report-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.required-label::after {
+  content: " *"; 
+  color: rgb(223, 3, 3);    
+  font-weight: 800;
+}
+
+.filter-form .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.filter-form .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+.dates{
+  max-width: 240px;
+}
+.datess{
+  max-width: 240px;
+  margin-left: 295px;
+}
+
+.report-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+  text-align: center;
+  color: #05555f;
+  width: 20px;
+  margin-left: 65%;
+}
+.filecheck
+{
+  font-size: 25px !important;
+}
+.report-button:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.report-button:hover:not(:disabled) {
+  transform: scale(1.3); /* Slight zoom on hover */
+  color: #0e7204;
+}
+
+
+
+/* Report Table */
+.report-table {
+  margin-top: 50px;
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Ensure columns are of fixed size */
+  overflow: hidden;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  min-width: 1100px; /* Ensures form doesn't shrink too much */
+  margin-bottom: 10px;
+  max-width: 1300px; /* Adjust as needed */
+  cursor: default !important;
+}
+
+.report-table thead
+{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.report-table th, .report-table td {
+  padding: 8px;
+  text-align: left;
+  border: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  cursor: default !important;
+}
+
+.report-table th {
+  color: rgb(255, 255, 255);
+  text-align: left;
+  font-size: 13px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  word-wrap: break-word; 
+  white-space: normal; /* Allow text to wrap */
+  overflow: hidden;
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 13px;
+  padding-bottom: 15px;
+  position: sticky;
+  top: 0;
+  background-color: #069696;
+  z-index: 2;
+  border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
+}
+.report-table td {
+  white-space: nowrap;  /* Ensures content stays in one line */
+  word-wrap: break-word; /* Ensure long text wraps */
+  color: #161616da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  background-color: rgba(170, 207, 234, 0.87);
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+}
+
+
+.report-table th:nth-child(1),
+.report-table td:nth-child(1) {
+  width: 10%; /* Fixed width */
+}
+.report-table th:nth-child(2),
+.report-table td:nth-child(2) {
+  width: 26%; /* Fixed width */
+}
+
+.report-table th:nth-child(3),
+.report-table td:nth-child(3) {
+  width: 13%; /* Fixed width */
+}
+.report-table th:nth-child(4),
+.report-table td:nth-child(4) {
+  width: 41%; /* Fixed width */
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+}
+.report-table th:nth-child(5),
+.report-table td:nth-child(5) {
+  width:7%; /* Fixed width */
+}
+
+.report-table tbody tr:hover {
+  background-color: #05afc5; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+
+/* Pagination */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.pagination-controls button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+
+/* Loading Container */
+.loading-container-report {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-left: 35%;
+}
+
+.loading-spinner-report {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #028618;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1.5s linear infinite; /* Slightly slower spin */
+  margin-left: 10%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.loading-message-report {
+  font-size: 18px;
+  font-weight: bold;
+  color: #028618;
+  margin-top: 15px;
+  text-align: center;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error Container */
+.error-container-report {
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #f51009; /* Red color for error */
+  background-color: #f8d7da; /* Light red background */
+  border: 1px solid #f5c6cb;
+  padding: 7px;
+  border-radius: 5px;
+  margin: 20px auto;
+  max-width: 400px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 35%;
+}
+
+.error-icon-report {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 14px;
+  color: #f51009; /* Red color for error */
+  font-weight: bold;
+}
+
+.error-message-report {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 14px;
+  color: #f51009; /* Red color for error */
+  font-weight: bold;
+}
+
+.no-activity-message {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #db6c03;
+  text-align:center;
+  margin-top: 5%;
+  word-spacing: 2px;
+}
+
+/* Responsive Styles */
+
+/* For screens up to 1024px */
+@media (max-width: 1024px) {
+  .report-section {
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .filter-form {
+    min-width: auto;
+    max-width: 90%;
+  }
+
+  .datess {
+    margin-left: 0;
+  }
+
+  .report-table {
+    min-width: 100%;
+    font-size: 11px;
+  }
+
+  .report-table th, 
+  .report-table td {
+    padding: 6px;
+    font-size: 11px;
+  }
+
+  .report-button {
+    margin-left: 50%;
+  }
+
+  .loading-container-report,
+  .error-container-report {
+    margin-left: 20%;
+  }
+}
+
+/* For screens up to 768px */
+@media (max-width: 768px) {
+  .report-section {
+    padding: 10px;
+  }
+
+  .filter-form {
+    padding: 10px;
+    min-width: auto;
+    max-width: 100%;
+    flex-direction: column;
+  }
+
+  .filter-form .form-control,
+  .filter-form .form-select {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .report-table th, 
+  .report-table td {
+    padding: 5px;
+    font-size: 10px;
+  }
+
+  .datess {
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .report-button {
+    margin-left: 40%;
+  }
+
+  .pagination-controls {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .loading-container-report,
+  .error-container-report {
+    margin-left: 10%;
+  }
+}
+
+/* For screens up to 480px (Mobile View) */
+@media (max-width: 480px) {
+  .report-section {
+    padding: 5px;
+  }
+
+  .filter-form {
+    padding: 5px;
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .filter-form .form-control,
+  .filter-form .form-select {
+    font-size: 10px;
+    padding: 6px;
+  }
+
+  .datess {
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .report-table {
+    font-size: 9px;
+    overflow-x: auto;
+  }
+
+  .report-table th, 
+  .report-table td {
+    padding: 4px;
+    font-size: 9px;
+  }
+
+  .report-button {
+    margin-left: 30%;
+  }
+
+  .pagination-controls {
+    font-size: 12px;
+  }
+
+  .loading-container-report,
+  .error-container-report {
+    margin-left: 5%;
+    font-size: 12px;
+  }
+
+  .no-activity-message {
+    font-size: 12px;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensures modal is above everything */
+}
+
+.modal-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 60%;  /* Increased width */
+  max-width: 800px;  /* Ensures it doesn't get too wide */
+  height: 70vh;  /* Increased height */
+  max-height: 90vh; /* Ensures it doesn't cover the whole screen */
+  overflow-y: auto; /* Allows scrolling if content is too long */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1001; /* Ensures content is above overlay */
+}
+
+.close-button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+/*  ------------------------------------------------------------- */
 .task-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(63, 59, 59, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -5229,113 +5843,786 @@ select option {
   color: #343a40;
 }
 
+/* Admin Section */
 
-
+/* Admin panel menus */
 .admin-topmenu {
+  align-items: center;
+  padding: 10px 20px;
+  gap: 23px;
+  position: relative;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 18px;
   display: flex;
-  background-color: #004080;
-  padding: 0;
-  margin-bottom: 10px;
+  flex-wrap: wrap;
+  justify-content: center; /* Centers horizontally */
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 32px;
+  box-sizing: border-box;
+  margin-left: 250px;
 }
 
 .admin-topmenu button,
 .admin-topmenu .dropbtn {
   background: none;
   border: none;
-  color: white;
-  padding: 14px 20px;
-  cursor: pointer;
   font-size: 16px;
+  cursor: pointer;
+  padding: 8px 10px;
+  position: relative;
+  font-weight: bolder;
+  font-size: 13px;
+  color: #1a1919;
+  transition: color 0.3s ease;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 10px;
 }
 
 .admin-topmenu button:hover,
 .admin-topmenu .dropbtn:hover {
-  background-color: #0059b3;
+  color: #038486;
+}
+
+.admin-topmenu button::after,
+.admin-topmenu .dropbtn::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: #038486;
+  transition: width 0.3s;
+  width: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.admin-topmenu button:hover::after,
+.admin-topmenu .dropbtn:hover::after {
+  width: 100%;
 }
 
 .dropdown {
   position: relative;
+  display: inline-block;
 }
 
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  min-width: 220px;
-  z-index: 1000;
   top: 100%;
+  left: 40px;
+  width: 100vh;
+  max-width: 210px;
+  background-color: rgba(206, 234, 238, 0.87);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  border-radius: 1px;
 }
 
 .dropdown-content a {
-  color: #000;
+  display: block;
   padding: 10px 16px;
+  font-weight: bolder;
+  font-size: 13px;
+  color:  rgba(34, 33, 33, 0.785) !important;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  border-bottom: 2px solid #f8f9fa !important;
   text-decoration: none;
+  cursor: pointer;
+}
+
+/* Show dropdown on hover */
+.dropdown-wrapper:hover .dropdown-content {
   display: block;
 }
 
 .dropdown-content a:hover {
-  background-color: #f1f1f1;
+  background-color: rgba(11, 101, 130, 0.5);
+  color: #ffffff !important;
 }
 
 .dropdown:hover .dropdown-content {
   display: block;
 }
-.create-user-container {
-  max-width: 600px;
-  margin: auto;
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.1);
-}
 
-.create-user-container h2 {
+.default-message-admin {
+  position: relative;
+
+  /* Match full width minus sidebar */
+  margin-left: 490px;
+  width: calc(100% - 750px);
+
+  /* Clean padding */
+  padding: 16px 0;
+
+  background-color: #f9f9f9;
+  color: #02707c;
+  border: 1px solid #8ff8f3;
+  border-radius: 5px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 18px;
+  font-weight: bolder;
+
+  margin-top: 19%;
   margin-bottom: 20px;
-  font-size: 24px;
-  color: #004080;
+  box-sizing: border-box;
 }
 
-.create-user-form .form-group {
-  margin-bottom: 15px;
+
+
+/* -------- Responsive CSS for Smaller Screens -------- */
+
+/* For small screens: 480px and below */
+@media (max-width: 480px) {
+  .default-message-admin {
+    margin-left: 0;
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+    margin-top: 30%;
+  }
+
+  .admin-topmenu {
+    margin-left: 0;
+    padding: 10px;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .dropdown-content {
+    left: 0;
+    width: 90vw;
+    max-width: none;
+  }
+}
+
+/* For tablets: 481px to 768px */
+@media (max-width: 768px) {
+  .default-message-admin {
+    margin-left: 0;
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+    margin-top: 25%;
+  }
+
+  .admin-topmenu {
+    margin-left: 0;
+    padding: 12px;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .dropdown-content {
+    left: 0;
+    width: 80vw;
+    max-width: none;
+  }
+}
+
+/* For medium screens: 769px to 1024px */
+@media (max-width: 1024px) {
+  .default-message-admin {
+    margin-left: 0;
+    width: 100%;
+    font-size: 17px;
+    padding: 14px;
+    margin-top: 20%;
+  }
+
+  .admin-topmenu {
+    margin-left: 0;
+    padding: 18px;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .dropdown-content {
+    left: 0;
+    width: 70vw;
+    max-width: none;
+  }
+}
+
+
+/* User Creation Section */
+.user-section {
+  flex-grow: 1;
+  padding: 20px;
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
+  background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
+  margin-left: 250px;
+}
+
+/* Make Form Take Full Width */
+.create-user-form{
+  background-color: rgba(217, 217, 217, 0.15);
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 32px;
+  padding-bottom: 32px;
   display: flex;
   flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 750px; /* Adjust as needed */
+  min-width: 500px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+  align-items: center;  /* Centers children horizontally */
+
 }
 
-.create-user-form label {
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: #333;
-}
-
-.create-user-form input,
-.create-user-form textarea {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.create-user-form textarea {
-  resize: none;
-}
-
-.create-user-form .form-actions {
+/* Heading */
+.user-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 50px;
   margin-top: 20px;
-  text-align: right;
 }
 
-.create-user-form button {
-  background-color: #004080;
-  color: white;
+/* Form Group */
+.user-section .form-group-user {
+ display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  width: 100%;
+  max-width: 550px;
+  margin: 0 auto; /* THIS CENTERS IT */
+}
+
+/* Labels */
+.user-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+/* This targets all labels for required fields and adds the asterisk */
+.required-label::after {
+  content: " *"; /* Adds the asterisk after the label text */
+  color: rgb(223, 3, 3);    /* Makes the asterisk red */
+  font-weight: 800;
+}
+
+
+/* Style for all input fields (text, email, etc.) within the customer form */
+.create-user-form .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+/* Focus state for input fields */
+.create-user-form .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+.create-user-form .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+.create-user-form .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+/* Focus state for select fields */
+.create-user-form .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.create-user-form .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+
+.user-section form button[type="submit"]:hover {
+  color: #218838;
+  transform: scale(1.4);
+  background: transparent;
+}
+.submit-button-user {
+  background: transparent;
   border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
+  display: inline-flex;
+  gap: 8px; /* Adjust gap between icon and text */
+  width: 100%;
+  max-width: 25px;
+  display: block;
+  color: #069696;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 30px; 
+  margin-left: 94%;
+  transition: transform 0.2s, color 0.2s;
 }
 
-.create-user-form button:hover {
-  background-color: #0059b3;
+.submit-button-user:disabled {
+  opacity: 0.6;
+  cursor: allowed;
 }
 
+.submit-button-user:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+/* ----------- Responsive Styles ----------- */
+
+/* Mobile Phones (max-width: 480px) */
+@media (max-width: 480px) {
+  .user-section {
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .create-user-form {
+    width: 100%;
+    min-width: unset;
+    padding: 20px;
+    gap: 10px;
+  }
+
+  .user-section h3 {
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+
+  .user-section .form-group-user {
+    max-width: 100%;
+  }
+
+  .submit-button-user {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    max-width: 40px;
+    transform: scale(1.1);
+  }
+}
+
+/* Tablets (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .user-section {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .create-user-form {
+    width: 100%;
+    min-width: unset;
+    max-width: 600px;
+  }
+
+  .user-section h3 {
+    font-size: 19px;
+  }
+
+  .user-section .form-group-user {
+    max-width: 100%;
+  }
+
+  .submit-button-user {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 40px;
+  }
+}
+
+/* Small Laptops or Tablets Landscape (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .user-section {
+    margin-left: 200px;
+    padding: 25px;
+  }
+
+  .create-user-form {
+    max-width: 700px;
+    min-width: unset;
+  }
+
+  .user-section h3 {
+    font-size: 20px;
+  }
+
+  .submit-button-user {
+    margin-left: auto;
+    margin-right: 20px;
+    max-width: 35px;
+  }
+}
+
+/* Product Category Creation Section */
+.category-section {
+  flex-grow: 1;
+  padding: 20px;
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
+  background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
+  margin-left: 250px;
+}
+
+/* Make Form Take Full Width */
+.category-form {
+  background-color: rgba(217, 217, 217, 0.15);
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 32px;
+  padding-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 750px; /* Adjust as needed */
+  min-width: 500px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+  align-items: center;  /* Centers children horizontally */
+}
+
+/* Heading */
+.category-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+}
+
+/* Toggle Mode Button */
+.category-section .toggle-icon-cat {
+  display: block;
+  color: #069696;
+  font-size: 26px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 85%;
+  margin-top: 20px; 
+  margin-bottom: 20px;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.category-section .toggle-icon-cat:hover
+{
+  color: #218838;
+  transform: scale(1.2);
+}
+
+/* Form Group */
+.category-section .form-group-cat {
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  width: 100%;
+  max-width: 550px;
+  margin: 0 auto; /* THIS CENTERS IT */
+}
+
+/* Labels */
+.category-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+/* This targets all labels for required fields and adds the asterisk */
+.required-label::after {
+  content: " *"; /* Adds the asterisk after the label text */
+  color: rgb(223, 3, 3);    /* Makes the asterisk red */
+  font-weight: 800;
+}
+
+
+/* Style for all input fields (text, email, etc.) within the customer form */
+.category-form .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+/* Focus state for input fields */
+.category-form .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+.category-form .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+.category-form .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+/* Focus state for select fields */
+.category-form .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.category-form .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+
+/* Search Field (for Edit Mode) */
+.category-section .search-field-cat {
+  width: 100%;
+  max-width: 340px;
+  height: 30px;
+  background: rgba(195, 237, 243, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  color: rgb(7, 94, 121); /* Change input text color */
+  margin-top: -41px;
+  margin-left: 10%;
+}
+.category-section .search-field-cat:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+
+.CategoriesLoading {
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 8px;
+  margin-bottom: 22px;
+  margin-left: 10% ;
+}
+
+.NoCategoriesFound {
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 8px;
+  margin-bottom: 22px;
+  margin-left: 10% ;
+}
+
+.search-field1-cat select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 174px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 10%;
+  display: block;
+} 
+.search-field1-cat select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-cat option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+.category-section form button[type="submit"]:hover {
+  color: #218838;
+  transform: scale(1.4);
+  background: transparent;
+}
+.submit-button-cat {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px; /* Adjust gap between icon and text */
+  width: 100%;
+  max-width: 25px;
+  display: block;
+  color: #069696;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 30px; 
+  margin-left: 94%;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.submit-button-cat:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.submit-button-cat:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+/* ----------- Responsive Styles ----------- */
+
+/* ====== 1024px and below ====== */
+@media (max-width: 1024px) {
+  .category-section {
+    margin-left: 200px; /* Reduce side gap */
+    padding: 15px;
+  }
+
+  .category-form {
+    max-width: 650px;
+    min-width: auto; /* Let it shrink more */
+  }
+
+  .category-section .toggle-icon-cat {
+    margin-left: 80%;
+  }
+
+  .search-field1-cat select {
+    max-width: 150px;
+  }
+}
+
+/* ====== 768px and below ====== */
+@media (max-width: 768px) {
+  .category-section {
+    margin-left: 0; /* Full width */
+    padding: 15px;
+  }
+
+  .category-form {
+    max-width: 100%;
+    padding: 20px;
+    min-width: auto;
+  }
+
+  .category-section .toggle-icon-cat {
+    margin-left: auto;
+    margin-right: 10px;
+    font-size: 22px;
+  }
+
+  .search-field-cat,
+  .search-field1-cat select {
+    margin-left: 0;
+    width: 100%;
+    max-width: none;
+  }
+
+  .CategoriesLoading,
+  .NoCategoriesFound {
+    margin-left: 0;
+    text-align: center;
+  }
+}
+
+/* ====== 480px and below ====== */
+@media (max-width: 480px) {
+  .category-section {
+    padding: 10px;
+  }
+
+  .category-form {
+    padding: 15px;
+    gap: 10px;
+  }
+
+  .category-section h3 {
+    font-size: 16px;
+  }
+
+  .category-section label {
+    font-size: 11px;
+  }
+
+  .category-form .form-control,
+  .category-form .form-select {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .category-section .toggle-icon-cat {
+    font-size: 20px;
+  }
+
+  .search-field-cat,
+  .search-field1-cat select {
+    font-size: 11px;
+    height: auto;
+    max-height: 28px;
+  }
+
+  .CategoriesLoading,
+  .NoCategoriesFound {
+    font-size: 13px;
+  }
+}
