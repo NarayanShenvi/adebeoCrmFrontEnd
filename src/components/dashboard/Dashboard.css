@@ -3153,7 +3153,7 @@ a:hover {
   cursor: pointer;
   margin-left: 85%;
   margin-top: 20px; 
-  margin-bottom: 20px;
+  margin-bottom: 35px;
   transition: transform 0.2s, color 0.2s;
 }
 
@@ -3356,6 +3356,7 @@ a:hover {
 .custom-checkbox input[type="checkbox"]:checked + label {
   color: #28a745;
 }
+
 .radio-prod {
   display: flex;
   gap: 20px;
@@ -3388,20 +3389,22 @@ a:hover {
 }
 
 /* Box-style radio buttons for CRM */
-.crm-type-radio {
+.crm-type-radio-type{
   display: flex;
   gap: 5px;
+  margin-top: -43px;
+  margin-left: 170%;
 }
 
-.crm-type-radio .form-check {
+.crm-type-radio-type .form-check {
   margin: 0;
 }
 
-.crm-type-radio .form-check-input {
+.crm-type-radio-type .form-check-input {
   display: none; /* hide default radio */
 }
 
-.crm-type-radio .form-check-label {
+.crm-type-radio-type .form-check-label {
   min-width: 110px; /* optional fixed width */
   display: inline-flex;
   align-items: center;
@@ -3417,12 +3420,12 @@ a:hover {
 }
 
 /* Hover effect */
-.crm-type-radio .form-check-label:hover {
+.crm-type-radio-type .form-check-label:hover {
     background-color: rgba(103, 183, 240, 0.753);
 }
 
 /* Selected state */
-.crm-type-radio .form-check-input:checked + .form-check-label {
+.crm-type-radio-type .form-check-input:checked + .form-check-label {
   background-color: #50f075;
   border-color: rgb(5, 158, 18);
   border: none;
@@ -6529,6 +6532,65 @@ select option {
   background-color: #218838;
 }
 
+/* Custom Checkbox Styling */
+
+.custom-checkbox-cat {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+}
+
+.custom-checkbox-cat input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #069696; /* Default border color */
+  border-radius: 1px;
+  background-color: white; /* Default background */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Checkbox Checked State */
+.custom-checkbox-cat input[type="checkbox"]:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+/* Checkbox Checkmark */
+.custom-checkbox-cat input[type="checkbox"]::after {
+  content: "";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Show Checkmark When Checked */
+.custom-checkbox-cat input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkbox Hover Effect */
+.custom-checkbox-cat input[type="checkbox"]:hover {
+  border-color: #06b4b4; /* Darker blue */
+}
+
+/* Checkbox Label */
+.custom-checkbox-cat label {
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+}
+
+/* Change Label Color on Checked */
+.custom-checkbox-cat input[type="checkbox"]:checked + label {
+  color: #28a745;
+}
 /* ----------- Responsive Styles ----------- */
 
 /* ====== 1024px and below ====== */

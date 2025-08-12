@@ -15,9 +15,10 @@ const CategorySection = () => {
   const [formData, setFormData] = useState({
     Category_Name: '',
     type: '',
-    description: '',
+    Category_description: '',
     Category_Code: '',
-    _id: ''
+    _id: '',
+    categoryEnabled: true,
   });
 
   const [formLoading, setFormLoading] = useState(false);
@@ -33,9 +34,10 @@ const CategorySection = () => {
     setFormData({
       Category_Name: '',
       type: '',
-      description: '',
+      Category_description: '',
       Category_Code: '',
-      _id: ''
+      _id: '',
+      isEnabled: true,
     });
   };
 
@@ -51,69 +53,51 @@ const CategorySection = () => {
     setSearchError('');
   };
 
-  const handleSearchChange = (e) => {
-    const keyword = e.target.value;
-    setFormData(prev => ({ ...prev, Category_Name: keyword }));
+ const handleSearchChange = async (e) => {
+  const searchTerm = e.target.value;
+  setFormData(prev => ({ ...prev, Category_Name: searchTerm }));
 
-    clearTimeout(searchTimeoutRef.current);
-
-    if (cancelTokenRef.current) {
-      cancelTokenRef.current.cancel('New search initiated');
-    }
-
-    if (keyword.length >= 3) {
-      searchTimeoutRef.current = setTimeout(async () => {
-        try {
-          setSearchLoading(true);
-          setSearchError('');
-
-          cancelTokenRef.current = axios.CancelToken.source();
-
-          const res = await axios.get(`${API}/dummy_category_search`, {
-            params: { name: keyword },
-            cancelToken: cancelTokenRef.current.token
-          });
-
-          setSearchResults(res.data.data || []);
-        } catch (err) {
-          if (!axios.isCancel(err)) {
-            setSearchError(err.response?.data?.message || 'Unable to fetch categories.');
-            setSearchResults([]);
-          }
-        } finally {
-          setSearchLoading(false);
-        }
-      }, 400);
-    } else {
-      setSearchResults([]);
+  if (searchTerm.length >= 3) {
+    try {
+      setSearchLoading(true);
       setSearchError('');
-    }
-  };
 
-  const handleSelectCategory = (e) => {
-    const selected = searchResults.find(cat => cat._id === e.target.value);
-    if (selected) {
-      setFormData({
-        Category_Name: selected.categoryName || selected.Category_Name || '',
-        type: selected.type || '',
-        description: selected.description || '',
-        Category_Code: selected.code || '',
-        _id: selected._id
+      const response = await axios.get(`${API}/getAllCategories`, {
+        params: { name: searchTerm }
       });
+
+      setSearchResults(response.data || []);
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+      setSearchError('Unable to fetch categories.');
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
     }
-  };
+  } else {
+    setSearchResults([]);
+    setSearchError('');
+  }
+};
+
+
+const handleSelectCategory = (e) => {
+  const selected = searchResults.find(cat => cat.Category_Name === e.target.value);
+  if (selected) {
+    setFormData({
+      Category_Name: selected.Category_Name,
+      type: selected.type || '',
+      Category_description: selected.Category_description,
+      Category_Code: selected.Category_Code,
+      isEnabled: selected.isEnabled !== undefined ? selected.isEnabled : true,
+    });
+  }
+};
+
 
   const handleSubmit = async (e) => {
   e.preventDefault();
   setFormLoading(true);
-
-  const { Category_Name, type, Category_Code } = formData;
-
-  if (!Category_Name || !type || !Category_Code) {
-    alert('Please fill in all required fields.');
-    setFormLoading(false);
-    return;
-  }
 
   try {
     if (mode === 'edit') {
@@ -166,6 +150,13 @@ const CategorySection = () => {
     setFormLoading(false);
   }
 };
+const handleCatChange = (e) => {
+  const { name, value, type, checked } = e.target;
+  setFormData(prev => ({
+    ...prev,
+    [name]: type === 'checkbox' ? checked : value,
+  }));
+};
 
 
   return (
@@ -196,13 +187,18 @@ const CategorySection = () => {
               <p className='NoCategoriesFound'>{searchError}</p>
             ) : searchResults.length > 0 ? (
               <select onChange={handleSelectCategory} value={formData._id || ''}>
-                <option value="" disabled>Select category</option>
-                {searchResults.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.categoryName || cat.Category_Name} ({cat.code})
-                  </option>
-                ))}
-              </select>
+  <option value="" disabled>Select category</option>
+  {searchResults.map(cat => (
+    <option
+      key={cat._id || cat.Category_Code}
+      value={cat._id || cat.Category_Code}
+    >
+      {cat.Category_Name} ({cat.Category_Code})
+    </option>
+  ))}
+</select>
+
+
             ) : (
               <p className='NoCategoriesFound'>No categories found...</p>
             )}
@@ -247,10 +243,11 @@ const CategorySection = () => {
           <Form.Control
             as="textarea"
             rows={2}
-            name="description"
-            value={formData.description}
+            name="Category_description"
+            value={formData.Category_description}
             onChange={handleChange}
             placeholder="Enter category description"
+            required
           />
         </Form.Group>
 
@@ -265,6 +262,15 @@ const CategorySection = () => {
             placeholder="Enter category code"
           />
         </Form.Group>
+        <Form.Group className="form-group-cat mt-4 custom-checkbox-cat" controlId="categoryEnabled">
+                   <Form.Check
+                     type="checkbox"
+                     label="Category Enabled"
+                     name="isEnabled"
+                    checked={formData.isEnabled}
+    onChange={handleCatChange}
+    />
+                 </Form.Group>  
 
         <button type="submit" className="submit-button-cat" disabled={formLoading}>
           {formLoading ? (

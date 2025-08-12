@@ -50,9 +50,9 @@ const [comboProducts, setComboProducts] = useState([
     prodisEnabled: false,
     subscriptionDuration: "1 Year", // Set default value here
     showCostFields: false,
-    costUSD: '',
-    costINR: '',
-  category: [], // <-- make sure it's an array
+    priceUSD: '',
+    priceINR: '',
+  categoryCode: [], // <-- make sure it's an array
 
   });
   
@@ -80,9 +80,9 @@ const [comboProducts, setComboProducts] = useState([
     prodisEnabled: false,
     subscriptionDuration: "1 Year", // Set default value here
     showCostFields: false,
-    costUSD: '',
-    costINR: '',
-  category: [], // <-- make sure it's an array
+    priceUSD: '',
+    priceINR: '',
+  categoryCode: [], // <-- make sure it's an array
 
 });
 
@@ -115,9 +115,9 @@ const [comboProducts, setComboProducts] = useState([
         prodisEnabled: false,
         subscriptionDuration: '1 Year', // ✅ Add default value here
         showCostFields: false,
-        costUSD: '',
-        costINR: '',
-  category: [], // <-- make sure it's an array
+        priceUSD: '',
+        priceINR: '',
+  categcategoryCode: [], // <-- make sure it's an array
 
       });
     }
@@ -309,89 +309,88 @@ const handleComboChange = (index, field, value) => {
 </div>
 
 
+<div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+  {/* Single / Combo product */}
   <div className="radio-prod">
-  <label>
-    <input
-  type="radio"
-  checked={!isCombo}
-  onChange={() => {
-    // Save current combo data before switching (optional)
-    setIsCombo(false);
-    
-    // Restore saved single product form data
-    setFormData(singleFormData);
-  }}
-/> Single Product
-  </label>
-  <label>
-    <input
-  type="radio"
-  checked={isCombo}
-  onChange={() => {
-    // Save current single product form before switching
-    setSingleFormData(formData);
+    <label>
+      <input
+        type="radio"
+        checked={!isCombo}
+        onChange={() => {
+          setIsCombo(false);
+          setFormData(singleFormData);
+        }}
+      />{" "}
+      Single Product
+    </label>
+    <label style={{ marginLeft: "10px" }}>
+      <input
+        type="radio"
+        checked={isCombo}
+        onChange={() => {
+          setSingleFormData(formData);
+          setIsCombo(true);
+          setFormData({
+            productName: "",
+            productCode: "",
+            ProductDisplay: "",
+            ProductCompanyName: "",
+            Contact: "",
+            address: "",
+            companyGstin: "",
+            primaryLocality: "",
+            secondaryLocality: "",
+            city: "",
+            state: "",
+            pincode: "",
+            email: "",
+            salesCode: "",
+            purchaseCost: "",
+            salesCost: "",
+            drStatus: "",
+            maxDiscount: "",
+            type: "product",
+            prodisEnabled: false,
+            subscriptionDuration: "1 Year",
+            showCostFields: false,
+            priceUSD: "",
+            priceINR: "",
+            categcategoryCode: [],
+          });
+        }}
+      />{" "}
+      Combo Product
+    </label>
+  </div>
 
-    setIsCombo(true);
-    
-    // Clear main formData so combo product list doesn't leak into it
-    setFormData({
-       productName: '',
-    productCode: '',
-    ProductDisplay: '',
-    ProductCompanyName: '',
-    Contact: '',
-    address: '',
-    companyGstin: '',
-    primaryLocality: '',
-    secondaryLocality: '',
-    city: '',
-    state: '',
-    pincode: '',
-    email: '',
-    salesCode: '',
-    purchaseCost: '',
-    salesCost: '',
-    drStatus: '',  // ✅ Added this
-    maxDiscount: '',
-    type: "product",
-    prodisEnabled: false,
-    subscriptionDuration: "1 Year", // Set default value here
-    showCostFields: false,
-    costUSD: '',
-    costINR: '',
-  category: [], // <-- make sure it's an array
-
-    });
-  }}
-/> Combo Product
-  </label>
-
+  {/* Product / Service type */}
   {!isCombo && (
-  <Form.Group className="crm-type-radio">
-          <Form.Label  >Type:</Form.Label>
-    <Form.Check
-      inline
-      type="radio"
-      id="type-product"
-      name="type"
-      label="Product"
-      value="product"
-      checked={formData.type === "product"}
-      onChange={handleChange}
-    />
-    <Form.Check
-      inline
-      type="radio"
-      id="type-service"
-      name="type"
-      label="Service"
-      value="service"
-      checked={formData.type === "service"}
-      onChange={handleChange}
-    />
-  </Form.Group>
-)}
-
+    <div>
+      <Form.Group className="crm-type-radio-type">
+        <Form.Label >Type:</Form.Label>
+        <Form.Check
+          inline
+          type="radio"
+          id="type-product"
+          name="type"
+          label="Product"
+          value="product"
+          checked={formData.type === "product"}
+          onChange={handleChange}
+        />
+        <Form.Check
+          inline
+          type="radio"
+          id="type-service"
+          name="type"
+          label="Service"
+          value="service"
+          checked={formData.type === "service"}
+          onChange={handleChange}
+        />
+      </Form.Group>
+    </div>
+  )}
 </div>
 
 {successMessage && <p className="success-prod">{successMessage}</p>}
@@ -427,6 +426,9 @@ const handleComboChange = (index, field, value) => {
       )}
 
       <Form onSubmit={handleSubmit}className='product-form'>
+        {!isCombo && (
+    <>
+      {/* ----------- FULL ORIGINAL FORM (EXACTLY AS YOU HAD) ----------- */}
        <Row className="g-5">
     <Col md={6}>
       <Form.Group className="form-group-prod">
@@ -866,7 +868,184 @@ const handleComboChange = (index, field, value) => {
            />
          </Form.Group>                  
           {/* changed up to here */}
+ </>
+  )}
+   {isCombo && (
+    <>
+      {/* ----------- COMBO FIELDS ONLY ----------- */}
 
+      <Row className="g-5">
+         {/* Multi-select products with quantity */}
+        <Col md={6}>
+          <Form.Group className="form-group-prod">
+            <Form.Label>Combo Products:</Form.Label>
+            {comboProducts.map((item, idx) => (
+              <div key={idx} className="d-flex gap-2 align-items-center mb-1">
+                <select
+                  disabled={mode === "edit"}
+                  className="form-control"
+                  value={item.name}
+                  onChange={(e) => handleComboChange(idx, "name", e.target.value)}
+                >
+                  <option value="">Select Product</option>
+                  {productList.map((product) => {
+                    const alreadySelected = comboProducts.some(
+                      (row, i) => i !== idx && row.name === product._id
+                    );
+                    return (
+                      <option
+                        key={product._id}
+                        value={product._id}
+                        disabled={alreadySelected}
+                      >
+                        {product.productName}
+                      </option>
+                    );
+                  })}
+                </select>
+
+                <input
+                  type="number"
+                  disabled={mode === "edit"}
+                  className="form-control w-25"
+                  value={item.quantity}
+                  min={1}
+                  onChange={(e) => handleComboChange(idx, "quantity", e.target.value)}
+                />
+
+                <MdAddBox
+                  className={`add-prod ${mode === "edit" ? "disabled-icon" : ""}`}
+                  size={20}
+                  onClick={mode === "edit" ? undefined : addComboRow}
+                  title={mode === "edit" ? "Disabled in Edit Mode" : "Add Product"}
+                  style={{
+                    cursor: mode === "edit" ? "not-allowed" : "pointer",
+                    opacity: mode === "edit" ? 0.5 : 1,
+                  }}
+                />
+
+ {/* Show delete only if not the first row */}
+    {idx > 0 && (
+      <MdDelete
+        className={`delete-prod ${mode === "edit" ? "disabled-icon" : ""}`}
+        size={20}
+        onClick={mode === "edit" ? undefined : () => removeComboRow(idx)}
+        title={mode === "edit" ? "Disabled in Edit Mode" : "Delete Product"}
+        style={{
+          cursor: mode === "edit" ? "not-allowed" : "pointer",
+          opacity: mode === "edit" ? 0.5 : 1,
+        }}
+      />
+    )}
+  </div>
+            ))}
+          </Form.Group>
+        </Col>
+      
+        <Col md={6}>
+          {/* Combo Code (mapped to productCode) */}
+          <Form.Group className="form-group-prod">
+            <Form.Label className="required-label">Combo Code:</Form.Label>
+            <Form.Control
+              type="text"
+              name="productCode"
+              value={formData.productCode}
+              onChange={handleChange}
+              disabled={mode === "edit"}
+              placeholder="Enter combo code"
+              required
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+
+      <Row className="g-5">
+         <Col md={6}>
+          <Form.Group className="form-group-prod">
+            <Form.Label className="required-label">Combo Display Name:</Form.Label>
+            <Form.Control
+    type="text"
+    name="ProductDisplay"
+    value={formData.ProductDisplay}
+    onChange={handleChange}
+    placeholder='Enter product display name'
+    required
+  />
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          {/* Sales Code */}
+          <Form.Group className="form-group-prod">
+            <Form.Label className="required-label">Sales Code:</Form.Label>
+            <Form.Control
+              type="text"
+              name="salesCode"
+              value={formData.salesCode}
+              onChange={handleChange}
+              placeholder="Enter sales code"
+              required
+            />
+          </Form.Group>
+        </Col>
+
+        
+      </Row>
+
+      <Row className="g-5">
+        <Col md={6}>
+          {/* Sales Cost (auto-calculated but editable) */}
+          <Form.Group className="form-group-prod">
+            <Form.Label className="required-label">Sales Cost:</Form.Label>
+            <Form.Control
+              type="number"
+              name="salesCost"
+              value={formData.salesCost || ""}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || parseFloat(value) >= 0) {
+                  setFormData((prev) => ({ ...prev, salesCost: value }));
+                }
+              }}
+              min="0"
+              placeholder="Enter sales cost"
+              required
+            />
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          {/* Max Discount */}
+          <Form.Group className="form-group-prod">
+            <Form.Label className="required-label">Max Discount:</Form.Label>
+            <Form.Control
+              type="number"
+              name="maxDiscount"
+              value={formData.maxDiscount || ""}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || parseFloat(value) >= 0) {
+                  handleChange(e);
+                }
+              }}
+              min="0"
+              placeholder="Enter maximum discount"
+              required
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+      <Form.Group className="form-group-prod mt-4 custom-checkbox" controlId="productEnabled">
+           <Form.Check
+             type="checkbox"
+             label="Product Enabled"
+             name="prodisEnabled"
+             checked={formData.prodisEnabled}
+             onChange={handleChange}
+         
+           />
+         </Form.Group> 
+     
+    </>
+  )}
 
         <button type="submit" disabled={loading} className="submit-button-prod">
           {loading ? (
@@ -892,19 +1071,3 @@ const handleComboChange = (index, field, value) => {
 };
 
 export default ProductSection;
-
-
-
-  
-
-  
-  
-   
-    
-
-      
-        
-        
-        
-
-
