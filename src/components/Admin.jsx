@@ -28,7 +28,7 @@ const Admin = () => {
       case 'SalesReport': return <SalesReport />;
       case 'ProductCategory': return <ProductCategory />;
 
-default: return <div className="default-message-admin">Please select a menu option.</div>;
+default: return <div className="default-message-admin">Please select an option from the menu above to proceed.</div>;
     }
   };
 
@@ -41,19 +41,18 @@ default: return <div className="default-message-admin">Please select a menu opti
         <div className="dropdown">
           <button className="dropbtn">Manage Funnel</button>
           <div className="dropdown-content">
-            <a onClick={() => setSelected('ManageCustomerFunnel')}>Manage Customer Funnel</a>
-            <a onClick={() => setSelected('ManageUserFunnel')}>Manage User Funnel</a>
+            <a onClick={() => setSelected('ManageUserFunnel')}>Transfer Funnel User</a>
             <a onClick={() => setSelected('ManageCustomerData')}>Manage Customer Data</a>
           </div>
         </div>
 
-        <button onClick={() => setSelected('PerformaInvoiceStatus')}>Performa Invoice</button>
-        <button onClick={() => setSelected('InvoiceStatus')}>Invoice Status</button>
-        <button onClick={() => setSelected('PurchaseOrderStatus')}>PO Status</button>
+        <button onClick={() => setSelected('PerformaInvoiceStatus')}>Performa Invoice Management</button>
+        <button onClick={() => setSelected('InvoiceStatus')}>Invoice Management</button>
+        <button onClick={() => setSelected('PurchaseOrderStatus')}>PO Management</button>
         
 
         <div className="dropdown">
-          <button className="dropbtn">Report</button>
+          <button className="dropbtn">Admin Report</button>
           <div className="dropdown-content">
             <a onClick={() => setSelected('PurchaseReport')}>Purchase Report</a>
             <a onClick={() => setSelected('SalesReport')}>Sales Report</a>

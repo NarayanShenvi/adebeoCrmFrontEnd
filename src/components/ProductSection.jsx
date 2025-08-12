@@ -365,6 +365,33 @@ const handleComboChange = (index, field, value) => {
   }}
 /> Combo Product
   </label>
+
+  {!isCombo && (
+  <Form.Group className="crm-type-radio">
+          <Form.Label  >Type:</Form.Label>
+    <Form.Check
+      inline
+      type="radio"
+      id="type-product"
+      name="type"
+      label="Product"
+      value="product"
+      checked={formData.type === "product"}
+      onChange={handleChange}
+    />
+    <Form.Check
+      inline
+      type="radio"
+      id="type-service"
+      name="type"
+      label="Service"
+      value="service"
+      checked={formData.type === "service"}
+      onChange={handleChange}
+    />
+  </Form.Group>
+)}
+
 </div>
 
 {successMessage && <p className="success-prod">{successMessage}</p>}
@@ -748,9 +775,6 @@ const handleComboChange = (index, field, value) => {
   </Col>
 
   <Col md={6}>
-    {/* Nested row for Max Discount and Type with a smaller gap */}
-    <Row className="g-2">
-      <Col md={6}>
         <Form.Group className="form-group-prod">
           <Form.Label className="required-label">Max Discount:</Form.Label>
           <Form.Group>
@@ -771,37 +795,6 @@ const handleComboChange = (index, field, value) => {
           </Form.Group>
         </Form.Group>
       </Col>
-
-      <Col md={6}>
-        <Form.Group className="form-group-prod">
-          <Form.Label className="required-label">Type:</Form.Label>
-          <Form.Group className="crm-type-radio">
-  <Form.Check
-    inline
-    type="radio"
-    id="type-product"
-    name="type"
-    label="Product"
-    value="product"
-    checked={formData.type === "product"}
-    onChange={handleChange}
-  />
-  <Form.Check
-    inline
-    type="radio"
-    id="type-service"
-    name="type"
-    label="Service"
-    value="service"
-    checked={formData.type === "service"}
-    onChange={handleChange}
-  />
-</Form.Group>
-
-        </Form.Group>
-      </Col>
-    </Row>
-  </Col>
 </Row>
                   <Row className="g-5 align-items-end">
       <Col md={6}>
