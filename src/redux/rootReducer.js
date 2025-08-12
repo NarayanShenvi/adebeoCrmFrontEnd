@@ -12,6 +12,7 @@ import createReports from './slices/reportSlice'
 import createUsers from './slices/userSlice'
 import addusers from './slices/adminUserSlice'
 import addProductCategoryreducer from './slices/addProductCategoy'
+import comboSlice from './slices/comboSlice'
 
 const rootReducer = combineReducers({
     //data: userReducer
@@ -26,7 +27,8 @@ const rootReducer = combineReducers({
     report:createReports,
     users:createUsers,
     addusers:addusers,
-    productCategory:addProductCategoryreducer
+    productCategory:addProductCategoryreducer,
+    combo:comboSlice
 })
 
 export default rootReducer;
