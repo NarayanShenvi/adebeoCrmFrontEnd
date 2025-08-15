@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProductToEdit, updateProductAsync, fetchProductsAsync, addProductAsync } from '../redux/slices/productSlice';
 import axios from "../config/apiConfig"; // Axios instance
@@ -13,11 +13,12 @@ import { HiSquaresPlus } from "react-icons/hi2";//to here
 import { MdAddBox, MdDelete  } from "react-icons/md";
 import { fetchCategoriesAsync } from '../redux/slices/addProductCategoy';
 import Select from 'react-select';
-
 import {
-  addProductCategoryAsync,
-  resetSuccessMessage as resetCategorySuccessMessage,
-} from '../redux/slices/addProductCategoy';
+  addComboProductAsync,
+  fetchComboProductsAsync,
+  updateComboProductAsync
+} from '../redux/slices/productSlice';
+
 
 const ProductSection = () => {
   const dispatch = useDispatch();
@@ -27,64 +28,68 @@ const ProductSection = () => {
   const [isCombo, setIsCombo] = useState(false);
 const [comboProducts, setComboProducts] = useState([
   { name: '', quantity: 1 }
-]);  const [productList, setProductList] = useState([]);  const [formData, setFormData] = useState({
-    productName: '',
-    productCode: '',
-    ProductDisplay: '',
-    ProductCompanyName: '',
-    Contact: '',
-    address: '',
-    companyGstin: '',
-    primaryLocality: '',
-    secondaryLocality: '',
-    city: '',
-    state: '',
-    pincode: '',
-    email: '',
-    salesCode: '',
-    purchaseCost: '',
-    salesCost: '',
-    drStatus: '',  // ✅ Added this
-    maxDiscount: '',
-    type: "product",
-    prodisEnabled: false,
-    subscriptionDuration: "1 Year", // Set default value here
-    showCostFields: false,
-    priceUSD: '',
-    priceINR: '',
-  categoryCode: [], // <-- make sure it's an array
+]); 
+const [selectedCategory, setSelectedCategory] = useState('');
+ const [productList, setProductList] = useState([]);  const [formData, setFormData] = useState({
+  productName: '',
+  productCode: '',
+  ProductDisplay: '',
+  ProductCompanyName: '',
+  Contact: '',
+  address: '',
+  companyGstin: '',
+  primaryLocality: '',
+  secondaryLocality: '',
+  city: '',
+  state: '',
+  pincode: '',
+  email: '',
+  salesCode: '',
+  purchaseCost: '',
+  salesCost: '',
+  drStatus: '',
+  maxDiscount: '',
+  type: "product",           // ✅ new backend field
+  prodisEnabled: false,
+  subscriptionDuration: "1 Year",
+  showCostFields: false,
+  categoryCode: selectedCategory || "", // single string
+  isUSD: false,               // ✅ new backend field
+  priceUSD: 0,               // ✅ new backend field
+  priceINR: 0,               // ✅ new backend field
+});
 
-  });
   
   const [searchResults, setSearchResults] = useState([]); // For holding search results
   const [singleFormData, setSingleFormData] = useState({
-   productName: '',
-    productCode: '',
-    ProductDisplay: '',
-    ProductCompanyName: '',
-    Contact: '',
-    address: '',
-    companyGstin: '',
-    primaryLocality: '',
-    secondaryLocality: '',
-    city: '',
-    state: '',
-    pincode: '',
-    email: '',
-    salesCode: '',
-    purchaseCost: '',
-    salesCost: '',
-    drStatus: '',  // ✅ Added this
-    maxDiscount: '',
-    type: "product",
-    prodisEnabled: false,
-    subscriptionDuration: "1 Year", // Set default value here
-    showCostFields: false,
-    priceUSD: '',
-    priceINR: '',
-  categoryCode: [], // <-- make sure it's an array
-
+  productName: '',
+  productCode: '',
+  ProductDisplay: '',
+  ProductCompanyName: '',
+  Contact: '',
+  address: '',
+  companyGstin: '',
+  primaryLocality: '',
+  secondaryLocality: '',
+  city: '',
+  state: '',
+  pincode: '',
+  email: '',
+  salesCode: '',
+  purchaseCost: '',
+  salesCost: '',
+  drStatus: '',
+  maxDiscount: '',
+  type: "product",            // ✅ new backend field
+  prodisEnabled: false,
+  subscriptionDuration: "1 Year",
+  showCostFields: false,
+  categoryCode: selectedCategory || "", // single string
+  isUSD: false,               // ✅ new backend field
+ priceUSD: 0,               // ✅ new backend field
+  priceINR: 0,               // ✅ new backend field
 });
+
 
   
   // Effect to reset form if switching between add/edit modes
@@ -93,31 +98,32 @@ const [comboProducts, setComboProducts] = useState([
       setFormData(productToEdit);  // Set data for edit mode
     } else {
       setFormData({
-        productName: '',
-        productCode: '',
-        ProductDisplay: '',
-        ProductCompanyName: '',
-        Contact: '',
-        address: '',
-        companyGstin: '',
-        primaryLocality: '',
-        secondaryLocality: '',
-        city: '',
-        state: '',
-        pincode: '',
-        email: '',
-        salesCode: '',
-        purchaseCost: '',
-        salesCost: '',
-        drStatus: '',  // ✅ Added this
-        maxDiscount: '',
-        type: "product",
-        prodisEnabled: false,
-        subscriptionDuration: '1 Year', // ✅ Add default value here
-        showCostFields: false,
-        priceUSD: '',
-        priceINR: '',
-  categcategoryCode: [], // <-- make sure it's an array
+       productName: '',
+  productCode: '',
+  ProductDisplay: '',
+  ProductCompanyName: '',
+  Contact: '',
+  address: '',
+  companyGstin: '',
+  primaryLocality: '',
+  secondaryLocality: '',
+  city: '',
+  state: '',
+  pincode: '',
+  email: '',
+  salesCode: '',
+  purchaseCost: '',
+  salesCost: '',
+  drStatus: '',
+  maxDiscount: '',
+  type: "product",            // ✅ new backend field
+  prodisEnabled: false,
+  subscriptionDuration: "1 Year",
+  showCostFields: false,
+  categoryCode: selectedCategory || "", // single string
+  isUSD: false,               // ✅ new backend field
+priceUSD: 0,               // ✅ new backend field
+  priceINR: 0,               // ✅ new backend field
 
       });
     }
@@ -126,16 +132,17 @@ const [comboProducts, setComboProducts] = useState([
   const [loadingCategories, setLoadingCategories] = useState(false);
 const [errorCategories, setErrorCategories] = useState('');
 
-  const [selectedCategories, setSelectedCategories] = useState([]);
-const handleCategorySelect = (selectedOptions) => {
-  setSelectedCategories(
-    selectedOptions ? selectedOptions.map(opt => opt.value) : []
-  );
-};
+ const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    // fetch all categories once
+    axios.get(`${API}/getAllCategories`)
+      .then(res => setCategories(res.data || []))
+      .catch(err => console.error(err));
+  }, []);
 
 
 
- 
   useEffect(() => {
     if (isCombo) {
       axios.get(`${API}/load_edit_adebeo_products`).then(res => {
@@ -167,7 +174,6 @@ useEffect(() => {
 useEffect(() => {
   dispatch(fetchCategoriesAsync());
 }, [dispatch]);
-const { categories = [] } = useSelector((state) => state.productCategory || {});
 
 const handleComboChange = (index, field, value) => {
   const updated = [...comboProducts];
@@ -177,10 +183,11 @@ const handleComboChange = (index, field, value) => {
     if (selected) {
       updated[index] = {
         ...updated[index],
-        name: selected._id,
-        productName: selected.productName,
+        name: selected._id,   // for display in dropdown
+        displayName: selected.productName,  // optional, for display elsewhere
+      productId: selected._id,      // backend requires
+        salesCost: parseFloat(selected.salesCost || 0),
         quantity: updated[index].quantity || 1,
-        salesCost: parseFloat(selected.salesCost || 0), // ✅ get price from real product
       };
     }
   } else if (field === 'quantity') {
@@ -189,13 +196,17 @@ const handleComboChange = (index, field, value) => {
 
   setComboProducts(updated);
 
-  // Save combo to formData
+  // Update total salesCost
+  const total = updated.reduce(
+    (acc, item) => acc + (parseFloat(item.salesCost || 0) * parseInt(item.quantity || 1)),
+    0
+  );
+
   setFormData(prev => ({
     ...prev,
-    productName: JSON.stringify(updated), // for backend
+    salesCost: total.toFixed(2),
   }));
 };
-
 
   const addComboRow = () => setComboProducts([...comboProducts, { name: '', quantity: 1 }]);
   const removeComboRow = (index) => {
@@ -219,7 +230,7 @@ const handleComboChange = (index, field, value) => {
   const handleCostChange  = (e) => {
     const { name, value, type, checked } = e.target;
   
-    if ((name === "costUSD" || name === "costINR") && (parseInt(value) < 1 || isNaN(value))) {
+    if ((name === "priceUSD" || name === "priceINR") && (parseInt(value) < 1 || isNaN(value))) {
       return; // Don't update state if value is less than 1
     }
   
@@ -230,55 +241,134 @@ const handleComboChange = (index, field, value) => {
   };
   
   // Handle search input change for productName
-  const handleSearchChange = async (e) => {
-    const searchTerm = e.target.value;
-    setFormData({ ...formData, productName: searchTerm });
+  
+const [searchTerm, setSearchTerm] = useState("");
+const handleSearchChange = async (e) => {
+  const term = e.target.value;
 
-    if (searchTerm.length >= 3) {  // Start searching after 3 characters
-      try {
-        const response = await axios.get(`${API}/load_edit_adebeo_products`, {
-          params: { productName: searchTerm }
-        });
-        setSearchResults(response.data.data); // Assuming response contains an array of products
-      } catch (error) {
-        console.error('Error fetching search results:', error);
-      }
-    } else {
-      setSearchResults([]); // Clear results if search term is too short
-    }
-  };
+  if (term.length < 3) {
+    setSearchResults([]);
+    return;
+  }
 
-  const handleSelectProduct = (e) => {
-    const selectedProduct = searchResults.find(product => product._id === e.target.value);
-    setFormData({
-      ...selectedProduct,  // Populate form with selected product's data
-    });
-    setSearchResults([]);  // Clear search results
-  };
-
- const handleSubmit = (e) => {
-  e.preventDefault();
-  if (mode === 'edit') {
-    dispatch(updateProductAsync(formData));  // Update product if in Edit mode
-  } else {
+  try {
     if (!isCombo) {
-      const payload = {
-        ...formData,
-        category: formData.category,  // Ensure category is included for single products
-      };
-      dispatch(addProductAsync(payload));
+      const response = await axios.get(`${API}/load_edit_adebeo_products`, {
+        params: { productName: term },
+      });
+      setSearchResults(response.data.data || []);
     } else {
-      dispatch(addProductAsync(formData)); // For combo products
+      const token = localStorage.getItem("Access_Token");
+      const response = await axios.get(`${API}/getComboProducts`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        params: { name: term },
+      });
+      setSearchResults(response.data.data || []);
     }
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+    setSearchResults([]);
   }
 };
 
-  const handleMultiSelectChange = (e) => {
-  const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-  setFormData((prev) => ({
-    ...prev,
-    category: selectedOptions,
-  }));
+const handleSelectProduct = (e) => {
+  const selectedId = e.target.value;
+
+  const selectedProduct = searchResults.find(
+    (p) => (!isCombo ? p._id === selectedId : p.comboCode === selectedId)
+  );
+
+  if (!selectedProduct) return;
+
+  if (!isCombo) {
+    // Single product populate
+    setFormData({
+      ...formData,
+      ...selectedProduct,
+    });
+  } else {
+    // Combo product populate with proper nesting
+    const comboObj = {
+      comboCode: selectedProduct.comboCode,
+      comboDisplayName: selectedProduct.comboDisplayName,
+      salesCode: selectedProduct.salesCode,
+      salesCost: parseFloat(selectedProduct.salesCost) || 0,
+      maxDiscount: parseFloat(selectedProduct.maxDiscount) || 0,
+      products: selectedProduct.products.map((p) => ({
+        productId: p.productId,
+        productCode: p.productCode,
+        productName: p.productName,
+        quantity: p.quantity,
+        salesCost: parseFloat(p.salesCost || 0),
+      })),
+    };
+
+    setFormData({
+      ...formData,
+      productName: selectedProduct.comboDisplayName, // display in input
+      productCode: selectedProduct.comboCode,
+      salesCode: selectedProduct.salesCode,
+      salesCost: parseFloat(selectedProduct.salesCost) || 0,
+      maxDiscount: parseFloat(selectedProduct.maxDiscount) || 0,
+      comboProducts: [comboObj], // ✅ full combo with nested products
+    });
+  }
+
+  setSearchResults([]);
+};
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (mode === 'edit') {
+    const payload = {
+      ...formData,
+      categoryCode: selectedCategory || "",
+    };
+    dispatch(updateProductAsync(payload));
+  } else {
+    if (!isCombo) {
+      // keep single product logic exactly as is
+      const payload = {
+        ...formData,
+        categoryCode: selectedCategory || "",
+      };
+      dispatch(addProductAsync(payload));
+    } else { // Combo product
+  const payload = {
+    comboCode: formData.productCode,
+    comboDisplayName: formData.ProductDisplay || formData.productName,
+    salesCode: formData.salesCode,
+    salesCost: parseFloat(formData.salesCost) || 0,
+    maxDiscount: parseFloat(formData.maxDiscount) || 0,
+    products: comboProducts.map(p => ({
+      productCode: p.name,
+      productId: p.productId,
+      quantity: p.quantity,
+      salesCost: parseFloat(p.salesCost || 0)
+    }))
+  };
+   // Clear form & combo list after submit
+        setFormData({
+          productCode: "",
+          productName: "",
+          ProductDisplay: "",
+          salesCode: "",
+          salesCost: "",
+          maxDiscount: "",
+        });
+        setComboProducts([{ name: "", productId: "", quantity: 1, salesCost: 0 }]);
+  const result = await dispatch(addComboProductAsync(payload));
+
+  if (result?.message) {
+    alert(result.message); // e.g. "Combo product created successfully"
+  } else if (result?.error) {
+    alert(result.error); // e.g. "ComboCode already exists"
+  }
+}
+
+  }
 };
 
 
@@ -353,9 +443,10 @@ const handleComboChange = (index, field, value) => {
             prodisEnabled: false,
             subscriptionDuration: "1 Year",
             showCostFields: false,
-            priceUSD: "",
-            priceINR: "",
-            categcategoryCode: [],
+            isUSD: false,               // ✅ new backend field
+            priceUSD: 0,               // ✅ new backend field
+            priceINR: 0,               // ✅ new backend field
+  categoryCode: selectedCategory || "", // single string
           });
         }}
       />{" "}
@@ -398,32 +489,50 @@ const handleComboChange = (index, field, value) => {
 
       {/* Show search input and dropdown if in Edit mode */}
       {mode === 'edit' && (
-        <div>
-          <input
-            className='search-field-prod'
-            type="text"
-            placeholder="Search by Product Name"
-            value={formData.productName}
-            onChange={handleSearchChange}
-          />
-                      <div className='search-field1-prod'>
-                      {loading ? (
-                <p className='ProductsLoading'>Loading...</p>
-              ) : searchResults.length > 0 ?  (
-            <select onChange={handleSelectProduct} value={formData._id || ''}>
-              <option value="" disabled>Select a product</option>
-              {searchResults.map((product) => (
-                <option key={product._id} value={product._id}>
-                  {product.productName} (Code: {product.productCode})
-                </option>
-              ))}
-            </select>
-            
-          ) : (
-            <p className='NoProductsFound'>No products found...</p>
-          )}</div>
-        </div>
+  <div>
+    <input
+  className="search-field-prod"
+  type="text"
+  placeholder={isCombo ? "Search by Combo Product Name" : "Search by Product Name"}
+  value={searchTerm}
+  onChange={(e) => {
+    setSearchTerm(e.target.value);
+    handleSearchChange(e);
+  }}
+/>
+
+    <div className="search-field1-prod">
+      {loading ? (
+        <p className="ProductsLoading">Loading...</p>
+      ) : searchResults.length > 0 ? (
+       <select
+  onChange={handleSelectProduct}
+  value={!isCombo ? formData._id || "" : ""}
+>
+  <option value="" disabled>
+    {isCombo ? "Select a combo product" : "Select a product"}
+  </option>
+  {searchResults.map((product) => (
+    <option
+      key={!isCombo ? product._id : product.comboCode}
+      value={!isCombo ? product._id : product.comboCode}
+    >
+      {isCombo
+        ? `${product.comboDisplayName} (Code: ${product.comboCode})`
+        : `${product.productName} (Code: ${product.productCode})`}
+    </option>
+  ))}
+</select>
+
+
+      ) : (
+        <p className="NoProductsFound">No products found...</p>
       )}
+    </div>
+  </div>
+)}
+
+
 
       <Form onSubmit={handleSubmit}className='product-form'>
         {!isCombo && (
@@ -509,35 +618,29 @@ const handleComboChange = (index, field, value) => {
 
       {/* ✅ Product Category Dropdown - only shown when not a combo */}
       {!isCombo && (
-       <Form.Group className="form-group-prod">
-  <Form.Label className="required-label">Choose Categories</Form.Label>
+       <Form.Group className="form-group-prod mt-3">
+  <Form.Label className="required-label">Choose Category</Form.Label>
   {loadingCategories ? (
-    <p>Loading Categories...</p>
-  ) : errorCategories ? (
-    <p style={{ color: 'red' }}>{errorCategories}</p>
-  ) : (
-    <Select
-      key="categories-select"
-      isMulti
-      name="categories"
-      options={categories.map(category => ({
-        label: category.name,
-        value: category._id
-      }))}
-      value={categories
-        .filter(category => selectedCategories.includes(category._id))
-        .map(category => ({
-          label: category.name,
-          value: category._id
-        }))}
-      onChange={handleCategorySelect}
-      getOptionLabel={(e) => e.label}
-      getOptionValue={(e) => e.value}
-      className="basic-multi-select"
-      classNamePrefix="select"
-    />
+  <p>Loading Categories...</p>
+) : errorCategories ? (
+  <p style={{ color: 'red' }}>{errorCategories}</p>
+) :(
+    <Form.Control
+      as="select"
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+    >
+      <option value="">Select a category</option>
+      {categories.map((cat) => (
+        <option key={cat.Category_Code} value={cat.Category_Code}>
+          {cat.Category_Name}
+        </option>
+      ))}
+    </Form.Control>
   )}
 </Form.Group>
+
+
 
       )}
     </Col>
@@ -827,34 +930,34 @@ const handleComboChange = (index, field, value) => {
             type="checkbox"
             id="show-cost-fields"
             label="Apply USD"
-            name="showCostFields"
-            checked={formData.showCostFields}
+            name="isUSD"
+            checked={formData.isUSD}
             onChange={handleChange}
             
           />
-          {formData.showCostFields && (
-            <div className="d-flex gap-2 mt-2">
-              <Form.Control 
+          {formData.isUSD && (
+  <div className="d-flex gap-2 mt-2">
+    <Form.Control 
   type="number"
   placeholder="Price in USD"
-  name="costUSD"
-  value={formData.costUSD}
+  name="priceUSD"
+  value={formData.priceUSD === 0 && formData.isUSD ? "" : formData.priceUSD}
   onChange={handleCostChange}
   min="1"
 />
+
 <Form.Control
   type="number"
   placeholder="INR Equivalent"
-  name="costINR"
-  value={formData.costINR}
+  name="priceINR"
+  value={formData.priceINR === 0 && formData.isUSD ? "" : formData.priceINR}
   onChange={handleCostChange}
   min="1"
 />
 
-
-            </div>
-          )}
-        </Form.Group>
+  </div>
+)}
+      </Form.Group>
       </Col>
     </Row>
                   <Form.Group className="form-group-prod mt-4 custom-checkbox" controlId="productEnabled">
@@ -882,28 +985,23 @@ const handleComboChange = (index, field, value) => {
             {comboProducts.map((item, idx) => (
               <div key={idx} className="d-flex gap-2 align-items-center mb-1">
                 <select
-                  disabled={mode === "edit"}
-                  className="form-control"
-                  value={item.name}
-                  onChange={(e) => handleComboChange(idx, "name", e.target.value)}
-                >
-                  <option value="">Select Product</option>
-                  {productList.map((product) => {
-                    const alreadySelected = comboProducts.some(
-                      (row, i) => i !== idx && row.name === product._id
-                    );
-                    return (
-                      <option
-                        key={product._id}
-                        value={product._id}
-                        disabled={alreadySelected}
-                      >
-                        {product.productName}
-                      </option>
-                    );
-                  })}
-                </select>
-
+  disabled={mode === "edit"}
+  className="form-control"
+  value={item.name}       // now this is the _id, matching option.value
+  onChange={(e) => handleComboChange(idx, "name", e.target.value)}
+>
+  <option value="">Select Product</option>
+  {productList.map(product => {
+    const alreadySelected = comboProducts.some(
+      (row, i) => i !== idx && row.name === product._id
+    );
+    return (
+      <option key={product._id} value={product._id} disabled={alreadySelected}>
+        {product.productName}
+      </option>
+    );
+  })}
+</select>
                 <input
                   type="number"
                   disabled={mode === "edit"}
@@ -968,7 +1066,7 @@ const handleComboChange = (index, field, value) => {
     name="ProductDisplay"
     value={formData.ProductDisplay}
     onChange={handleChange}
-    placeholder='Enter product display name'
+    placeholder='Enter combo product display name'
     required
   />
           </Form.Group>

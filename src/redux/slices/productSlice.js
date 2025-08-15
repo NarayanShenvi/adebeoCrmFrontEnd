@@ -8,9 +8,10 @@ const initialState = {
   productToEdit: null,  // Stores the selected product to be edited
   loading: false,
   error: null,
+  comboProducts: [],   // Stores all combo products
 };
 
-const productSlice = createSlice({
+const productSlice = createSlice({  
   name: 'products',
   initialState,
   reducers: {
@@ -26,10 +27,14 @@ const productSlice = createSlice({
     setProductToEdit: (state, action) => {
       state.productToEdit = action.payload;
     },
+    setComboProducts: (state, action) => {
+    state.comboProducts = action.payload;
+  },
   },
 });
 
-export const { setProducts, setLoading, setError, setProductToEdit } = productSlice.actions;
+
+export const { setProducts, setLoading, setError, setProductToEdit, setComboProducts } = productSlice.actions;
 
 export default productSlice.reducer;
 
@@ -116,3 +121,82 @@ export const addProductAsync = (productData) => async (dispatch) => {
   }
 };
 
+// Add combo product
+export const addComboProductAsync = (payload) => async (dispatch) => {
+  dispatch(setLoading(true));
+  try {
+    const token = localStorage.getItem('Access_Token');
+    const response = await axios.post(`${API}/addComboProduct`, payload, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+
+    // ✅ If backend sends message, return it to the caller
+    if (response.data?.message) {
+      dispatch(fetchComboProductsAsync()); // Refresh combo list
+      return { message: response.data.message };
+    }
+
+    // ✅ If backend sends error, return it to the caller
+    if (response.data?.error) {
+      return { error: response.data.error };
+    }
+
+    // Fallback if neither message nor error is given
+    return { error: "Unknown response from server" };
+
+  } catch (error) {
+    const errMsg =
+      error.response?.data?.error ||
+      error.message ||
+      "Failed to add combo product.";
+    dispatch(setError(errMsg));
+    return { error: errMsg };
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+
+
+// Fetch combo products (optionally by name)
+export const fetchComboProductsAsync = (name = '') => async (dispatch) => {
+  dispatch(setLoading(true));
+  try {
+    const token = localStorage.getItem('Access_Token');
+    const response = await axios.get(`${API}/getComboProducts`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      params: name ? { name } : {},
+    });
+
+    if (response && response.data) {
+      const combos = response.data.data || [];
+      dispatch(setComboProducts(combos));
+      return combos; // allow component to use results
+    }
+    return [];
+  } catch (error) {
+    dispatch(setError('Failed to fetch combo products.'));
+    return [];
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+
+
+
+// Update combo product
+export const updateComboProductAsync = ({ combo_code, updateFields }) => async (dispatch) => {
+  dispatch(setLoading(true));
+  try {
+    const token = localStorage.getItem('Access_Token');
+    const response = await axios.put(`${API}/updateComboProduct/${combo_code}`, updateFields, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (response.status === 200) {
+      dispatch(fetchComboProductsAsync()); // Refresh after update
+    }
+  } catch (error) {
+    dispatch(setError('Failed to update combo product.'));
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
