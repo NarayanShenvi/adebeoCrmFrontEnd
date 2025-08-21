@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';//changes made
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { MdOutlineCancel } from "react-icons/md"; // Correct import changes made
-import { fetchProductsAsync } from '../redux/slices/productSlice'; // Assuming you have this action set up
+import { fetchProductsAsync, fetchComboProductsAsync } from "../redux/slices/productSlice";
 import { createQuote, fetchQuotesAsync } from '../redux/slices/quoteSlice';  // Import the createQuote and fetchQuotesAsync actions
 import { MdAddBox, MdDelete  } from "react-icons/md";
 import { FaSpinner, FaFilePdf, FaHackerNewsSquare } from 'react-icons/fa';
 import {  FaChevronLeft, FaChevronRight } from "react-icons/fa"; //import statements are changed and some new imports are added
+import { createPortal } from "react-dom";
 
 const QuoteSlider = ({ customerId, onClose }) => {
   const dispatch = useDispatch();
@@ -13,20 +14,46 @@ const QuoteSlider = ({ customerId, onClose }) => {
   const quoteState = useSelector((state) => state.quote); // Getting entire quote state
   const { loading, quotes, error, currentPage, totalPages,quoteCreationResponse } = quoteState || {}; // Safe destructuring
 
-  const sliderRef = useRef(null); // Reference for the slider container changes made
+const sliderRef = useRef(null); // Reference for the slider container changes made
+const wrapperRef = useRef(null);
+const triggerRefs = useRef({}); // per-line trigger elements
+const [portalPos, setPortalPos] = useState({ top: 0, left: 0 });
+const portalRefs = useRef({}); // store per-line portal refs
 
-  const [quoteLines, setQuoteLines] = useState([{
-    productCode:'',
-    salesCode:0,
-    productId: '',
-    description:'',
-    quantity: 0,
-    discount: 0,
-    subtotal: 0,
-    unitPrice: 0,  // Initial salesCost as unitPrice
-    drStatus: '', // Default status
+// Local UI state
+const [selectionType, setSelectionType] = useState("single"); // "single" | "combo"
+const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  }]); // Initial line for quote
+// Hover / click control
+const [hoveredCatId, setHoveredCatId] = useState(null); // category currently hovered
+const [activeCatId, setActiveCatId] = useState(null); // category clicked/tapped (persist)
+const hideTimerRef = useRef(null);
+
+const [selectedProduct, setSelectedProduct] = useState(null);
+const [selectedCombo, setSelectedCombo] = useState("");
+
+// Redux state (safe selectors)
+const combos = useSelector((s) => s.products?.comboProducts || []);
+
+const [quoteLines, setQuoteLines] = useState([{
+  productCode:'',
+  productId: '',
+  description:'',
+  quantity: 0,
+  discount: 0,
+  subtotal: 0,
+  unitPrice: 0,
+  drStatus: '',
+  selectionType: 'single',  // add per line
+  selectedProduct: null,    // add per line
+  selectedCombo: '',        // add per line
+}]);
+const quoteLinesRef = useRef(quoteLines);
+// keep the ref updated whenever quoteLines changes
+useEffect(() => {
+  quoteLinesRef.current = quoteLines;
+}, [quoteLines]);
+
   const [total, setTotal] = useState(0);
   //changes
   const [overallDiscount, setOverallDiscount] = useState(0); // New state for overall discount
@@ -36,6 +63,65 @@ const QuoteSlider = ({ customerId, onClose }) => {
   // Pagination state for lower section
   const [currentPageState, setCurrentPageState] = useState(1);
   const itemsPerPage = 5; // Number of items to display per page
+
+  useEffect(() => {
+  dispatch(fetchProductsAsync());
+  dispatch(fetchComboProductsAsync());
+}, [dispatch]);
+const clearHideTimer = () => {
+  if (hideTimerRef.current) {
+    clearTimeout(hideTimerRef.current);
+    hideTimerRef.current = null;
+  }
+};
+const startHideTimer = (delay = 250) => {
+  clearHideTimer();
+  hideTimerRef.current = setTimeout(() => {
+    setHoveredCatId(null);
+    hideTimerRef.current = null;
+  }, delay);
+};
+const onCategoryMouseEnter = (catId) => { clearHideTimer(); setHoveredCatId(catId); };
+const onCategoryMouseLeave = () => startHideTimer(200);
+const onSubmenuMouseEnter = (catId) => { clearHideTimer(); setHoveredCatId(catId); };
+const onSubmenuMouseLeave = () => startHideTimer(200);
+const onCategoryClick = (catId) => { setActiveCatId(prev => (prev === catId ? null : catId)); setDropdownOpen(true); };
+const pickProduct = (prod) => {
+  setSelectedProduct(prod);
+  setDropdownOpen(false);
+  setHoveredCatId(null);
+  setActiveCatId(null);
+  clearHideTimer();
+};
+const categories = useMemo(() => {
+  const map = {};
+  const unc = { _id: "uncat", categoryName: "Uncategorized", products: [] };
+
+  products.forEach((p) => {
+    const code = p.categoryCode && String(p.categoryCode).trim() !== "" ? String(p.categoryCode) : null;
+    const name = p.categoryName || p.category || code || "Uncategorized";
+
+    if (code) {
+      if (!map[code]) map[code] = { _id: code, categoryName: name, products: [] };
+      map[code].products.push(p);
+    } else {
+      unc.products.push(p);
+    }
+  });
+
+  const arr = Object.values(map);
+  if (unc.products.length) arr.push(unc);
+  return arr;
+}, [products]);
+
+const currentCatId = hoveredCatId ?? activeCatId ?? null;
+
+const currentProducts = useMemo(() => {
+  const cat = categories.find((c) => c._id === currentCatId);
+  return cat?.products || [];
+}, [categories, currentCatId]);
+
+
   useEffect(() => {
     if (quoteCreationResponse && quoteCreationResponse.message) {
       const timer = setTimeout(() => {
@@ -64,107 +150,177 @@ const QuoteSlider = ({ customerId, onClose }) => {
       }
   }, [quoteCreationResponse]); // This will trigger when quoteCreationResponse updates
   
+const handleSelectionTypeChange = (index, value) => {
+  const newLines = [...quoteLines];
+  newLines[index].selectionType = value;
+  newLines[index].selectedProduct = null;
+  newLines[index].selectedCombo = '';
+  setQuoteLines(newLines);
+};
 
  //changes made from here 
- const handleLineChange = (index, field, value) => {
+const handleLineChange = (index, field, value) => {
   const newQuoteLines = [...quoteLines];
   newQuoteLines[index][field] = value;
-  const currentLine = newQuoteLines[index];
+  const line = newQuoteLines[index];
 
-  console.log('Quantity before processing:', currentLine.quantity);  // Debugging log  
-  if (field === 'quantity' || field === 'discount') {
-    const product = products.find(product => product._id === newQuoteLines[index].productId);
-    if (product) {
-      const quantity = parseInt(newQuoteLines[index].quantity, 10) || 1;
-      let discount = parseFloat(newQuoteLines[index].discount) || 0;
-      const price = parseFloat(product.salesCost) || 0;
-      const description = product.ProductDisplay;
-      const productCode = product.productCode;
-      const salesCode = product.salesCode;
-      const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
-      newQuoteLines[index].discount = validDiscount;
-      
+  console.log('Quantity before processing:', line.quantity);
 
-      const unitPrice = price;
-      const subtotal = (unitPrice - validDiscount) * quantity;
-
-      newQuoteLines[index].unitPrice = unitPrice;
-      newQuoteLines[index].subtotal = subtotal;
-      newQuoteLines[index].description = description;
-      newQuoteLines[index].productCode = productCode;
-      newQuoteLines[index].salesCode = salesCode;
-    }
-  }
-
+  // 1) Discount edits: validate + alert for ALL (single + combo)
   if (field === 'discount') {
-    const product = products.find(product => product._id === newQuoteLines[index].productId);
+    let product = null;
+    let maxDiscount = 100;
 
-    if (!product) {
+    if (line.selectionType === 'single') {
+      product = products.find(p => p._id === line.productId);
+      if (!product) {
         alert("💡 Please select a product first, before entering a discount!");
-        return; // Prevents further execution
+        setQuoteLines(newQuoteLines);
+        line.discount = 0;
+        return;
+      }
+      maxDiscount = parseFloat(product.maxDiscount) || 100;
+    } 
+    else if (line.selectionType === 'combo') {
+      const combo =
+        combos.find(c => c.comboCode === line.productId) ||
+        combos.find(c => c.comboCode === line.selectedCombo);
+      if (!combo) {
+        alert("💡 Please select a combo first, before entering a discount!");
+        setQuoteLines(newQuoteLines);
+        line.discount = 0;
+        return;
+      }
+      maxDiscount = parseFloat(combo.maxDiscount) || 100; // ✅ enforce combo maxDiscount too
     }
 
     let discount = parseFloat(value) || 0;
-    const maxDiscount = parseFloat(product.maxDiscount) || 100; 
 
     if (discount < 0) {
-        alert("⛔ Discount cannot be negative!");
-        discount = 0;
+      alert("⛔ Discount cannot be negative!");
+      discount = 0;
     } else if (discount > maxDiscount) {
-        alert(`🚫 Maximum discount allowed is ${maxDiscount}₹!`);
-        discount = maxDiscount;
+      alert(`🚫 Maximum discount allowed is ${maxDiscount}₹!`);
+      discount = maxDiscount;
     }
+    line.discount = discount;
+  }
 
-    newQuoteLines[index].discount = discount;
-}
+  // 2) Recalculate on quantity or discount
+  if (field === 'quantity' || field === 'discount') {
+    if (line.selectionType === 'single') {
+      const product = products.find(p => p._id === line.productId);
+      if (product) {
+        const quantity = parseInt(line.quantity, 10) || 1;
+        let discount = parseFloat(line.discount) || 0;
+        const maxDiscount = parseFloat(product.maxDiscount) || 100;
+
+        // ✅ Clamp silently for single
+        if (discount < 0) discount = 0;
+        if (discount > maxDiscount) discount = maxDiscount;
+        line.discount = discount;
+
+        const unitPrice = parseFloat(product.salesCost) || 0;
+        const subtotal = (unitPrice - discount) * quantity;
+
+        line.unitPrice = unitPrice;
+        line.subtotal = subtotal;
+        line.description = product.ProductDisplay || '';
+        line.productCode = product.productCode;
+        line.salesCode = product.salesCode;
+      }
+    } else if (line.selectionType === 'combo') {
+      const combo =
+        combos.find(c => c.comboCode === line.productId) ||
+        combos.find(c => c.comboCode === line.selectedCombo);
+
+      if (combo) {
+        const quantity = parseInt(line.quantity, 10) || 1;
+        let discount = parseFloat(line.discount) || 0;
+        const maxDiscount = parseFloat(combo.maxDiscount) || 100;
+
+        // ✅ Clamp silently for combo too
+        if (discount < 0) discount = 0;
+        if (discount > maxDiscount) discount = maxDiscount;
+        line.discount = discount;
+
+        const unitPrice = parseFloat(combo.salesCost) || 0;
+        const subtotal = (unitPrice - discount) * quantity;
+
+        line.unitPrice = unitPrice;
+        line.subtotal = subtotal;
+        line.description = combo.comboDisplayName || '';
+        line.productCode = combo.comboCode;
+        line.salesCode = '';
+      }
+    }
+  }
+
   setQuoteLines(newQuoteLines);
   updateTotal(newQuoteLines);
 };
-
 
 const handleAddProductRow = () => {
   setQuoteLines([
     ...quoteLines,
     {
+     productCode: '',
       productId: '',
-      productCode:'',
-      salesCode:'',
-      description:'',
+      description: '',
       quantity: 0,
       discount: 0,
       subtotal: 0,
       unitPrice: 0,
-      drStatus:'',
+      drStatus: '',
+      selectionType: 'single',   // 👈 ensure default is single
+      selectedProduct: null,     // 👈 required for product dropdown
+      selectedCombo: null        // 👈 keep null for combo
     },
   ]);
 };
 
 const handleProductSelect = (index, productId) => {
   const newQuoteLines = [...quoteLines];
-  newQuoteLines[index].productId = productId;
+  const line = newQuoteLines[index];
+  line.productId = productId;
 
-  const product = products.find(product => product._id === productId);
-  if (product) {
-    const quantity = parseInt(newQuoteLines[index].quantity, 10) || 1;
-    let discount = parseFloat(newQuoteLines[index].discount) || 0;
-    const price = parseFloat(product.salesCost) || 0;
-    const description = product.ProductDisplay || '';
-    const validDiscount = Math.min(discount, parseFloat(product.maxDiscount) || 100);
-    const productCode = product.prodcutCode;
-    const salesCode = product.salesCode;
-    const unitPrice = price;
-    const subtotal = (unitPrice - validDiscount) * quantity;
+  if (line.selectionType === "single") {
+    const product = products.find(p => p._id === productId);
+    if (product) {
+      const quantity = parseInt(line.quantity, 10) || 1;
+      const discount = Math.min(parseFloat(line.discount) || 0, parseFloat(product.maxDiscount) || 100);
+      const unitPrice = parseFloat(product.salesCost) || 0;
+      const subtotal = (unitPrice - discount) * quantity;
 
-    newQuoteLines[index].unitPrice = unitPrice;
-    newQuoteLines[index].subtotal = subtotal;
-    newQuoteLines[index].description = description;
-    newQuoteLines[index].productCode=productCode;
-    newQuoteLines[index].salesCode=salesCode;
+      line.unitPrice = unitPrice;
+      line.subtotal = subtotal;
+      line.description = product.ProductDisplay || '';
+      line.productCode = product.productCode;
+      line.salesCode = product.salesCode;
+      line.discount = discount;
+    }
+  }
+
+  if (line.selectionType === "combo") {
+    const combo = combos.find(c => c.comboCode === productId);
+    if (combo) {
+      const quantity = parseInt(line.quantity, 10) || 1;
+      const unitPrice = parseFloat(combo.salesCost) || 0;
+      const subtotal = unitPrice * quantity;
+
+      line.unitPrice = unitPrice;
+      line.subtotal = subtotal;
+      line.description = combo.comboDisplayName;
+      line.productCode = combo.comboCode;
+      line.salesCode = '';
+      line.discount = 0; // optional, combos may not allow individual discounts
+    }
   }
 
   setQuoteLines(newQuoteLines);
   updateTotal(newQuoteLines);
 };
+
 //changes made
 
 const updateTotal = (lines) => {
@@ -178,19 +334,21 @@ let discountValue = parseFloat(e.target.value) || 0;
 const maxOverallDiscount = 100; // Maximum allowed discount
 
 // Check if at least one product is selected
-const hasProduct = quoteLines.some(line => line.productId);
+const hasProductOrCombo = quoteLines.some(
+  (line) => line.productId || line.selectedCombo
+);
 
-if (!hasProduct) {  
-    alert("💡 Please select a product first, before entering a overall discount!");
-    return;
+if (!hasProductOrCombo) {  
+  alert("💡 Please select a product or combo first, before entering an overall discount!");
+  return;
 }
 
 if (discountValue < 0) {
-    alert("⛔ Overall Discount cannot be negative!");
-    discountValue = 0;
+  alert("⛔ Overall Discount cannot be negative!");
+  discountValue = 0;
 } else if (discountValue > maxOverallDiscount) {
-    alert(`🚫 Maximum allowed Overall Discount is ${maxOverallDiscount}₹!`);
-    discountValue = maxOverallDiscount;
+  alert(`🚫 Maximum allowed Overall Discount is ${maxOverallDiscount}₹!`);
+  discountValue = maxOverallDiscount;
 }
 
 setOverallDiscount(discountValue);
@@ -224,95 +382,129 @@ const calculateFinalTotal = (totalAmount, discount) => {
   console.log("current quotes",currentQuotes )
 //changes made to disable button
   const handleSubmitQuote = () => {
-    console.log("🔹 handleSubmitQuote function triggered!");
-  
-    if (!customerId) {
-      console.log("❌ No customer selected!");
-      alert("❌ Please select a customer before submitting the quote.");
-      return;
-    }
-  
-    if (quoteLines.length === 0) {
-      console.log("❌ No products added!");
-      alert("❌ Please add at least one product.");
-      return;
-    }
-  
-    if (quoteLines.some(line => !line.productId)) {
-      console.log("❌ Missing product in one or more lines!");
-      alert("❌ Please select a product for each line.");
-      return;
-    }
-  
-    if (quoteLines.some(line => line.quantity <= 0)) {
-      console.log("❌ Quantity cannot be zero or negative!");
-      alert("❌ Please enter a valid quantity for all products.");
-      return;
-    }
-  
-    console.log("✅ All validations passed, submitting the quote...");
-    console.log("quote lines", quoteLines);
-    const quoteData = {
-      customer_id: customerId,
-     
-   //   quoteTag: `QUOTE_TAG-${quoteLines.map(line => line.productCode).join('-')}`, // Adding productCode to the quoteTag
-      quoteTag: `${quoteLines.map(line => `${line.productCode}(${line.quantity})`).join('-')}`,  // Join them with a dash
-      items: quoteLines.map(line => ({
-        description: line.description,
+  console.log("🔹 handleSubmitQuote function triggered!");
+
+  // ✅ Validation 1: Customer must be selected
+  if (!customerId) {
+    alert("⚠️ Please select a customer before submitting the quote!");
+    return;
+  }
+
+  // ✅ Validation 2: At least one product line required
+  if (quoteLines.length === 0) {
+    alert("⚠️ Please add at least one product before submitting!");
+    return;
+  }
+
+  // ✅ Validation 3: Product ID must be present
+  if (quoteLines.some(line => !line.productId)) {
+    alert("⚠️ One or more lines are missing a product!");
+    return;
+  }
+
+  // ✅ Validation 4: Quantity must be > 0
+  if (quoteLines.some(line => line.quantity <= 0)) {
+    alert("⚠️ Quantity must be greater than 0 for all products!");
+    return;
+  }
+
+  console.log("✅ All validations passed, submitting the quote...");
+
+  const quoteData = {
+    customer_id: customerId,
+    quoteTag: `${quoteLines.map(line => `${line.productCode}(${line.quantity})`).join('-')}`,
+    items: quoteLines.map(line => {
+      // Detect if this is a combo
+      const combo = combos.find(c => c.comboCode === line.productId);
+      let description = line.description;
+      let unitPrice = line.unitPrice;
+      let subtotal = line.subtotal;
+
+      if (combo) {
+        description = combo.comboDisplayName;
+        unitPrice = parseFloat(combo.salesCost) || 0;
+        subtotal = unitPrice * (parseInt(line.quantity, 10) || 1);
+      }
+
+      return {
+        description,
         prodcutCode: line.productCode,
-        salesCode:line.salesCode,
+        salesCode: line.salesCode,
         quantity: line.quantity,
         discount: line.discount,
-        unit_price: line.unitPrice,
-        sub_total: line.subtotal,
+        unit_price: unitPrice,
+        sub_total: subtotal,
         dr_status: line.drStatus,
-        product_id:line.productId
-      })),
-      gross_total: finalTotal,
-      overall_discount: overallDiscount, // Include the overall discount
-      tax_amount: taxAmount, // Include the tax amount
-    };
-  
-    console.log("📝 Dispatching createQuote action:", quoteData);
-    dispatch(createQuote(quoteData));
-    // ✅ Reset the form fields after submission
-    setQuoteLines([{
-      productCode: '',
-      productId: '',
-      description: '',
-      quantity: 0,
-      discount: 0,
-      subtotal: 0,
-      unitPrice: 0,
-      drStatus: '',
+        product_id: line.productId
+      };
+    }),
+    gross_total: finalTotal,
+    overall_discount: overallDiscount,
+    tax_amount: taxAmount,
+  };
+
+  console.log("📝 Dispatching createQuote action:", quoteData);
+  dispatch(createQuote(quoteData));
+
+  alert("✅ Quote submitted successfully!");
+
+  // ✅ Reset the form fields after submission
+  setQuoteLines([{
+    productCode: '',
+    productId: '',
+    description: '',
+    quantity: 0,
+    discount: 0,
+    subtotal: 0,
+    unitPrice: 0,
+    drStatus: '',
   }]);
 
   setTotal(0);
   setFinalTotal(0);
   setOverallDiscount(0);
   setTaxAmount(0);
+
   console.log("🔄 Form reset successfully!");
-  };
-  
-  
+};
 
-// Handle click outside to close slider chnages below
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (sliderRef.current && !sliderRef.current.contains(event.target)) {
-        onClose(); // Close the slider
+useEffect(() => {
+  function handleClick(e) {
+    let clickedInsideSlider = wrapperRef.current?.contains(e.target);
+
+    quoteLinesRef.current.forEach((line, i) => {
+      const triggerEl = triggerRefs.current[i];
+      const portalEl = portalRefs.current[i];
+
+      const clickedInsideDropdown =
+        triggerEl?.contains(e.target) || portalEl?.contains(e.target);
+
+      // Close dropdown if click outside trigger + portal
+      if (line.dropdownOpen && !clickedInsideDropdown) {
+        const newLines = [...quoteLinesRef.current];
+        newLines[i].dropdownOpen = false;
+        setQuoteLines(newLines);
       }
-    };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [onClose]);
+      // Prevent slider from closing if click inside dropdown
+      if (clickedInsideDropdown) {
+        clickedInsideSlider = true;
+      }
+    });
+
+    // Close slider if clicked completely outside wrapper + portal
+    if (!clickedInsideSlider) {
+      onClose();
+    }
+  }
+
+  document.addEventListener("mousedown", handleClick);
+  return () => document.removeEventListener("mousedown", handleClick);
+}, [onClose]);
 
   return (
 
-<div ref={sliderRef}  className="quote-slider show">
+<div ref={wrapperRef}  className="quote-slider show">
       <div className="quote-slider-content">
         <div className="quote-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
@@ -326,25 +518,172 @@ const calculateFinalTotal = (totalAmount, discount) => {
         <div className="quote-create-section">
           {quoteLines.map((line, index) => (
             <div key={index} className="quote-line">
-              <div className="dropdown-container">
-              <select
-                className="quote-select"
-                value={line.productId}
-                onChange={(e) => handleProductSelect(index, e.target.value)}
-                required
-              >
-                <option value="" disabled>Select a Product</option>
-                {products && products.length > 0 ? (
-                  products.map((product) => (
-                    <option key={product._id} value={product._id}>
-                      {product.productName} ({product.productCode}) - {product.ProductDisplay}
-                    </option>
-                  ))
-                ) : (
-                  <option value="" disabled>No products available</option>  // Optional fallback if no products
-                )}
-              </select>
+
+              {/* SELECTION TYPE */}
+        <div className="selection-type">
+          <select
+            value={line.selectionType}
+            onChange={(e) => {
+              const val = e.target.value;
+              const newLines = [...quoteLines];
+              newLines[index].selectionType = val;
+              newLines[index].selectedProduct = null;
+              newLines[index].selectedCombo = "";
+              setQuoteLines(newLines);
+            }}
+            className="select-product-type"
+          >
+            <option value="" disabled>
+              Select Product Type
+            </option>
+            <option value="single">Single Product</option>
+            <option value="combo">Combo Product</option>
+          </select>
+        </div>
+             <div className="quote-wrapper">
+
+{/* SINGLE PRODUCT DROPDOWN */}
+{line.selectionType === "single" && (
+  <div className="single-product-container">
+    {/* Trigger box */}
+    <div
+      ref={(el) => (triggerRefs.current[index] = el)}
+      onClick={(e) => {
+        e.stopPropagation(); // Prevent slider closure
+        const newLines = [...quoteLines];
+        const nextOpen = !newLines[index].dropdownOpen;
+        newLines[index].dropdownOpen = nextOpen;
+        setQuoteLines(newLines);
+
+        // Position the portal under the trigger
+        const el = triggerRefs.current[index];
+        if (nextOpen && el) {
+          const r = el.getBoundingClientRect();
+          setPortalPos({
+            top: r.bottom + window.scrollY,
+            left: r.left + window.scrollX,
+          });
+        }
+      }}
+      className="single-product-trigger"
+    >
+      {line.selectedProduct
+        ? `${line.selectedProduct.productName} (${line.selectedProduct.productCode})`
+        : "Select Category"}
+    </div>
+
+    {/* Render dropdown into body */}
+    {line.dropdownOpen &&
+      createPortal(
+        <div
+          ref={(el) => (portalRefs.current[index] = el)}
+          style={{
+            position: "absolute",
+            top: portalPos.top,
+            left: portalPos.left,
+            zIndex: 10000,
+          }}
+          onClick={(e) => e.stopPropagation()} // Prevent slider closure
+        >
+          <div className="product-dropdown">
+            {/* Left panel: Categories */}
+            <div className="product-categories">
+              {categories.map((cat) => (
+                <div
+                  key={cat._id}
+                  onMouseEnter={() => setHoveredCatId(cat._id)}
+                  onClick={() => setActiveCatId(cat._id)}
+                  className={`category-item ${
+                    hoveredCatId === cat._id ? "hovered" : ""
+                  }`}
+                >
+                  {cat.categoryName} ({cat.products.length})
+                </div>
+              ))}
             </div>
+
+            {/* Right panel: Products */}
+            <div className="product-list">
+              {currentCatId &&
+                categories
+                  .find((c) => c._id === currentCatId)
+                  ?.products.map((p) => (
+                    <div
+                      key={p._id}
+                      onClick={() => {
+                        const newLines = [...quoteLines];
+                        newLines[index].selectedProduct = p;
+                        newLines[index].productId = p._id;
+                        newLines[index].dropdownOpen = false; // 👈 close dropdown after selection
+                        setQuoteLines(newLines);
+                        handleProductSelect(index, p._id);
+                      }}
+                      className={`product-item ${
+                        line.selectedProduct?._id === p._id ? "selected" : ""
+                      }`}
+                    >
+                      {p.productName} ({p.ProductDisplay || ""}) — Code: {p.productCode}
+                    </div>
+                  ))}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+  </div>
+)}
+        {/* COMBO PRODUCT DROPDOWN */}
+        {line.selectionType === "combo" && (
+          <div className="combo-container">
+            {loading ? (
+              <div className="loading">Loading combos...</div>
+            ) : combos.length === 0 ? (
+              <div className="no-combos">No combos available</div>
+            ) : (
+              <div>
+                <select
+                  value={line.selectedCombo || ""}
+                  onChange={(e) => {
+                    const selectedComboCode = e.target.value;
+                    const newLines = [...quoteLines];
+                    newLines[index].selectedCombo = selectedComboCode;
+                    newLines[index].productId = selectedComboCode;
+                    setQuoteLines(newLines);
+
+                    const combo = combos.find(
+                      (c) => c.comboCode === selectedComboCode
+                    );
+                    if (combo) {
+                      const quantity =
+                        parseInt(newLines[index].quantity, 10) || 1;
+                      const unitPrice = parseFloat(combo.salesCost) || 0;
+                      const subtotal = unitPrice * quantity;
+
+                      newLines[index].unitPrice = unitPrice;
+                      newLines[index].subtotal = subtotal;
+                      newLines[index].description = combo.comboDisplayName;
+                      newLines[index].productCode = combo.comboCode;
+                      newLines[index].salesCode = "";
+                      newLines[index].discount = 0;
+
+                      setQuoteLines(newLines);
+                      updateTotal(newLines);
+                    }
+                  }}
+                  className="combo-select-quote"
+                >
+                  <option value="">Select Combo</option>
+                  {combos.map((c) => (
+                    <option key={c.comboCode} value={c.comboCode}>
+                      {c.comboDisplayName} (Code: {c.comboCode})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
              <input
   type="number"
@@ -352,6 +691,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
   value={line.quantity || ""} // Allows placeholder to show when empty
   onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
   placeholder={`Quantity`} // Dynamic placeholder
+  min="1"
   required
 />
 

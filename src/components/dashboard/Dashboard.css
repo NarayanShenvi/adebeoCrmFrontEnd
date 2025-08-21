@@ -995,6 +995,164 @@ html, body {
   font-weight: 800; 
 }
 
+/**modefied product with categories and combo**/
+.quote-wrapper {
+font-family: "Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.select-product-type {
+  flex: 2; /* Larger width for dropdown */
+  min-width: 140px;
+  max-width: 150px;
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 3px;     font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+.select-product-type:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+  outline: none;
+}
+.select-product-type:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+/* Trigger box (always min-width 360px) */
+.single-product-trigger {
+  flex: 2;
+  min-width: 140px;
+  max-width: 150px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px 3px;
+  font-size: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+  cursor: pointer;
+
+  white-space: nowrap;       /* keep it single line */
+  overflow: hidden;          /* hide overflow */
+  text-overflow: clip;       /* no ellipsis, just clip */
+}
+
+
+.single-product-trigger:hover {
+  background-color: rgba(52, 164, 245, 0.31);
+}
+
+.single-product-trigger:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+  outline: none;
+}
+
+/* Dropdown wrapper (width matches trigger, not fixed 720px) */
+.product-dropdown {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 4px;
+  width: 100%;               /* match the trigger width */
+  min-width: 360px;          /* enforce same min width */
+  background-color: white;
+  z-index: 9999;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+/* Left panel (Categories) */
+.product-categories {
+  flex: 1;                   /* half width */
+  border-right: 1px solid #ccc;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: #555555;
+}
+
+/* Category items */
+.category-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  background-color: white;
+  transition: background-color 0.3s;
+}
+
+.category-item:hover,
+.category-item.hovered {
+  background-color: rgba(52, 164, 245, 0.31);
+}
+
+/* Right panel (Products) */
+.product-list {
+  flex: 1;                   /* half width */
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: #555555;
+}
+
+/* Product items */
+.product-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  background-color: white;
+  transition: background-color 0.3s;
+}
+
+.product-item:hover {
+  background-color: rgba(52, 164, 245, 0.31);
+}
+
+.product-item.selected {
+  background-color: rgba(134, 195, 238, 0.6);
+}
+
+
+.combo-select-quote {
+  flex: 2; /* Larger width for dropdown */
+  min-width: 140px;
+  max-width: 150px;
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 3px;     font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+.combo-select-quote:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+  outline: none;
+}
+.combo-select-quote:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+
 /* Quote Buttons */
 .add-quote
 {
@@ -1766,6 +1924,34 @@ input.form-control-ref:focus {
 .amount {
   color: rgba(0, 0, 0, 0.747);
   font-weight: bold;
+}
+
+
+.select-product-type-po {
+  flex: 2; /* Larger width for dropdown */
+  min-width: 140px;
+  max-width: 150px;
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 3px;     font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+  margin-bottom: 10px;
+}
+.select-product-type-po:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+  outline: none;
+}
+.select-product-type-po:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
 }
 
 .submit-button-po {

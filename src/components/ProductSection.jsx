@@ -128,7 +128,56 @@ priceUSD: 0,               // ✅ new backend field
       });
     }
   }, [mode, productToEdit]);
- 
+ // Function to reset single product form
+const [resetCounter, setResetCounter] = useState(0); // force re-render
+const defaultSingleFormData = {
+  productName: '',
+  productCode: '',
+  ProductDisplay: '',
+  ProductCompanyName: '',
+  Contact: '',
+  address: '',
+  companyGstin: '',
+  primaryLocality: '',
+  secondaryLocality: '',
+  city: '',
+  state: '',
+  pincode: '',
+  email: '',
+  salesCode: '',
+  purchaseCost: '',
+  salesCost: '',
+  drStatus: '',
+  maxDiscount: '',
+  type: "product",            // default
+  prodisEnabled: false,       // default
+  subscriptionDuration: "1 Year", // default
+  showCostFields: false,      // default
+  categoryCode: "",           // default
+  isUSD: false,               // default
+  priceUSD: 0,                // default
+  priceINR: 0,                // default
+};
+
+const resetSingleForm = () => {
+  setFormData({ ...defaultSingleFormData }); // restores all defaults
+  setSelectedCategory(''); // resets dropdown
+  setResetCounter(prev => prev + 1); // force re-render
+};
+
+// Function to reset combo product form
+const resetComboForm = () => {
+  setFormData({
+    productName: "",
+    productCode: "",
+    ProductDisplay: "",
+    salesCode: "",
+    salesCost: "",
+    maxDiscount: "",
+  });
+  setComboProducts([{ name: "", productId: "", quantity: 1, salesCost: 0 }]);
+};
+
   const [loadingCategories, setLoadingCategories] = useState(false);
 const [errorCategories, setErrorCategories] = useState('');
 
@@ -151,21 +200,25 @@ const [errorCategories, setErrorCategories] = useState('');
     }
   }, [isCombo]);
 
- useEffect(() => {
+useEffect(() => {
   if (isCombo) {
+    // Only recalc if user is editing quantities, not just selecting existing combo
     const total = comboProducts.reduce(
       (acc, item) =>
-        acc + (parseFloat(item.salesCost || 0) * parseFloat(item.quantity || 0)),
+        acc +
+        (parseFloat(item.salesCost || 0) * parseFloat(item.quantity || 0)),
       0
     );
 
-    setFormData((prev) => ({
-      ...prev,
-      salesCost: total.toFixed(2),
-    }));
+    // ✅ Only update if total > 0, otherwise keep backend value
+    if (total > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        salesCost: total.toFixed(2),
+      }));
+    }
   }
 }, [comboProducts, isCombo]);
- 
 useEffect(() => {
   dispatch(fetchCategoriesAsync());
 }, [dispatch]);
@@ -241,10 +294,17 @@ const handleComboChange = (index, field, value) => {
   };
   
   // Handle search input change for productName
-  
+ 
+
 const [searchTerm, setSearchTerm] = useState("");
+ useEffect(() => {
+  // Clear search input and results when switching between single/combo or changing edit mode
+  setSearchTerm("");
+  setSearchResults([]);
+}, [isCombo, mode]);
 const handleSearchChange = async (e) => {
   const term = e.target.value;
+  setSearchTerm(term);
 
   if (term.length < 3) {
     setSearchResults([]);
@@ -252,19 +312,29 @@ const handleSearchChange = async (e) => {
   }
 
   try {
+    let responseData = [];
+
     if (!isCombo) {
+      // Single product search
       const response = await axios.get(`${API}/load_edit_adebeo_products`, {
         params: { productName: term },
       });
-      setSearchResults(response.data.data || []);
+      responseData = response.data.data || [];
+      // FILTER: only include products that are NOT combos
+      responseData = responseData.filter(p => !p.comboCode && p.type === "product");
     } else {
+      // Combo product search
       const token = localStorage.getItem("Access_Token");
       const response = await axios.get(`${API}/getComboProducts`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         params: { name: term },
       });
-      setSearchResults(response.data.data || []);
+      responseData = response.data.data || [];
+      // FILTER: only include products that are combos
+      responseData = responseData.filter(p => !!p.comboCode);
     }
+
+    setSearchResults(responseData);
   } catch (error) {
     console.error("Error fetching search results:", error);
     setSearchResults([]);
@@ -273,45 +343,48 @@ const handleSearchChange = async (e) => {
 
 const handleSelectProduct = (e) => {
   const selectedId = e.target.value;
-
   const selectedProduct = searchResults.find(
     (p) => (!isCombo ? p._id === selectedId : p.comboCode === selectedId)
   );
-
   if (!selectedProduct) return;
 
   if (!isCombo) {
-    // Single product populate
-    setFormData({
-      ...formData,
-      ...selectedProduct,
-    });
-  } else {
-    // Combo product populate with proper nesting
-    const comboObj = {
-      comboCode: selectedProduct.comboCode,
-      comboDisplayName: selectedProduct.comboDisplayName,
-      salesCode: selectedProduct.salesCode,
-      salesCost: parseFloat(selectedProduct.salesCost) || 0,
-      maxDiscount: parseFloat(selectedProduct.maxDiscount) || 0,
-      products: selectedProduct.products.map((p) => ({
-        productId: p.productId,
-        productCode: p.productCode,
-        productName: p.productName,
-        quantity: p.quantity,
-        salesCost: parseFloat(p.salesCost || 0),
-      })),
-    };
+  setFormData({
+    ...formData,
+    ...selectedProduct,                // backend fields like _id, productCode, etc.
+    type: selectedProduct.type || "product",
+    subscriptionDuration: selectedProduct.subscriptionDuration || "1 Year",
+    prodisEnabled: selectedProduct.prodisEnabled ?? false,
+    showCostFields: selectedProduct.showCostFields ?? false,
+    isUSD: selectedProduct.isUSD ?? false,
+    priceUSD: selectedProduct.priceUSD ?? 0,
+    priceINR: selectedProduct.priceINR ?? 0,
+  });
 
-    setFormData({
-      ...formData,
-      productName: selectedProduct.comboDisplayName, // display in input
-      productCode: selectedProduct.comboCode,
-      salesCode: selectedProduct.salesCode,
-      salesCost: parseFloat(selectedProduct.salesCost) || 0,
-      maxDiscount: parseFloat(selectedProduct.maxDiscount) || 0,
-      comboProducts: [comboObj], // ✅ full combo with nested products
-    });
+  setSelectedCategory(selectedProduct.categoryCode || "");
+}
+
+ else {
+  
+    // ✅ Combo product
+setFormData({
+  ...formData,
+  productCode: selectedProduct.comboCode,
+  ProductDisplay: selectedProduct.comboDisplayName,
+  salesCode: selectedProduct.salesCode,
+  salesCost: parseFloat(selectedProduct.salesCost) || 0, // ✅ use selectedProduct value
+  maxDiscount: selectedProduct.maxDiscount,
+});
+
+
+setComboProducts(
+  selectedProduct.products.map((p) => ({
+    name: p.productId,
+    productId: p.productId,
+    quantity: p.quantity,
+    salesCost: p.salesCost !== undefined ? parseFloat(p.salesCost) : "" // ✅ keep true value
+  }))
+);
   }
 
   setSearchResults([]);
@@ -322,52 +395,94 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   if (mode === 'edit') {
-    const payload = {
-      ...formData,
-      categoryCode: selectedCategory || "",
-    };
-    dispatch(updateProductAsync(payload));
-  } else {
     if (!isCombo) {
-      // keep single product logic exactly as is
+      // --- UPDATE SINGLE PRODUCT ---
       const payload = {
         ...formData,
         categoryCode: selectedCategory || "",
       };
-      dispatch(addProductAsync(payload));
-    } else { // Combo product
-  const payload = {
-    comboCode: formData.productCode,
-    comboDisplayName: formData.ProductDisplay || formData.productName,
-    salesCode: formData.salesCode,
-    salesCost: parseFloat(formData.salesCost) || 0,
-    maxDiscount: parseFloat(formData.maxDiscount) || 0,
-    products: comboProducts.map(p => ({
-      productCode: p.name,
-      productId: p.productId,
-      quantity: p.quantity,
-      salesCost: parseFloat(p.salesCost || 0)
-    }))
-  };
-   // Clear form & combo list after submit
-        setFormData({
-          productCode: "",
-          productName: "",
-          ProductDisplay: "",
-          salesCode: "",
-          salesCost: "",
-          maxDiscount: "",
-        });
-        setComboProducts([{ name: "", productId: "", quantity: 1, salesCost: 0 }]);
-  const result = await dispatch(addComboProductAsync(payload));
+      const result = await dispatch(updateProductAsync(payload));
 
-  if (result?.message) {
-    alert(result.message); // e.g. "Combo product created successfully"
-  } else if (result?.error) {
-    alert(result.error); // e.g. "ComboCode already exists"
-  }
-}
+      if (result?.message) {
+        alert(result.message); // success message from backend
+        resetSingleForm();
+  resetComboForm();
+      } else if (result?.error) {
+        alert(result.error);
+        
+      }
+    } else {
+      // --- UPDATE COMBO PRODUCT ---
+      const payload = {
+  comboCode: formData.productCode,
+  comboDisplayName: formData.ProductDisplay || formData.productName,
+  salesCode: formData.salesCode,
+  salesCost: String(formData.salesCost || 0),   // send as string
+  maxDiscount: String(formData.maxDiscount || 0),
+  products: comboProducts.map(p => ({
+    productCode: p.name,
+    productId: p.productId,
+    quantity: String(p.quantity),               // string
+    salesCost: String(p.salesCost || 0)         // string
+  }))
+};
 
+      const result = await dispatch(updateComboProductAsync(payload));
+
+      if (result?.message) {
+        alert(result.message); // e.g. "Combo updated successfully"
+        resetSingleForm();
+  resetComboForm();
+      } else if (result?.error) {
+        alert(result.error);
+        
+      }
+    }
+  } else {
+    if (!isCombo) {
+      // --- ADD SINGLE PRODUCT ---
+      const payload = {
+        ...formData,
+        categoryCode: selectedCategory || "",
+      };
+      const result = await dispatch(addProductAsync(payload));
+
+      if (result?.message) {
+        alert(result.message);
+        resetSingleForm();
+  resetComboForm();
+      } else if (result?.error) {
+        alert(result.error);
+        
+      }
+    } else {
+      // --- ADD COMBO PRODUCT ---
+      const payload = {
+        comboCode: formData.productCode,
+        comboDisplayName: formData.ProductDisplay || formData.productName,
+        salesCode: formData.salesCode,
+        salesCost: parseFloat(formData.salesCost) || 0,
+        maxDiscount: parseFloat(formData.maxDiscount) || 0,
+        products: comboProducts.map(p => ({
+          productCode: p.name,
+          productId: p.productId,
+          quantity: p.quantity,
+          salesCost: parseFloat(p.salesCost || 0)
+        }))
+      };
+
+      const result = await dispatch(addComboProductAsync(payload));
+
+      if (result?.message) {
+        alert(result.message); // success message
+        // Clear form after successful creation
+       resetSingleForm();
+  resetComboForm();
+      } else if (result?.error) {
+        alert(result.error);
+        
+      }
+    }
   }
 };
 
@@ -409,6 +524,8 @@ const handleSubmit = async (e) => {
         onChange={() => {
           setIsCombo(false);
           setFormData(singleFormData);
+          resetSingleForm();      // refresh single product form
+
         }}
       />{" "}
       Single Product
@@ -448,6 +565,8 @@ const handleSubmit = async (e) => {
             priceINR: 0,               // ✅ new backend field
   categoryCode: selectedCategory || "", // single string
           });
+              resetComboForm();      // refresh combo product form
+
         }}
       />{" "}
       Combo Product
@@ -484,30 +603,30 @@ const handleSubmit = async (e) => {
   )}
 </div>
 
-{successMessage && <p className="success-prod">{successMessage}</p>}
-      {error && <p className="error-prod">{error}</p>}
 
       {/* Show search input and dropdown if in Edit mode */}
       {mode === 'edit' && (
   <div>
+    {/* Search input */}
     <input
-  className="search-field-prod"
-  type="text"
-  placeholder={isCombo ? "Search by Combo Product Name" : "Search by Product Name"}
-  value={searchTerm}
-  onChange={(e) => {
-    setSearchTerm(e.target.value);
-    handleSearchChange(e);
-  }}
-/>
+      className="search-field-prod"
+      type="text"
+      placeholder={isCombo ? "Search by Combo Product Name" : "Search by Product Name"}
+      value={searchTerm}
+      onChange={(e) => {
+        setSearchTerm(e.target.value);
+        handleSearchChange(e); // your existing search handler
+      }}
+    />
 
+    {/* Search results dropdown */}
     <div className="search-field1-prod">
       {loading ? (
         <p className="ProductsLoading">Loading...</p>
       ) : searchResults.length > 0 ? (
-       <select
+        <select
   onChange={handleSelectProduct}
-  value={!isCombo ? formData._id || "" : ""}
+  value={!isCombo ? formData._id || "" : formData.productCode || ""}
 >
   <option value="" disabled>
     {isCombo ? "Select a combo product" : "Select a product"}
@@ -524,7 +643,6 @@ const handleSubmit = async (e) => {
   ))}
 </select>
 
-
       ) : (
         <p className="NoProductsFound">No products found...</p>
       )}
@@ -533,8 +651,7 @@ const handleSubmit = async (e) => {
 )}
 
 
-
-      <Form onSubmit={handleSubmit}className='product-form'>
+      <Form key={resetCounter} onSubmit={handleSubmit}className='product-form'>
         {!isCombo && (
     <>
       {/* ----------- FULL ORIGINAL FORM (EXACTLY AS YOU HAD) ----------- */}
@@ -543,7 +660,7 @@ const handleSubmit = async (e) => {
       <Form.Group className="form-group-prod">
         <Form.Label className="required-label">Product Name:</Form.Label>
 
-        {!isCombo ? (
+       
           <Form.Control
             type="text"
             name="productName"
@@ -553,67 +670,7 @@ const handleSubmit = async (e) => {
             placeholder="Enter product name"
             required
           />
-        ) : (
-          <div>
-            {comboProducts.map((item, idx) => (
-              <div key={idx} className="d-flex gap-2 align-items-center mb-1">
-                <select
-                  disabled={mode === "edit"}
-                  className="form-control"
-                  value={item.name}
-                  onChange={e => handleComboChange(idx, 'name', e.target.value)}
-                >
-                  <option value="">Select Product</option>
-                  {productList.map((product) => {
-                    const alreadySelected = comboProducts.some(
-                      (row, i) => i !== idx && row.name === product._id
-                    );
-                    return (
-                      <option
-                        key={product._id}
-                        value={product._id}
-                        disabled={alreadySelected}
-                      >
-                        {product.productName}
-                      </option>
-                    );
-                  })}
-                </select>
-
-                <input
-                  type="number"
-                  disabled={mode === "edit"}
-                  className="form-control w-25"
-                  value={item.quantity}
-                  min={1}
-                  onChange={(e) => handleComboChange(idx, 'quantity', e.target.value)}
-                />
-
-                <MdAddBox
-                  className={`add-prod ${mode === 'edit' ? 'disabled-icon' : ''}`}
-                  size={20}
-                  onClick={mode === 'edit' ? undefined : addComboRow}
-                  title={mode === 'edit' ? "Disabled in Edit Mode" : "Add Product"}
-                  style={{
-                    cursor: mode === 'edit' ? 'not-allowed' : 'pointer',
-                    opacity: mode === 'edit' ? 0.5 : 1
-                  }}
-                />
-
-                <MdDelete
-                  className={`delete-prod ${mode === 'edit' ? 'disabled-icon' : ''}`}
-                  size={20}
-                  onClick={mode === 'edit' ? undefined : () => removeComboRow(idx)}
-                  title={mode === 'edit' ? "Disabled in Edit Mode" : "Delete Product"}
-                  style={{
-                    cursor: mode === 'edit' ? 'not-allowed' : 'pointer',
-                    opacity: mode === 'edit' ? 0.5 : 1
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+    
       </Form.Group>
 
       {/* ✅ Product Category Dropdown - only shown when not a combo */}
@@ -987,7 +1044,7 @@ const handleSubmit = async (e) => {
                 <select
   disabled={mode === "edit"}
   className="form-control"
-  value={item.name}       // now this is the _id, matching option.value
+  value={item.name}  // ✅ now this is productId
   onChange={(e) => handleComboChange(idx, "name", e.target.value)}
 >
   <option value="">Select Product</option>
@@ -1002,6 +1059,7 @@ const handleSubmit = async (e) => {
     );
   })}
 </select>
+
                 <input
                   type="number"
                   disabled={mode === "edit"}
@@ -1095,19 +1153,20 @@ const handleSubmit = async (e) => {
           <Form.Group className="form-group-prod">
             <Form.Label className="required-label">Sales Cost:</Form.Label>
             <Form.Control
-              type="number"
-              name="salesCost"
-              value={formData.salesCost || ""}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === "" || parseFloat(value) >= 0) {
-                  setFormData((prev) => ({ ...prev, salesCost: value }));
-                }
-              }}
-              min="0"
-              placeholder="Enter sales cost"
-              required
-            />
+  type="number"
+  name="salesCost"
+  value={formData.salesCost || ""}
+  onChange={(e) => {
+    const value = e.target.value;
+    if (value === "" || parseFloat(value) >= 0) {
+      setFormData((prev) => ({ ...prev, salesCost: value }));
+    }
+  }}
+  min="0"
+  placeholder="Enter sales cost"
+  required
+/>
+
           </Form.Group>
         </Col>
         <Col md={6}>

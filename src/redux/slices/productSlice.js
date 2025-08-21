@@ -86,17 +86,19 @@ export const searchProductsAsync = (productName) => async (dispatch) => {
 // Async Thunk to update a product (PUT)
 export const updateProductAsync = (productData) => async (dispatch) => {
   dispatch(setLoading(true));
-
   try {
     const response = await axios.put(`${API}/update_adebeo_product/${productData._id}`, productData);
     console.log('Update API response:', response);
-    
+
     if (response.status === 200) {
-      // Optionally, update the products list or just fetch updated products
-      dispatch(fetchProductsAsync());  // Re-fetch products after update
+      dispatch(fetchProductsAsync()); // refresh products
+      return { message: "Product updated successfully" }; // <-- return message
+    } else {
+      return { error: "Failed to update product" }; // <-- return error
     }
   } catch (error) {
     dispatch(setError('Failed to update product.'));
+    return { error: error.response?.data?.error || error.message || "Update failed" };
   } finally {
     dispatch(setLoading(false));
   }
@@ -105,21 +107,37 @@ export const updateProductAsync = (productData) => async (dispatch) => {
 // Async Thunk to add a new product (POST)
 export const addProductAsync = (productData) => async (dispatch) => {
   dispatch(setLoading(true));
-
   try {
     const response = await axios.post(`${API}/create_adebeo_products`, productData);
     console.log('Add API response:', response);
-    
+
     if (response.status === 200) {
-      // Optionally, update the products list
-      dispatch(fetchProductsAsync());  // Re-fetch products after adding
+      dispatch(fetchProductsAsync()); // refresh products
+      return { message: "Product added successfully" };
+    } else {
+      return { error: "Failed to add product" };
     }
   } catch (error) {
-    dispatch(setError('Failed to add product.'));
+    let errorMsg = "Failed to add product";
+
+    if (error.response) {
+      if (error.response.status === 409) {
+        // Backend returns 409 Conflict if product exists
+        errorMsg = "Product code already exists";
+      } else if (error.response.data?.error) {
+        errorMsg = error.response.data.error;
+      }
+    } else if (error.message) {
+      errorMsg = error.message;
+    }
+
+    dispatch(setError(errorMsg));
+    return { error: errorMsg };
   } finally {
     dispatch(setLoading(false));
   }
 };
+
 
 // Add combo product
 export const addComboProductAsync = (payload) => async (dispatch) => {
@@ -182,20 +200,42 @@ export const fetchComboProductsAsync = (name = '') => async (dispatch) => {
 };
 
 
-
-// Update combo product
-export const updateComboProductAsync = ({ combo_code, updateFields }) => async (dispatch) => {
+// Async Thunk to update a combo product (PUT)
+export const updateComboProductAsync = (payload) => async (dispatch) => {
   dispatch(setLoading(true));
+
   try {
     const token = localStorage.getItem('Access_Token');
-    const response = await axios.put(`${API}/updateComboProduct/${combo_code}`, updateFields, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    if (response.status === 200) {
-      dispatch(fetchComboProductsAsync()); // Refresh after update
+
+    const response = await axios.put(
+  `${API}/updateComboProduct/${payload.comboCode}`,
+  payload,
+  {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  }
+);
+    console.log("Update Combo API response:", response);
+
+    // ✅ success case
+    if (response.data?.message) {
+      dispatch(fetchComboProductsAsync()); // refresh combo list
+      return { message: response.data.message };
     }
+
+    // ❌ error case
+    if (response.data?.error) {
+      return { error: response.data.error };
+    }
+
+    return { error: "Unknown response from server" };
+
   } catch (error) {
-    dispatch(setError('Failed to update combo product.'));
+    const errMsg =
+      error.response?.data?.error ||
+      error.message ||
+      "Failed to update combo product.";
+    dispatch(setError(errMsg));
+    return { error: errMsg };
   } finally {
     dispatch(setLoading(false));
   }
