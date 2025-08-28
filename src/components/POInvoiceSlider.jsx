@@ -207,6 +207,7 @@ const currentProducts = useMemo(() => {
       subtotal: item.subtotal,
       unitPrice: item.unitPrice,
       drStatus: item.drStatus,
+      isCombo: item.isCombo ?? false,
       selectionType: 'single',   // ADD THIS
       selectedProduct: null,     // ADD THIS (optional: prefill if products list available)
       selectedCombo: '',         // ADD THIS
@@ -230,6 +231,7 @@ const currentProducts = useMemo(() => {
       subtotal: item.sub_total || 0,
       unitPrice: item.unit_price || 0,
       drStatus: item.dr_status || "",
+      isCombo: item.isCombo ?? false,
       productId: item.product_id || 0,
       selectionType: 'single',     // Added for dropdown logic
       selectedProduct: null,       // Optional: prefill if products available
@@ -491,9 +493,11 @@ const currentProducts = useMemo(() => {
   unitPrice: parseFloat(item.unit_price) || 0,
   drStatus: item.dr_status || "",
   productId: item.product_id || 0,
+  isCombo: item.hasOwnProperty("isCombo") ? item.isCombo : false, // safest check
   selectionType: item.selectionType || "single",
   selectedCombo: item.selectedCombo || ""
 }));
+//console.log("🧾 Normalized invoice lines:", quoteItems);
 
 setOverallDiscount(selectedQuote.overall_discount || 0);
 setTaxAmount(selectedQuote.tax_amount || 0);
@@ -530,22 +534,29 @@ updateTotal(quoteItems);
   // --- PREPARE DATA ---
   const proformaInvoiceData = {
     customer_id: customerId,
+    
     preformaTag: `${invoiceLines.map(line => `${line.productCode}(${line.quantity})`).join('-')}`,
     quote_number: selectedQuoteDetails?.quote_number || null,
     refPoValue: refPoValue || "",
     quote_tag: selectedQuoteDetails?.quote_tag || null,
+    
     items: invoiceLines.map(line => {
       const combo = combos.find(c => c.comboCode === line.productId);
       let description = line.description;
       let unitPrice = line.unitPrice;
       let subtotal = line.subtotal;
+      
 
       if (combo) {
         description = combo.comboDisplayName;
         unitPrice = parseFloat(combo.salesCost) || 0;
         subtotal = unitPrice * (parseInt(line.quantity, 10) || 1);
+      
       }
-
+      //console.log("Line productId:",selectedQuoteDetails);
+      //console.log("Line productId:", line.productId);
+      //console.log("line.isCombo before:", line.isCombo);
+      //console.log("line.isCombo (type):", typeof line.isCombo);
       return {
         description,
         productCode: line.productCode,
@@ -555,7 +566,9 @@ updateTotal(quoteItems);
         unit_price: unitPrice,
         sub_total: subtotal,
         dr_status: line.drStatus,
-        product_id: line.productId
+        product_id: line.productId,
+        isCombo: line.isCombo ?? false, // Add this line
+       // isCombo: !!line.isCombo,
       };
     }),
     gross_total: finalTotal,
@@ -716,6 +729,7 @@ updateTotal(quoteItems);
               const val = e.target.value;
               const newLines = [...invoiceLines];
               newLines[index].selectionType = val;
+             // newLines[index].isCombo = val === 'combo'; 
               newLines[index].selectedProduct = null;
               newLines[index].selectedCombo = "";
               setInvoiceLines(newLines);
@@ -838,6 +852,7 @@ updateTotal(quoteItems);
                       const newLines = [...invoiceLines];
                       newLines[index].selectedCombo = selectedComboCode;
                       newLines[index].productId = selectedComboCode;
+                    //  newLines[index].isCombo = false; //ensure this is set
 
                       const combo = combos.find(
                         (c) => c.comboCode === selectedComboCode
@@ -852,6 +867,7 @@ updateTotal(quoteItems);
                         newLines[index].subtotal = subtotal;
                         newLines[index].description = combo.comboDisplayName;
                         newLines[index].productCode = combo.comboCode;
+                        newLines[index].isCombo = true; //ensure this is set
                         newLines[index].salesCode = "";
                         newLines[index].discount = 0;
                       }

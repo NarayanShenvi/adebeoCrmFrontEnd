@@ -47,6 +47,7 @@ const [quoteLines, setQuoteLines] = useState([{
   selectionType: 'single',  // add per line
   selectedProduct: null,    // add per line
   selectedCombo: '',        // add per line
+  isCombo:false,
 }]);
 const quoteLinesRef = useRef(quoteLines);
 // keep the ref updated whenever quoteLines changes
@@ -153,6 +154,7 @@ const currentProducts = useMemo(() => {
 const handleSelectionTypeChange = (index, value) => {
   const newLines = [...quoteLines];
   newLines[index].selectionType = value;
+  newLines[index].isCombo = value === 'combo'; // ✅ update isCombo here
   newLines[index].selectedProduct = null;
   newLines[index].selectedCombo = '';
   setQuoteLines(newLines);
@@ -228,6 +230,7 @@ const handleLineChange = (index, field, value) => {
         line.description = product.ProductDisplay || '';
         line.productCode = product.productCode;
         line.salesCode = product.salesCode;
+        //isCombo = false;
       }
     } else if (line.selectionType === 'combo') {
       const combo =
@@ -252,6 +255,7 @@ const handleLineChange = (index, field, value) => {
         line.description = combo.comboDisplayName || '';
         line.productCode = combo.comboCode;
         line.salesCode = '';
+ //       isCombo = true;
       }
     }
   }
@@ -298,6 +302,7 @@ const handleProductSelect = (index, productId) => {
       line.productCode = product.productCode;
       line.salesCode = product.salesCode;
       line.discount = discount;
+      line.isCombo = false; // ✅ set isCombo
     }
   }
 
@@ -314,6 +319,7 @@ const handleProductSelect = (index, productId) => {
       line.productCode = combo.comboCode;
       line.salesCode = '';
       line.discount = 0; // optional, combos may not allow individual discounts
+      line.isCombo = true; // ✅ set isCombo
     }
   }
 
@@ -435,7 +441,8 @@ const calculateFinalTotal = (totalAmount, discount) => {
         unit_price: unitPrice,
         sub_total: subtotal,
         dr_status: line.drStatus,
-        product_id: line.productId
+        product_id: line.productId,
+        isCombo: line.isCombo || false,
       };
     }),
     gross_total: finalTotal,
@@ -458,6 +465,7 @@ const calculateFinalTotal = (totalAmount, discount) => {
     subtotal: 0,
     unitPrice: 0,
     drStatus: '',
+    isCombo:false,
   }]);
 
   setTotal(0);
@@ -527,6 +535,7 @@ useEffect(() => {
               const val = e.target.value;
               const newLines = [...quoteLines];
               newLines[index].selectionType = val;
+              newLines[index].isCombo = val === 'combo'; // ✅ also update here
               newLines[index].selectedProduct = null;
               newLines[index].selectedCombo = "";
               setQuoteLines(newLines);
@@ -648,6 +657,7 @@ useEffect(() => {
                     const newLines = [...quoteLines];
                     newLines[index].selectedCombo = selectedComboCode;
                     newLines[index].productId = selectedComboCode;
+                    newLines[index].isCombo = false; 
                     setQuoteLines(newLines);
 
                     const combo = combos.find(
@@ -665,6 +675,7 @@ useEffect(() => {
                       newLines[index].productCode = combo.comboCode;
                       newLines[index].salesCode = "";
                       newLines[index].discount = 0;
+                      newLines[index].isCombo = true; // ✅ set this when selecting a combo
 
                       setQuoteLines(newLines);
                       updateTotal(newLines);
