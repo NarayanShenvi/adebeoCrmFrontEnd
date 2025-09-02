@@ -180,9 +180,10 @@ const currentProducts = useMemo(() => {
   }, [proformaInvoices]);
 
   useEffect(() => {
-    if (proformaType === "new") {
-      setInvoiceLines([{
-       productId: '',
+  if (proformaType === "new") {
+    // ✅ Always reset to Unknown row for New
+    setInvoiceLines([{
+      productId: '',
       quantity: 1,
       discount: 0,
       subtotal: 0,
@@ -192,33 +193,56 @@ const currentProducts = useMemo(() => {
       selectedProduct: null,
       selectedCombo: '',
       dropdownOpen: false
-      }]);
-      setTotal(0);
+    }]);
+    setTotal(0);
     setOverallDiscount(0);
     setTaxAmount(0);
     setFinalTotal(0);
-    } else if (proformaType === "existing" && selectedQuoteDetails) {
+
+  } else if (proformaType === "existing") {
+    if (selectedQuoteDetails) {
+      // ✅ Load existing quote items
       const quoteItems = selectedQuoteDetails.items.map(item => ({
         productId: item.productId,
-      productCode: item.productCode,
-      salesCode: item.salesCode,
-      quantity: item.quantity,
-      discount: item.discount,
-      subtotal: item.subtotal,
-      unitPrice: item.unitPrice,
-      drStatus: item.drStatus,
-      isCombo: item.isCombo ?? false,
-      selectionType: 'single',   // ADD THIS
-      selectedProduct: null,     // ADD THIS (optional: prefill if products list available)
-      selectedCombo: '',         // ADD THIS
-      dropdownOpen: false        // ADD THIS
+        productCode: item.productCode,
+        salesCode: item.salesCode,
+        quantity: item.quantity,
+        discount: item.discount,
+        subtotal: item.subtotal,
+        unitPrice: item.unitPrice,
+        drStatus: item.drStatus,
+        isCombo: item.isCombo ?? false,
+        selectionType: 'single',
+        selectedProduct: null,
+        selectedCombo: '',
+        dropdownOpen: false
       }));
-      setOverallDiscount(selectedQuoteDetails.overall_discount); // this has been added here to fetch the existing values
-      setTaxAmount(selectedQuoteDetails.tax_amount); // this has been added here to fetch the existing values
       setInvoiceLines(quoteItems);
+      setOverallDiscount(selectedQuoteDetails.overall_discount);
+      setTaxAmount(selectedQuoteDetails.tax_amount);
       updateTotal(quoteItems);
+    } else {
+      // ✅ No quote selected yet → show Unknown row
+      setInvoiceLines([{
+        productId: '',
+        quantity: 1,
+        discount: 0,
+        subtotal: 0,
+        unitPrice: 0,
+        drStatus: '',
+        selectionType: 'single',
+        selectedProduct: null,
+        selectedCombo: '',
+        dropdownOpen: false
+      }]);
+      setTotal(0);
+      setOverallDiscount(0);
+      setTaxAmount(0);
+      setFinalTotal(0);
     }
-  }, [proformaType, selectedQuoteDetails]);
+  }
+}, [proformaType, selectedQuoteDetails]);
+
 
   useEffect(() => {
     if (selectedQuoteDetails) {
@@ -483,20 +507,41 @@ const currentProducts = useMemo(() => {
     setSelectedQuote(quoteID);
     setSelectedQuoteDetails(selectedQuote);
   
-    const quoteItems = selectedQuote.items.map(item => ({
-  description: item.description || "Unknown Product",
-  productCode: item.productCode || ' ',
-  salesCode: item.salesCode || 0,
-  quantity: parseInt(item.quantity) || 0,
-  discount: parseFloat(item.discount) || 0,
-  subtotal: parseFloat(item.sub_total) || 0,
-  unitPrice: parseFloat(item.unit_price) || 0,
-  drStatus: item.dr_status || "",
-  productId: item.product_id || 0,
-  isCombo: item.hasOwnProperty("isCombo") ? item.isCombo : false, // safest check
-  selectionType: item.selectionType || "single",
-  selectedCombo: item.selectedCombo || ""
-}));
+  const quoteItems = selectedQuote.items.map(item => {
+  let selectedProduct = null;
+  let selectedCombo = "";
+
+  // 🔹 If it's a single product, find it in categories
+  if (item.selectionType === "single" && item.productId) {
+    categories.forEach(cat => {
+      const prod = cat.products.find(p => p._id === item.productId);
+      if (prod) selectedProduct = prod;
+    });
+  }
+
+  // 🔹 If it's a combo, find it in combos list
+  if (item.selectionType === "combo" && item.productCode) {
+    const combo = combos.find(c => c.comboCode === item.productCode);
+    if (combo) selectedCombo = combo.comboCode;
+  }
+
+  return {
+    description: item.description || "Unknown Product",
+    productCode: item.productCode || " ",
+    salesCode: item.salesCode || 0,
+    quantity: parseInt(item.quantity) || 0,
+    discount: parseFloat(item.discount) || 0,
+    subtotal: parseFloat(item.sub_total) || 0,
+    unitPrice: parseFloat(item.unit_price) || 0,
+    drStatus: item.dr_status || "",
+    productId: item.product_id || 0,
+    isCombo: item.hasOwnProperty("isCombo") ? item.isCombo : false,
+    selectionType: item.selectionType || "single",
+    selectedProduct,   // ✅ hydrate product object
+    selectedCombo,     // ✅ hydrate combo code
+  };
+});
+
 //console.log("🧾 Normalized invoice lines:", quoteItems);
 
 setOverallDiscount(selectedQuote.overall_discount || 0);
@@ -650,13 +695,18 @@ updateTotal(quoteItems);
 </div>
           <MdOutlineCancel onClick={onClose} className="close-slider" title="Close" />
         </div>
-        <div className="radio-group">
+     <div className="radio-group">
   <input 
     type="radio" 
     id="new" 
     value="new" 
     checked={proformaType === "new"} 
-    onChange={() => setProformaType("new")} 
+    onChange={() => {
+      setProformaType("new");
+      setInvoiceLines([]);          // empty table for new
+      setSelectedQuote(null);       // clear quote
+      setOverallDiscount(0);        // reset discount
+    }} 
   />
   <label htmlFor="new">New</label>
 
@@ -665,11 +715,18 @@ updateTotal(quoteItems);
     id="existing" 
     value="existing" 
     checked={proformaType === "existing"} 
-    onChange={() => setProformaType("existing")} 
+    onChange={() => {
+      setProformaType("existing");
+      // ✅ instead of [], reset to placeholder Unknown row
+  
+      setSelectedQuote(null);       // clear previous quote
+      setOverallDiscount(0);        // reset discount
+    }} 
   />
   <label htmlFor="existing">From Existing Quotes</label>
-
 </div>
+
+
 {/* from--added-27-3*/}
 <div className="input-container-ref">
   <label className='ref' >Ref PO</label>
@@ -706,44 +763,74 @@ updateTotal(quoteItems);
 
   {/* Invoice Table for "New" Proforma */}
   <table className="po-invoice-table">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Quantity</th>
-        <th>Discount</th>
-        <th>DR Status</th> {/* New column for DR Status */}
-        <th>Unit Price</th>
-        <th>Sub Total</th>
-        {proformaType === "new" && <th>Actions</th>} {/* Conditionally render "Actions" header */}
-      </tr>
-    </thead>
-   <tbody>
-  {invoiceLines.map((line, index) => (
-    <tr key={line.description + index}>
-      <td>
-        {/* SELECTION TYPE */}
-        <div className="selection-type">
-          <select
-            value={line.selectionType}
-            onChange={(e) => {
-              const val = e.target.value;
-              const newLines = [...invoiceLines];
-              newLines[index].selectionType = val;
-             // newLines[index].isCombo = val === 'combo'; 
-              newLines[index].selectedProduct = null;
-              newLines[index].selectedCombo = "";
-              setInvoiceLines(newLines);
-            }}
-            className="select-product-type-po"
-          >
-            <option value="" disabled>
-              Select Product Type
-            </option>
-            <option value="single">Single Product</option>
-            <option value="combo">Combo Product</option>
-          </select>
-        </div>
+  <thead>
+    <tr>
+      <th>Product Type</th>
+      <th>Product / Combo</th>
+      <th>Qty</th>
+      <th>Discount</th>
+      <th>DR Status</th>
+      <th>Unit Price</th>
+      <th>Sub Total</th>
+      {proformaType === "new" && <th>Actions</th>}
+    </tr>
+  </thead>
+  <tbody>
+    {invoiceLines.map((line, index) => (
+  <tr key={line.description + index} className={index > 0 ? "extra-gap" : ""}>
+    {/* Selection Type */}
+    <td>
+  {proformaType === "existing" ? (
+    <span
+    >
+      Unknown Type
+    </span>
+  ) : (
+    <select
+      value={line.selectionType}
+      onChange={(e) => {
+        const val = e.target.value;
+        const newLines = [...invoiceLines];
+        newLines[index].selectionType = val;
+        newLines[index].selectedProduct = null;
+        newLines[index].selectedCombo = "";
+        setInvoiceLines(newLines);
+      }}
+      className="select-product-type-po"
+      style={{
+        fontSize: "12px",
+        transition: "border-color 0.3s, box-shadow 0.3s",
+        backgroundColor: "rgba(134, 195, 238, 0.31)",
+        fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+        color: "#555555",
+        fontWeight: 800,
+      }}
+    >
+      <option value="" disabled>
+        Select Product Type
+      </option>
+      <option value="single">Single Product</option>
+      <option value="combo">Combo Product</option>
+    </select>
+  )}
+</td>
 
+
+    {/* Product / Combo */}
+    <td>
+      {proformaType === "existing" ? (
+        <span>
+          {line.selectionType === "single"
+            ? line.selectedProduct
+              ? `${line.selectedProduct.productName} (${line.selectedProduct.productCode})`
+              : "Unknown Product"
+            : line.selectionType === "combo"
+            ? line.selectedCombo
+              ? `Combo: ${line.selectedCombo}`
+              : "Unknown Combo"
+            : "Unknown Type"}
+        </span>
+      ) : (
         <div className="quote-wrapper">
           {/* SINGLE PRODUCT DROPDOWN */}
           {line.selectionType === "single" && (
@@ -767,6 +854,11 @@ updateTotal(quoteItems);
                   }
                 }}
                 className="single-product-trigger"
+                style={{
+                  width: "140px", // Set width for dropdown
+                  maxWidth: "115px", // Optional: Prevents too wide dropdown
+                  minWidth: "115px", // Minimum width
+                }}
               >
                 {line.selectedProduct
                   ? `${line.selectedProduct.productName} (${line.selectedProduct.productCode})`
@@ -814,7 +906,7 @@ updateTotal(quoteItems);
                                   const newLines = [...invoiceLines];
                                   newLines[index].selectedProduct = p;
                                   newLines[index].productId = p._id;
-                                  newLines[index].dropdownOpen = false; // 👈 close dropdown after selection
+                                  newLines[index].dropdownOpen = false;
                                   handleProductSelect(index, p._id);
                                   setInvoiceLines(newLines);
                                 }}
@@ -844,148 +936,211 @@ updateTotal(quoteItems);
               ) : combos.length === 0 ? (
                 <div className="no-combos">No combos available</div>
               ) : (
-                <div>
-                  <select
-                    value={line.selectedCombo || ""}
-                    onChange={(e) => {
-                      const selectedComboCode = e.target.value;
-                      const newLines = [...invoiceLines];
-                      newLines[index].selectedCombo = selectedComboCode;
-                      newLines[index].productId = selectedComboCode;
-                    //  newLines[index].isCombo = false; //ensure this is set
+                <select
+                  value={line.selectedCombo || ""}
+                  onChange={(e) => {
+                    const selectedComboCode = e.target.value;
+                    const newLines = [...invoiceLines];
+                    newLines[index].selectedCombo = selectedComboCode;
+                    newLines[index].productId = selectedComboCode;
 
-                      const combo = combos.find(
-                        (c) => c.comboCode === selectedComboCode
-                      );
-                      if (combo) {
-                        const quantity =
-                          parseInt(newLines[index].quantity, 10) || 1;
-                        const unitPrice = parseFloat(combo.salesCost) || 0;
-                        const subtotal = unitPrice * quantity;
+                    const combo = combos.find(
+                      (c) => c.comboCode === selectedComboCode
+                    );
+                    if (combo) {
+                      const quantity =
+                        parseInt(newLines[index].quantity, 10) || 1;
+                      const unitPrice = parseFloat(combo.salesCost) || 0;
+                      const subtotal = unitPrice * quantity;
 
-                        newLines[index].unitPrice = unitPrice;
-                        newLines[index].subtotal = subtotal;
-                        newLines[index].description = combo.comboDisplayName;
-                        newLines[index].productCode = combo.comboCode;
-                        newLines[index].isCombo = true; //ensure this is set
-                        newLines[index].salesCode = "";
-                        newLines[index].discount = 0;
-                      }
+                      newLines[index].unitPrice = unitPrice;
+                      newLines[index].subtotal = subtotal;
+                      newLines[index].description = combo.comboDisplayName;
+                      newLines[index].productCode = combo.comboCode;
+                      newLines[index].isCombo = true;
+                      newLines[index].salesCode = "";
+                      newLines[index].discount = 0;
+                    }
 
-                      setInvoiceLines(newLines);
-                      updateTotal(newLines);
-                    }}
-                    className="combo-select-quote"
-                  >
-                    <option value="">Select Combo</option>
-                    {combos.map((c) => (
-                      <option key={c.comboCode} value={c.comboCode}>
-                        {c.comboDisplayName} (Code: {c.comboCode})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    setInvoiceLines(newLines);
+                    updateTotal(newLines);
+                  }}
+                  className="combo-select-quote"
+                  style={{
+                    fontSize: "12px",
+                    transition: "border-color 0.3s, box-shadow 0.3s",
+                    backgroundColor: "rgba(134, 195, 238, 0.31)",
+                    fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+                    color: "#555555",
+                    fontWeight: 800,
+                    width: "140px",
+                    maxWidth: "115px",
+                    minWidth: "115px",
+                  }}
+                >
+                  <option value="">Select Combo</option>
+                  {combos.map((c) => (
+                    <option key={c.comboCode} value={c.comboCode}>
+                      {c.comboDisplayName} (Code: {c.comboCode})
+                    </option>
+                  ))}
+                </select>
               )}
             </div>
           )}
         </div>
-      </td>
-          {/* Quantity */}
-          <td>
-            {proformaType === "existing" ? (
-              <span>{line.quantity}</span>
-            ) : (
-              <input 
-                className="po-quantity-input"
-                type="number"
-                value={line.quantity || ""}
-                onChange={(e) => handleLineChange(index, 'quantity', e.target.value)}
-                min="1"
-                placeholder={`Quantity`}
-                required
-              />
-            )}
-          </td>
-
-          {/* Discount */}
-          <td>
-            {proformaType === "existing" ? (
-              <span>{line.discount}</span>
-            ) : (
-              <input
-                type="number"
-                className="po-quantity-input"
-                value={line.discount || ""}
-                onChange={(e) => handleLineChange(index, 'discount', e.target.value)}
-                min="0"
-                max={products.find(product => product._id === line.productId)?.maxDiscount || 100}
-                placeholder={`Discount`}
-                required
-              />
-            )}
-          </td>
-
-          {/* DR Status */}
-          <td>
-            {proformaType === "existing" ? (
-              <span>{line.drStatus || "Unknown Status"}</span>
-            ) : (
-              <select
-                value={line.drStatus || ""}
-                onChange={(e) => handleLineChange(index, 'drStatus', e.target.value)}
-                className="po-select"
-              >
-                <option value="" disabled>Select DR Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-              </select>
-            )}
-          </td>
-
-          {/* Unit Price & Subtotal */}
-          <td className="po-unit-price">{(line.unitPrice || 0).toFixed(2)}</td>
-          <td className="po-subtotal">{(line.subtotal || 0).toFixed(2)}</td>
-
-          {/* Actions */}
-          {proformaType === "new" && (
-            <td>
-              <div className="icon-container-po">
-                <MdDelete
-                  onClick={() => handleDeleteProductRow(index)}
-                  className="delete-poinvoice"
-                  title="Delete Quote"
-                />
-                <MdAddBox
-                  onClick={() => handleAddProductRow(index)}
-                  className="add-poinvoice"
-                  title="Add Quote"
-                />
-              </div>
-            </td>
+      )}
+    </td>
+  {/* Quantity */}
+        <td>
+          {proformaType === "existing" ? (
+            <span>{line.quantity}</span>
+          ) : (
+            <input
+              className="po-quantity-input"
+              style={{
+                fontSize: "12px",
+                transition: "border-color 0.3s, box-shadow 0.3s",
+                backgroundColor: "rgba(134, 195, 238, 0.31)",
+                fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+                color: "#555555",
+                fontWeight: 800,
+                width: "140px",
+                          maxWidth: "40px",   
+                          minWidth: "40px",
+              }}
+              type="number"
+              value={line.quantity || ""}
+              onChange={(e) =>
+                handleLineChange(index, "quantity", e.target.value)
+              }
+              min="1"
+              placeholder="Qty"
+              required
+            />
           )}
-        </tr>
-      ))}
-    </tbody>
-  </table>
+        </td>
+
+        {/* Discount */}
+        <td>
+          {proformaType === "existing" ? (
+            <span>{line.discount}</span>
+          ) : (
+            <input
+              type="number"
+              className="po-quantity-input"
+              style={{
+                fontSize: "12px",
+                transition: "border-color 0.3s, box-shadow 0.3s",
+                backgroundColor: "rgba(134, 195, 238, 0.31)",
+                fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+                color: "#555555",
+                fontWeight: 800,
+              }}
+              value={line.discount || ""}
+              onChange={(e) =>
+                handleLineChange(index, "discount", e.target.value)
+              }
+              min="0"
+              max={
+                products.find((product) => product._id === line.productId)
+                  ?.maxDiscount || 100
+              }
+              placeholder="Discount"
+              required
+            />
+          )}
+        </td>
+
+        {/* DR Status */}
+        <td>
+          {proformaType === "existing" ? (
+            <span>{line.drStatus || "Unknown "}</span>
+          ) : (
+            <select
+              value={line.drStatus || ""}
+              onChange={(e) =>
+                handleLineChange(index, "drStatus", e.target.value)
+              }
+              className="po-select"
+              style={{
+                fontSize: "12px",
+                transition: "border-color 0.3s, box-shadow 0.3s",
+                backgroundColor: "rgba(134, 195, 238, 0.31)",
+                fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+                color: "#555555",
+                fontWeight: 800,
+                width: "140px",
+                          maxWidth: "60px",     
+                          minWidth: "60px",
+              }}
+            >
+              <option value="" disabled>Select DR Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          )}
+        </td>
+
+        {/* Unit Price */}
+        <td className="po-unit-price">{(line.unitPrice || 0).toFixed(2)}</td>
+
+        {/* Subtotal */}
+        <td className="po-subtotal">{(line.subtotal || 0).toFixed(2)}</td>
+
+        {/* Actions */}
+        {proformaType === "new" && (
+          <td>
+            <div className="icon-container-po">
+              <MdDelete
+                onClick={() => handleDeleteProductRow(index)}
+                className="delete-poinvoice"
+                title="Delete Quote"
+              />
+              <MdAddBox
+                onClick={() => handleAddProductRow(index)}
+                className="add-poinvoice"
+                title="Add Quote"
+              />
+            </div>
+          </td>
+        )}
+      </tr>
+    ))}
+  </tbody>
+</table>
 
         <div  className="totals-section">
           <div>
             <label className="label">Sum:</label>
             <span className="amount"> ₹&nbsp;{total.toFixed(2)}</span>
           </div>
-          <div>
-            {/*CHANGES MADE */}
-            <input 
-              className="amount"
-              type="number" 
-              step="0.01"
-              value={overallDiscount === 0 ? '' : overallDiscount}  
-              onChange={handleOverallDiscountChange}            
-              disabled={proformaType === "existing"}
-              placeholder="Enter Overall Discount"
-            />                  {/*TO HERE - bugs free */}
-          </div>
+         <div>
+  {proformaType === "existing" ? (
+   <span className="amount">
+  <span  className="label">
+    Overall Discount :
+  </span>{" "}
+  <span>
+    {overallDiscount && overallDiscount !== 0
+      ? overallDiscount
+      : "00"}
+  </span>
+</span>
+
+  ) : (
+    <input
+      className="amount"
+      type="number"
+      step="0.01"
+      value={overallDiscount === 0 ? "" : overallDiscount}
+      onChange={handleOverallDiscountChange}
+      placeholder="Enter Overall Discount"
+    />
+  )}
+</div>
+
           <div>
             <label className="label">Total:</label>
             <span className="amount"> ₹&nbsp;{(total - overallDiscount).toFixed(2)}</span> 
@@ -1054,8 +1209,6 @@ updateTotal(quoteItems);
   ) : (
     <p className="no-po">No Proformas Available</p>
   )}
-
-
 
   {/* Pagination Controls */}
   {currentPerformas && currentPerformas.length > 0 && (

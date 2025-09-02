@@ -1661,8 +1661,8 @@ input.form-control-ref:focus {
   font-weight: bold;
   text-align: left;
   font-size: 12px;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 6px;
+  padding-right: 6px;
   padding-top: 10px;
   padding-bottom: 5px;
   text-overflow: unset;  /* Prevent ellipsis (...) */
@@ -1676,8 +1676,8 @@ input.form-control-ref:focus {
   white-space: normal; /* Allow text to wrap */
   overflow: hidden;
   padding: 11px;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 6px;
+  padding-right: 6px;
   padding-top: 8px;
   padding-bottom: 8px;
 }
@@ -1685,8 +1685,8 @@ input.form-control-ref:focus {
 /* Specific width for dropdowns (select elements) */
 .po-invoice-table td select {
   width: 140px; /* Set width for dropdown */
-  max-width: 200px; /* Optional: Prevents too wide dropdown */
-  min-width: 120px;
+  max-width: 115px; /* Optional: Prevents too wide dropdown */
+  min-width: 115px;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   font-weight: 400;
 }
@@ -1695,28 +1695,59 @@ input.form-control-ref:focus {
 .po-invoice-table td input[type="number"],
 .po-invoice-table td input[type="text"] {
   width: 80; /* Set width for input fields */
-  max-width: 80px;
-  min-width: 80px;
+  max-width: 70px;
+  min-width: 70px;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   font-weight: 400;
 }
 
 /* Optional: Apply different width to specific columns */
+/* Product Type */
 .po-invoice-table td:nth-child(1),
 .po-invoice-table th:nth-child(1) {
-  width: 200px; /* First column */
+  width: 130px !important;
 }
+
+/* Product / Combo */
 .po-invoice-table td:nth-child(2),
 .po-invoice-table th:nth-child(2) {
-  width: 90px; /* First column */
+  width: 130px;
 }
+
+/* Quantity */
 .po-invoice-table td:nth-child(3),
 .po-invoice-table th:nth-child(3) {
-  width: 90px; /* First column */
+  width: 50px;
 }
+
+/* Discount */
 .po-invoice-table td:nth-child(4),
 .po-invoice-table th:nth-child(4) {
-  width: 200px; /* First column */
+  width: 80px;
+}
+
+/* DR Status */
+.po-invoice-table td:nth-child(5),
+.po-invoice-table th:nth-child(5) {
+  width: 70px;
+}
+
+/* Unit Price */
+.po-invoice-table td:nth-child(6),
+.po-invoice-table th:nth-child(6) {
+  width: 80px;
+}
+
+/* Sub Total (always column 7 in both modes) */
+.po-invoice-table td:nth-child(7),
+.po-invoice-table th:nth-child(7) {
+  width: 100px;  /* give proper width */
+}
+
+/* Actions (only exists in "new" mode = column 8) */
+.po-invoice-table td:nth-child(8),
+.po-invoice-table th:nth-child(8) {
+  width: 60px;
 }
 
 /* Fixed Table Header */
@@ -1769,7 +1800,24 @@ input.form-control-ref:focus {
 .icon-container-po {
   display: inline-flex;
   align-items: center;
-  gap: 17px; /* Add space between the icons */
+  gap: 10px; /* Add space between the icons */
+}
+.selection-type-row-po.extra-gap td {
+  padding-top: 19px; /* adds space above new rows */
+}
+/* Reduce bottom padding of selection row */
+.selection-type-row-po td {
+  padding-bottom: 2px;   /* tighter */
+}
+
+/* Reduce top padding of product row */
+.se td {
+  padding-top: 2px;      /* tighter */
+}
+
+/* For rows after the first block, keep extra gap */
+.selection-type-row-po.extra-gap td {
+  padding-top: 16px;     /* extra spacing before new blocks */
 }
 
 .po-select {
@@ -1781,9 +1829,9 @@ input.form-control-ref:focus {
   font-size: 12px;               /* Consistent font size */
   transition: border-color 0.3s, box-shadow 0.3s;
   background-color: rgba(134, 195, 238, 0.31);
-  font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  color: #050202fb;
-  font-weight: bold;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800; 
   pointer-events: auto;
 }
 
@@ -1798,8 +1846,8 @@ input.form-control-ref:focus {
   transition: border-color 0.3s, box-shadow 0.3s;
   background-color: rgba(134, 195, 238, 0.31);
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  color: #050202fb;
-  font-weight: bold; 
+  color: #555555;
+  font-weight: 800;
   pointer-events: auto;
 }
 .po-select:focus {
@@ -1942,7 +1990,6 @@ input.form-control-ref:focus {
   color: #555555;
   font-weight: 800;
   pointer-events: auto;
-  margin-bottom: 10px;
 }
 .select-product-type-po:focus {
   border-color: rgba(6, 41, 66, 0.31);
