@@ -25,7 +25,7 @@
 // });
 
 // const proformaSlice = createSlice({
-//   name: 'proformaInvoice',
+//   name: 'proformaInvoice',               
 //   initialState: {
 //     performa: null, // The newly created proforma
 //     performas: [],  // List of fetched performas
@@ -112,6 +112,42 @@ export const createPerforma = createAsyncThunk('performa/createPerforma', async 
   }
 });
 
+
+export const fetchPOInvoicesByCustomer = createAsyncThunk(
+  'proforma/fetchPOInvoicesByCustomer',
+  async (customer_name) => {
+    try {
+      const token = localStorage.getItem('Access_Token');
+      const response = await axios.get(
+        `${API}/get_proformas_for_purchase_order`,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          params: { customer_name }, // ✅ this sends ?customer_name=value
+        }
+      );
+      return response.data.invoices || response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || error.response?.data?.error || error.message
+      );
+    }
+  }
+);
+
+
+// Update proforma invoice status
+export const updatePOInvoiceStatus = createAsyncThunk(
+  "proforma/updatePOInvoiceStatus",
+  async ({ invoiceId, isEnabled }) => {
+    const token = localStorage.getItem("Access_Token");
+    const response = await axios.put(
+      `${API}/update_proforma_enabled/${invoiceId}`,
+      { isEnabled },
+      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return { invoiceId, isEnabled }; // normalize return
+  }
+);
 const proformaSlice = createSlice({
   name: 'proformaInvoice',
   initialState: {
@@ -159,6 +195,29 @@ const proformaSlice = createSlice({
     builder.addCase(createPerforma.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message; // Capture any error that occurred
+    });
+
+     // Fetch invoices by customer
+    builder
+      .addCase(fetchPOInvoicesByCustomer.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchPOInvoicesByCustomer.fulfilled, (state, action) => {
+        state.loading = false;
+        state.invoices = action.payload || [];
+      })
+      .addCase(fetchPOInvoicesByCustomer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // Update invoice status
+    builder.addCase(updatePOInvoiceStatus.fulfilled, (state, action) => {
+      const { invoiceId, isEnabled } = action.payload;
+      const idx = state.performas.findIndex((inv) => inv.id === invoiceId);
+      if (idx !== -1) {
+        state.performas[idx].isEnabled = isEnabled;
+      }
     });
   },
 });

@@ -131,8 +131,6 @@ html, body {
   max-width: 190%;
 }
 
-
-  
 /* Funnel Container */
 /* Loading Message */
 .loading {
@@ -1661,8 +1659,8 @@ input.form-control-ref:focus {
   font-weight: bold;
   text-align: left;
   font-size: 12px;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 6px;
+  padding-right: 6px;
   padding-top: 10px;
   padding-bottom: 5px;
   text-overflow: unset;  /* Prevent ellipsis (...) */
@@ -1676,8 +1674,8 @@ input.form-control-ref:focus {
   white-space: normal; /* Allow text to wrap */
   overflow: hidden;
   padding: 11px;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 6px;
+  padding-right: 6px;
   padding-top: 8px;
   padding-bottom: 8px;
 }
@@ -1685,8 +1683,8 @@ input.form-control-ref:focus {
 /* Specific width for dropdowns (select elements) */
 .po-invoice-table td select {
   width: 140px; /* Set width for dropdown */
-  max-width: 200px; /* Optional: Prevents too wide dropdown */
-  min-width: 120px;
+  max-width: 115px; /* Optional: Prevents too wide dropdown */
+  min-width: 115px;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   font-weight: 400;
 }
@@ -1695,28 +1693,59 @@ input.form-control-ref:focus {
 .po-invoice-table td input[type="number"],
 .po-invoice-table td input[type="text"] {
   width: 80; /* Set width for input fields */
-  max-width: 80px;
-  min-width: 80px;
+  max-width: 70px;
+  min-width: 70px;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   font-weight: 400;
 }
 
 /* Optional: Apply different width to specific columns */
+/* Product Type */
 .po-invoice-table td:nth-child(1),
 .po-invoice-table th:nth-child(1) {
-  width: 200px; /* First column */
+  width: 130px !important;
 }
+
+/* Product / Combo */
 .po-invoice-table td:nth-child(2),
 .po-invoice-table th:nth-child(2) {
-  width: 90px; /* First column */
+  width: 130px;
 }
+
+/* Quantity */
 .po-invoice-table td:nth-child(3),
 .po-invoice-table th:nth-child(3) {
-  width: 90px; /* First column */
+  width: 50px;
 }
+
+/* Discount */
 .po-invoice-table td:nth-child(4),
 .po-invoice-table th:nth-child(4) {
-  width: 200px; /* First column */
+  width: 80px;
+}
+
+/* DR Status */
+.po-invoice-table td:nth-child(5),
+.po-invoice-table th:nth-child(5) {
+  width: 70px;
+}
+
+/* Unit Price */
+.po-invoice-table td:nth-child(6),
+.po-invoice-table th:nth-child(6) {
+  width: 80px;
+}
+
+/* Sub Total (always column 7 in both modes) */
+.po-invoice-table td:nth-child(7),
+.po-invoice-table th:nth-child(7) {
+  width: 100px;  /* give proper width */
+}
+
+/* Actions (only exists in "new" mode = column 8) */
+.po-invoice-table td:nth-child(8),
+.po-invoice-table th:nth-child(8) {
+  width: 60px;
 }
 
 /* Fixed Table Header */
@@ -1769,7 +1798,24 @@ input.form-control-ref:focus {
 .icon-container-po {
   display: inline-flex;
   align-items: center;
-  gap: 17px; /* Add space between the icons */
+  gap: 10px; /* Add space between the icons */
+}
+.selection-type-row-po.extra-gap td {
+  padding-top: 19px; /* adds space above new rows */
+}
+/* Reduce bottom padding of selection row */
+.selection-type-row-po td {
+  padding-bottom: 2px;   /* tighter */
+}
+
+/* Reduce top padding of product row */
+.se td {
+  padding-top: 2px;      /* tighter */
+}
+
+/* For rows after the first block, keep extra gap */
+.selection-type-row-po.extra-gap td {
+  padding-top: 16px;     /* extra spacing before new blocks */
 }
 
 .po-select {
@@ -1781,9 +1827,9 @@ input.form-control-ref:focus {
   font-size: 12px;               /* Consistent font size */
   transition: border-color 0.3s, box-shadow 0.3s;
   background-color: rgba(134, 195, 238, 0.31);
-  font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  color: #050202fb;
-  font-weight: bold;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800; 
   pointer-events: auto;
 }
 
@@ -1798,8 +1844,8 @@ input.form-control-ref:focus {
   transition: border-color 0.3s, box-shadow 0.3s;
   background-color: rgba(134, 195, 238, 0.31);
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  color: #050202fb;
-  font-weight: bold; 
+  color: #555555;
+  font-weight: 800;
   pointer-events: auto;
 }
 .po-select:focus {
@@ -1942,7 +1988,6 @@ input.form-control-ref:focus {
   color: #555555;
   font-weight: 800;
   pointer-events: auto;
-  margin-bottom: 10px;
 }
 .select-product-type-po:focus {
   border-color: rgba(6, 41, 66, 0.31);
@@ -3920,6 +3965,7 @@ a:hover {
   color: rgb(7, 94, 121); /* Text color */
   margin-bottom: 5px;
   transition: all 0.3s ease; /* Smooth transition */
+  margin-left: 90px;
 }
 
 .select-proforma select:focus
@@ -4627,6 +4673,10 @@ select option {
 .payments-table td:nth-child(12) {
   width: 48px; /* Fixed width */
 }
+.payments-table th:last-child,
+.payments-table td:last-child {
+  width: 48px; /* Fixed width */
+}
 
 
 .payments-table tbody tr:hover {
@@ -4702,6 +4752,32 @@ select option {
   color: #1c5e02;
   transform: scale(1.4) !important; /* Slight zoom on hover */
 }
+.regen-btn {
+  background: none;
+  border: none;
+  font-size: 21px;
+  cursor: pointer;
+  color: green;
+  transition: transform 0.5s ease, color 0.3s ease;
+}
+
+/* Rotate + darker green when hovered (enabled) */
+.regen-btn:hover:not(.is-disabled) {
+  transform: rotate(180deg);
+  color: darkgreen;
+}
+
+/* Disabled look */
+.regen-btn.is-disabled {
+  color: #a4a5a4;
+}
+
+/* Allow hover animation even if disabled */
+.regen-btn.is-disabled:hover {
+  transform: rotate(180deg);
+  color: #7e807e; /* stay gray, no green */
+}
+
 .nopdf{
   background: none;
   border: none;
@@ -6139,8 +6215,8 @@ select option {
   position: relative;
 
   /* Match full width minus sidebar */
-  margin-left: 490px;
-  width: calc(100% - 750px);
+  margin-left: 420px;
+  width: calc(100% - 600px);
 
   /* Clean padding */
   padding: 16px 0;
@@ -6163,6 +6239,11 @@ select option {
   box-sizing: border-box;
 }
 
+.admin-topmenu .active {
+  color: #069696;
+  font-weight: bold;
+  font-size: 15px;
+}
 
 
 /* -------- Responsive CSS for Smaller Screens -------- */
@@ -6874,3 +6955,1197 @@ select option {
     font-size: 13px;
   }
 }
+
+/* Proforma invoice status management Section */
+.performa-invoice-status {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  max-height: 100vh; 
+  background-color: #feffff;
+  margin-left: 250px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+/* Heading */
+.performa-invoice-status h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+}
+.performa-invoice-status .search-field-poinvoice-status {
+  width: 100%;
+  max-width: 340px;
+  height: 30px;
+  background: rgba(195, 237, 243, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  color: rgb(7, 94, 121); /* Change input text color */
+  margin-top: 5%;
+}
+
+.performa-invoice-status .search-field-poinvoice-status {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+
+.search-field1-poinvoicestatus .NoPoinvoicestatusFound
+{
+  text-align: left;
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.search-field1-poinvoicestatus .PoinvoicestatusLoading 
+{
+  text-align: left;
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.search-field1-poinvoicestatus select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 174px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  display: block;
+} 
+.search-field1-poinvoicestatus select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-poinvoicestatus option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+.poinvoice-status-invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 1100px; /* Ensures form doesn't shrink too much */
+}
+
+.poinvoice-status-invoice-table thead
+{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.poinvoice-status-invoice-table th, 
+.poinvoice-status-invoice-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold;
+}
+
+.poinvoice-status-invoice-table th {
+  background-color: #dfa436;
+  color: aliceblue;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:12px;
+  padding-bottom:12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.poinvoice-status-invoice-table td {
+  background-color: rgba(231, 236, 155, 0.87);
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  font-size: 12px;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-right: 5px; /* Slight padding for column spacing */
+  color: rgba(34, 31, 31, 0.986);
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+
+.poinvoice-status-invoice-table th:nth-child(1),
+.poinvoice-status-invoice-table td:nth-child(1) {
+  width: 6%; /* Fixed width */
+}
+.poinvoice-status-invoice-table th:nth-child(2),
+.poinvoice-status-invoice-table td:nth-child(2) {
+  width: 10%; /* Fixed width */
+}
+.poinvoice-status-invoice-table th:nth-child(3),
+.poinvoice-status-invoice-table td:nth-child(3) {
+  width: 14%; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+.poinvoice-status-invoice-table th:nth-child(4),
+.poinvoice-status-invoice-table td:nth-child(4) {
+  width: 14%; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+.poinvoice-status-invoice-table th:nth-child(5),
+.poinvoice-status-invoice-table td:nth-child(5) {
+  width:14%; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+.poinvoice-status-invoice-table th:nth-child(6),
+.poinvoice-status-invoice-table td:nth-child(6) {
+  width: 7%; /* Fixed width */
+}
+.poinvoice-status-invoice-table th:nth-child(7),
+.poinvoice-status-invoice-table td:nth-child(7) {
+  width: 10%; /* Fixed width */
+}
+.poinvoice-status-invoice-table th:nth-child(8),
+.poinvoice-status-invoice-table td:nth-child(8) {
+  width: 11%; /* Fixed width */
+}
+/* Target the last column (both th and td) */
+.poinvoice-status-invoice-table tbody tr:hover {
+  background-color: #c5a205; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Table cell checkbox styling */
+.custom-checkbox-poinvoicestatus {
+  appearance: none;         /* remove default browser style */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #069696; /* Default border color */
+  border-radius: 3px;
+  background-color: white; /* Default background */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Hover effect */
+.custom-checkbox-poinvoicestatus:hover {
+  border-color: #2c6fbb;
+  box-shadow: 0 0 6px #7fca90;
+}
+
+/* Checked state */
+.custom-checkbox-poinvoicestatus:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+.custom-checkbox-poinvoicestatus:checked::after {
+  content: "✔";
+  font-size: 14px;
+  color: #fff;
+  position: absolute;
+  top: -2px;
+  left: 2px;
+}
+
+/* Focus accessibility */
+.custom-checkbox-poinvoicestatus:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+/* Modern Compact Glass-Like Toggle Switch */
+.toggle-btn {
+  position: relative;
+  display: inline-block;
+  width: 50px;           /* smaller width */
+  height: 24px;          /* reduced height */
+  border-radius: 20px;   /* fully rounded edges */
+  background: rgba(255, 255, 255, 0.15); /* glass base */
+  backdrop-filter: blur(8px);           /* blur glass effect */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+  padding: 0;
+  outline: none;
+  font-size: 0; /* hide text */
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.3),
+              0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Base Toggle Button */
+.toggle-btn {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  border-radius: 24px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+  background-clip: padding-box;
+  /* Pressed / inset effect */
+  box-shadow:
+    inset 0 2px 5px rgba(0,0,0,0.25),
+    inset 0 -1px 2px rgba(255,255,255,0.2),
+    0 1px 3px rgba(0,0,0,0.15);
+}
+
+/* Circular Slider Knob */
+.toggle-btn::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ffffff, #e0e0e0);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    0 1px 2px rgba(255, 255, 255, 0.5) inset;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* Enabled (ON) */
+.toggle-btn.disable {
+  background: linear-gradient(135deg, rgba(76, 175, 80,0.75), rgba(56, 142, 60,0.75));
+  border: 1px solid rgba(76, 175, 80, 0.9);
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.35),
+    inset 0 -1px 2px rgba(255,255,255,0.25),
+    0 0 6px rgba(76, 175, 80, 0.5);
+}
+
+.toggle-btn.disable::before {
+  transform: translateX(26px);
+  background: linear-gradient(145deg, #fff, #c8ffc8);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(255, 255, 255, 0.5) inset;
+}
+
+/* Disabled (OFF) */
+.toggle-btn.enable {
+  background: rgba(120, 120, 120, 0.35);
+  border: 1px solid rgba(150, 150, 150, 0.5);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.35),
+    inset 0 -1px 2px rgba(255,255,255,0.15),
+    0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-btn.enable::before {
+  transform: translateX(0);
+  background: linear-gradient(145deg, #f5f5f5, #cfcfcf);
+  border-radius: 50%;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.35),
+    0 1px 2px rgba(255, 255, 255, 0.4) inset;
+}
+
+/* Optional Hover Effect */
+.toggle-btn:hover::before {
+  box-shadow:
+    0 3px 6px rgba(0,0,0,0.35),
+    0 1px 3px rgba(255,255,255,0.5) inset;
+}
+
+
+/* Hover Effect */
+.toggle-btn:not(:disabled):hover::before {
+  box-shadow: 0 3px 8px rgba(0,0,0,0.35),
+              0 1px 2px rgba(255, 255, 255, 0.5) inset;
+}
+
+/* Disabled state */
+.toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  margin-top: 30px;
+}
+
+.pagination-controls button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* Submit Button */
+.submit-button-poinvoicestatus {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px; /* Adjust gap between icon and text */
+  width: 100%;
+  max-width: 30px;
+  display: block;
+  color: #069696;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 40px; 
+  margin-left: 97.5%;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.submit-button-poinvoicestatus:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.submit-button-poinvoicestatus:hover:not(:disabled) {
+  color: #fff;
+  background: linear-gradient(135deg, #00bfa5, #069696); /* modern gradient hover */
+  transform: translateY(-2px); /* subtle lift effect */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* subtle shadow */
+  transition: all 0.3s ease; /* smooth transition */
+}
+
+
+/* ----------- Responsive Styles ----------*/
+
+/* Small screens - Mobile (up to 480px) */
+@media (max-width: 480px) {
+  .performa-invoice-status {
+    padding: 10px;
+    margin-left: 0;
+    max-width: 100%;
+    font-size: 12px;
+  }
+
+  .search-field-poinvoice-status {
+    max-width: 100%;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .search-field1-poinvoicestatus select {
+    max-width: 100%;
+    font-size: 11px;
+    height: 28px;
+  }
+
+  .poinvoice-status-invoice-table {
+    min-width: 100%;
+    max-width: 100%;
+    font-size: 10px;
+  }
+
+  .poinvoice-status-invoice-table th, 
+  .poinvoice-status-invoice-table td {
+    padding: 6px 4px;
+  }
+
+  .toggle-btn {
+    width: 40px;
+    height: 20px;
+  }
+
+  .toggle-btn::before {
+    width: 16px;
+    height: 16px;
+    top: 2px;
+    left: 2px;
+  }
+
+  .toggle-btn.disable::before {
+    transform: translateX(20px);
+  }
+
+  .submit-button-poinvoicestatus {
+    max-width: 25px;
+    margin-top: 20px;
+    margin-left: 90%;
+  }
+
+  .pagination-controls span {
+    font-size: 12px;
+  }
+}
+
+/* Medium screens - Tablets (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .performa-invoice-status {
+    padding: 15px;
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .search-field-poinvoice-status {
+    max-width: 280px;
+    height: 28px;
+    font-size: 13px;
+  }
+
+  .search-field1-poinvoicestatus select {
+    max-width: 140px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .poinvoice-status-invoice-table {
+    min-width: 95%;
+    max-width: 100%;
+    font-size: 11px;
+  }
+
+  .poinvoice-status-invoice-table th, 
+  .poinvoice-status-invoice-table td {
+    padding: 8px 5px;
+  }
+
+  .toggle-btn {
+    width: 45px;
+    height: 22px;
+  }
+
+  .toggle-btn::before {
+    width: 18px;
+    height: 18px;
+    top: 2px;
+    left: 2px;
+  }
+
+  .toggle-btn.disable::before {
+    transform: translateX(22px);
+  }
+
+  .submit-button-poinvoicestatus {
+    max-width: 28px;
+    margin-top: 30px;
+    margin-left: 95%;
+  }
+
+  .pagination-controls span {
+    font-size: 13px;
+  }
+}
+
+/* Large screens - Small laptops (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .performa-invoice-status {
+    padding: 18px;
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .search-field-poinvoice-status {
+    max-width: 300px;
+    height: 29px;
+    font-size: 13px;
+  }
+
+  .search-field1-poinvoicestatus select {
+    max-width: 150px;
+    height: 29px;
+    font-size: 12px;
+  }
+
+  .poinvoice-status-invoice-table {
+    min-width: 100%;
+    max-width: 100%;
+    font-size: 12px;
+  }
+
+  .poinvoice-status-invoice-table th, 
+  .poinvoice-status-invoice-table td {
+    padding: 9px 6px;
+  }
+
+  .toggle-btn {
+    width: 48px;
+    height: 23px;
+  }
+
+  .toggle-btn::before {
+    width: 19px;
+    height: 19px;
+    top: 2px;
+    left: 2px;
+  }
+
+  .toggle-btn.disable::before {
+    transform: translateX(24px);
+  }
+
+  .submit-button-poinvoicestatus {
+    max-width: 30px;
+    margin-top: 35px;
+    margin-left: 96%;
+  }
+
+  .pagination-controls span {
+    font-size: 14px;
+  }
+}
+
+/* Invoice status management Section */
+.invoice-status {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  max-height: 100vh; 
+  background-color: #feffff;
+  margin-left: 250px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  position: relative;
+}
+
+/* Heading */
+.invoice-status h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+}
+
+.invoice-status .search-container {
+  position: absolute; /* fix inside table container */
+  top: 20px;
+  left: 20px;
+  display: flex;
+  padding: 10px 0;
+  z-index: 5;
+  width: 100%;
+}
+.invoice-status .table-container {
+  margin-top: 15%;
+  width: 100%;
+}
+
+.invoice-status .search-field-invoice-status {
+  width: 100%;
+  max-width: 340px;
+  height: 30px;
+  background: rgba(195, 237, 243, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  color: rgb(7, 94, 121); /* Change input text color */
+  margin-top: 5%;
+}
+
+.invoice-status .search-field-invoice-status {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+
+.search-field1-invoice-status .NoInvoiceStatusFound
+{
+  text-align: left;
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.search-field1-invoice-status .InvoiceStatusLoading 
+{
+  text-align: left;
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.search-field1-invoice-status select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-top: 95px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 174px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  display: block;
+} 
+.search-field1-invoice-status select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-invoice-status option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+.invoice-status-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 1100px; /* Ensures form doesn't shrink too much */
+}
+
+.invoice-status-table th, 
+.invoice-status-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold;
+}
+
+.invoice-status-table th {
+  background-color: #dfa436;
+  color: aliceblue;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:12px;
+  padding-bottom:12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.invoice-status-table td {
+  background-color: rgba(231, 236, 155, 0.87);
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  font-size: 12px;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-right: 5px; /* Slight padding for column spacing */
+  color: rgba(34, 31, 31, 0.986);
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+
+.invoice-status-table th:nth-child(1),
+.invoice-status-table td:nth-child(1) {
+  width: 3%; /* Fixed width */
+}
+.invoice-status-table th:nth-child(2),
+.invoice-status-table td:nth-child(2) {
+  width: 8%; /* Fixed width */
+}
+.invoice-status-table th:nth-child(3),
+.invoice-status-table td:nth-child(3) {
+  width: 14%; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+.invoice-status-table th:nth-child(4),
+.invoice-status-table td:nth-child(4) {
+  width: 8%; 
+}
+.invoice-status-table th:nth-child(5),
+.invoice-status-table td:nth-child(5) {
+  width:14%; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+.invoice-status-table th:nth-child(6),
+.invoice-status-table td:nth-child(6) {
+  width: 5%; /* Fixed width */
+}
+.invoice-status-table th:nth-child(7),
+.invoice-status-table td:nth-child(7) {
+  width: 8%; /* Fixed width */
+}
+.invoice-status-table th:nth-child(8),
+.invoice-status-table td:nth-child(8) {
+  width: 9%; /* Fixed width */
+}
+.invoice-status-table th:nth-child(9),
+.invoice-status-table td:nth-child(9) {
+  width: 9%; /* Fixed width */
+}
+.invoice-status-table th:nth-child(10),
+.invoice-status-table td:nth-child(10) {
+  width: 9%; /* Fixed width */
+}
+.invoice-status-table th:nth-child(11),
+.invoice-status-table td:nth-child(11) {
+  width: 7%; /* Fixed width */
+}
+/* Target the last column (both th and td) */
+.invoice-status-table th:last-child,
+.invoice-status-table td:last-child {
+  width: 7%; /* Adjust as needed */
+}
+
+.invoice-status-table tbody tr:hover {
+  background-color: #c5a205; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Table cell checkbox styling */
+.custom-checkbox-invoice-status {
+  appearance: none;         /* remove default browser style */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #069696; /* Default border color */
+  border-radius: 3px;
+  background-color: white; /* Default background */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Hover effect */
+.custom-checkbox-invoice-status:hover {
+  border-color: #2c6fbb;
+  box-shadow: 0 0 6px #7fca90;
+}
+
+/* Checked state */
+.custom-checkbox-invoice-status:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+.custom-checkbox-invoice-status:checked::after {
+  content: "✔";
+  font-size: 14px;
+  color: #fff;
+  position: absolute;
+  top: -2px;
+  left: 2px;
+}
+
+/* Focus accessibility */
+.custom-checkbox-invoice-status:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+/* Modern Compact Glass-Like Toggle Switch */
+.toggle-btn {
+  position: relative;
+  display: inline-block;
+  width: 50px;           /* smaller width */
+  height: 24px;          /* reduced height */
+  border-radius: 20px;   /* fully rounded edges */
+  background: rgba(255, 255, 255, 0.15); /* glass base */
+  backdrop-filter: blur(8px);           /* blur glass effect */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+  padding: 0;
+  outline: none;
+  font-size: 0; /* hide text */
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.3),
+              0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Base Toggle Button */
+.toggle-btn {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  border-radius: 24px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+  background-clip: padding-box;
+  /* Pressed / inset effect */
+  box-shadow:
+    inset 0 2px 5px rgba(0,0,0,0.25),
+    inset 0 -1px 2px rgba(255,255,255,0.2),
+    0 1px 3px rgba(0,0,0,0.15);
+}
+
+/* Circular Slider Knob */
+.toggle-btn::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ffffff, #e0e0e0);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    0 1px 2px rgba(255, 255, 255, 0.5) inset;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* Enabled (ON) */
+.toggle-btn.disable {
+  background: linear-gradient(135deg, rgba(76, 175, 80,0.75), rgba(56, 142, 60,0.75));
+  border: 1px solid rgba(76, 175, 80, 0.9);
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.35),
+    inset 0 -1px 2px rgba(255,255,255,0.25),
+    0 0 6px rgba(76, 175, 80, 0.5);
+}
+
+.toggle-btn.disable::before {
+  transform: translateX(26px);
+  background: linear-gradient(145deg, #fff, #c8ffc8);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(255, 255, 255, 0.5) inset;
+}
+
+/* Disabled (OFF) */
+.toggle-btn.enable {
+  background: rgba(120, 120, 120, 0.35);
+  border: 1px solid rgba(150, 150, 150, 0.5);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.35),
+    inset 0 -1px 2px rgba(255,255,255,0.15),
+    0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-btn.enable::before {
+  transform: translateX(0);
+  background: linear-gradient(145deg, #f5f5f5, #cfcfcf);
+  border-radius: 50%;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.35),
+    0 1px 2px rgba(255, 255, 255, 0.4) inset;
+}
+
+/* Optional Hover Effect */
+.toggle-btn:hover::before {
+  box-shadow:
+    0 3px 6px rgba(0,0,0,0.35),
+    0 1px 3px rgba(255,255,255,0.5) inset;
+}
+
+
+/* Hover Effect */
+.toggle-btn:not(:disabled):hover::before {
+  box-shadow: 0 3px 8px rgba(0,0,0,0.35),
+              0 1px 2px rgba(255, 255, 255, 0.5) inset;
+}
+
+/* Disabled state */
+.toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  margin-top: 30px;
+}
+
+.pagination-controls button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* Submit Button */
+.submit-button-invoice-status {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px; /* Adjust gap between icon and text */
+  width: 100%;
+  max-width: 30px;
+  display: block;
+  color: #069696;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 40px; 
+  margin-left: 97.5%;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.submit-button-invoice-status:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.submit-button-invoice-status:hover:not(:disabled) {
+  color: #fff;
+  background: linear-gradient(135deg, #00bfa5, #069696); /* modern gradient hover */
+  transform: translateY(-2px); /* subtle lift effect */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* subtle shadow */
+  transition: all 0.3s ease; /* smooth transition */
+}
+
+/* Popup container with icon style */
+.disable-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px 28px;
+  width: 340px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.25);
+  z-index: 2000;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  animation: fadeInDrop 0.3s ease-in-out;
+  margin-left: 130px;
+}
+
+/* Icon at top */
+.disable-popup .popup-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.disable-popup .popup-icon svg {
+  font-size: 32px;
+  color: #db6c03; /* warning orange */
+}
+
+/* Heading text */
+.disable-popup p {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #2c2c2c;
+  text-align: center;
+}
+
+/* Radio options */
+.disable-popup label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #444;
+}
+
+.disable-popup input[type="radio"] {
+  margin-right: 10px;
+  accent-color: #db6c03;
+}
+
+/* Button row */
+.disable-popup .popup-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* Buttons with icons */
+/* Shared button base */
+.disable-popup button {
+  display: inline-flex;
+  align-items: left;
+  justify-content: center;
+  font-size: 11px;       /* smaller font */
+  font-weight: 600;
+  margin: 5px;
+  padding-left: 2px;
+  padding-right: 2px;
+  padding-top: 2px;
+  border: none;
+  border-radius: 2px;    /* small rounded corners, almost square */
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  min-width: 70px;       /* keeps them evenly sized */
+  height: 23px;          /* small button height */
+}
+
+/* Confirm button */
+.popup-confirm-btn {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.popup-confirm-btn:hover {
+  background-color: #43a047;
+  transform: scale(1.05);
+}
+
+/* Cancel button */
+.popup-cancel-btn {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.popup-cancel-btn:hover {
+  background-color: #e53935;
+  transform: scale(1.05);
+}
+
+/* Drop-in animation */
+@keyframes fadeInDrop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -40%) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+
+/* ----------- Responsive Styles ----------*/

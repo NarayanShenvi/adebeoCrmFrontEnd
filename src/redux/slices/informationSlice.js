@@ -17,7 +17,7 @@
 //   initialState: {
 //     orders: {}, // Initialize orders as an empty object
 //     status: 'idle', // Initial status
-//     error: null,
+//     error: null,  
 //   },
 //   reducers: {},
 //   extraReducers: (builder) => {
@@ -67,14 +67,59 @@ export const fetchAdebeoOrders = createAsyncThunk(
   }
 );
 
+// ✅ Fetch invoices by customer
+export const fetchInvoicesByCustomer = createAsyncThunk(
+  "information/fetchInvoicesByCustomer",
+  async (customer_name) => {
+    try {
+      const token = localStorage.getItem("Access_Token");
+      const response = await axios.get(`${API}/get_cxpayment`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        params: { customer_name },
+      });
+      // response.data has { current_page, payments: [] }
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message
+      );
+    }
+  }
+);
+
+
+// ✅ Disable invoice (with or without PO)
+export const disableInvoice = createAsyncThunk(
+  "information/disableInvoice",
+  async ({ invoice_id, isEnableInvoicePurchase }) => {
+    const token = localStorage.getItem("Access_Token");
+
+    const response = await axios.put(
+      `${API}/disable_invoice/${invoice_id}`,
+      { isEnableInvoicePurchase }, // true = disable with PO, false = disable only invoice
+      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+
+    return {
+      invoice_id,
+      isEnabled: false,
+      isEnableInvoicePurchase,
+    };
+  }
+);
+
 
 const informationSlice = createSlice({
   name: 'information',
   initialState: {
     orders: {},           // Initialize orders as an empty object
-    status: 'idle',       // Initial status
+    status: 'idle',           // Initial status
+    loading: false,    // ✅ added       
     error: null,          // Store error messages here
-    noOrdersFound: false, // New field to handle 'no orders found' state
+    noOrdersFound: false, // New field to handle 'no orders found' 
+     invoices: [],         // ✅ For customer invoices
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -97,7 +142,36 @@ const informationSlice = createSlice({
         } else {
           state.error = action.error.message;  // Any other errors
         }
-      });
+      })
+      // ✅ Fetch invoices by customer
+      .addCase(fetchInvoicesByCustomer.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchInvoicesByCustomer.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.invoices = action.payload || [];
+      })
+      .addCase(fetchInvoicesByCustomer.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+
+      // ✅ Update invoice status
+      .addCase(disableInvoice.fulfilled, (state, action) => {
+  const { invoice_id, isEnabled } = action.payload;
+
+  // If your state.invoices is just one object:
+  if (state.invoices?.id === invoice_id) {
+    state.invoices.isEnabled = isEnabled;
+  }
+
+  // If your state.invoices is just the ID:
+  if (state.invoices === invoice_id) {
+    state.invoices = { id: invoice_id, isEnabled }; 
+  }
+});
+
+
   },
 });
 

@@ -35,18 +35,21 @@ const CustomerPaymentSection = () => {
     }
   }, [dispatch, currentPage, totalPages]);
 
-  // Initialize editablePayments when payments are updated
-  useEffect(() => {
-    if (payments && payments.length > 0) {
-      const initializedPayments = payments.map(payment => ({
-        ...payment,
-        paid_amount: payment.paid_amount || 0,  // Default paid_amount to 0 if undefined
-        comment: payment.comment || ''  // Initialize comment field
-      }));
-      console.debug('Initialized editable payments:', initializedPayments);
-      setEditablePayments(initializedPayments);
-    }
-  }, [payments]);
+  
+// Initialize editablePayments when payments are updated
+useEffect(() => {
+  if (payments && payments.length > 0) {
+    const initializedPayments = payments.map(payment => ({
+      ...payment,
+      paid_amount: payment.paid_amount || 0,  // Default paid_amount to 0 if undefined
+      comment: payment.comment || '',         // Initialize comment field
+      canRegenerate: payment.isEnableInvoicePurchase === false // 👈 NEW flag
+    }));
+    console.debug('Initialized editable payments:', initializedPayments);
+    setEditablePayments(initializedPayments);
+  }
+}, [payments]);
+
 
   // Guard to prevent showing errors during loading phase ---- CHANGES MADE
   if (loading) {
@@ -130,6 +133,7 @@ const CustomerPaymentSection = () => {
         <th><FaDownload className='header-down'/>
         </th>
         <th>Info</th> {/* New Info column */}
+        <th>Reg-inv</th>
       </tr>
     </thead>
     <tbody>
@@ -201,6 +205,25 @@ className='cxpay'
              <RiInformation2Fill   title=" Payment Information" className="action-icon-payment"   // Pass customer ID
                />
           </td>
+          <td>
+  <button
+    className={`regen-btn ${!payment.canRegenerate ? "is-disabled" : ""}`}
+    disabled={!payment.canRegenerate}
+    onClick={() => {
+      if (payment.canRegenerate) {
+        handleGeneratePDF(payment.invoice_number);
+      }
+    }}
+    title={
+      payment.canRegenerate
+        ? "Re-generate Invoice"
+        : "Regeneration unavailable.\nIf only the invoice is disabled,\nyou can re-generate it here."
+    }
+  >
+    ♻
+  </button>
+</td>
+
        </tr>
       ))}
     </tbody>
