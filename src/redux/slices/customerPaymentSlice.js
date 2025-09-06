@@ -16,7 +16,7 @@ export const fetchCustomerPaymentsAsync = createAsyncThunk(
     try {
       // Make the API call with the access token included in the headers
       const response = await axios.get(`${API}/get_cxpayment`, {
-        params: { page, per_page },  // Passing pagination parameters
+        params: { page, per_page , include_disabled: true},  // Passing pagination parameters
         headers: {
           Authorization: `Bearer ${token}`,  // Add the token to the request headers
         },
