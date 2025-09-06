@@ -781,9 +781,12 @@ updateTotal(quoteItems);
     {/* Selection Type */}
     <td>
   {proformaType === "existing" ? (
-    <span
-    >
-      Unknown Type
+    <span>
+  {line?.isCombo === true
+      ? "Combo Product"
+      : line?.isCombo === false
+      ? "Single Product"
+      : ""}
     </span>
   ) : (
     <select
@@ -820,17 +823,19 @@ updateTotal(quoteItems);
     <td>
       {proformaType === "existing" ? (
         <span>
-          {line.selectionType === "single"
-            ? line.selectedProduct
-              ? `${line.selectedProduct.productName} (${line.selectedProduct.productCode})`
-              : "Unknown Product"
-            : line.selectionType === "combo"
-            ? line.selectedCombo
-              ? `Combo: ${line.selectedCombo}`
-              : "Unknown Combo"
-            : "Unknown Type"}
-        </span>
-      ) : (
+          {line?.isCombo === true ? (
+          <>
+            {line?.description || "No Description"} (Unknown) - Combo Product
+          </>
+        ) : line?.isCombo === false ? (
+          <>
+            {line?.description || "No Description"} ({line?.prodcutCode || "Unknown Code"}) 
+          </>
+        ) : (
+          "Unknown Typ"
+        )}
+    </span>
+    ) : (
         <div className="quote-wrapper">
           {/* SINGLE PRODUCT DROPDOWN */}
           {line.selectionType === "single" && (
