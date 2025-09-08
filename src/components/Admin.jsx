@@ -44,7 +44,7 @@ default: return <div className="default-message-admin">Please select an option f
         className={selected === 'ManageUserFunnel' ? 'active' : ''}
         onClick={() => setSelected('ManageUserFunnel')}
       >
-        Transfer Funnel User
+        Transfer User Funnel
       </a>
       <a
         className={selected === 'ManageCustomerData' ? 'active' : ''}

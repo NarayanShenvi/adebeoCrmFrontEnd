@@ -8,7 +8,7 @@ import { generateInvoicePdfAsync } from '../redux/slices/customerPaymentSlice';
 import { FaFileDownload, FaFilePdf } from 'react-icons/fa'; // added
 import { CiFileOff } from "react-icons/ci"; // added
 import { FaDownload } from "react-icons/fa6";// added
-
+import { recreateInvoiceAsync } from '../redux/slices/customerPaymentSlice';
 
 const CustomerPaymentSection = () => {
   const dispatch = useDispatch();
@@ -41,14 +41,16 @@ useEffect(() => {
   if (payments && payments.length > 0) {
     const initializedPayments = payments.map(payment => ({
       ...payment,
-      paid_amount: payment.paid_amount || 0,  // Default paid_amount to 0 if undefined
-      comment: payment.comment || '',         // Initialize comment field
-      canRegenerate: payment.isEnableInvoicePurchase === false // 👈 NEW flag
+      paid_amount: payment.paid_amount || 0,
+      comment: payment.comment || '',
+      canRegenerate: payment.payment_status === 'Cancelled' || payment.isEnableInvoicePurchase === false
     }));
-    console.debug('Initialized editable payments:', initializedPayments);
     setEditablePayments(initializedPayments);
+  } else {
+    setEditablePayments([]);
   }
 }, [payments]);
+
 
 
   // Guard to prevent showing errors during loading phase ---- CHANGES MADE
@@ -138,94 +140,136 @@ useEffect(() => {
     </thead>
     <tbody>
       {editablePayments.map((payment, index) => (
-        <tr key={payment.invoice_number}>
-           <td>
-          <button 
-className='cxpay'
-            onClick={() => handleGeneratePDF(payment.invoice_number)} // Function to handle PDF generation
-          >
- <FaFilePdf   title='Generate PDF' />     </button> 
-        </td>
-          <td>{payment.invoice_number}</td>
-          <td>{payment.customer_name}</td>
-          <td>{payment.total_amount}</td>
-          <td>{payment.amount_due}</td>
-          <td>{new Date(payment.invoice_date).toLocaleDateString()}</td>
-          <td>{payment.payment_status}</td>
-          <td>
-          <input
-  type="number"
-  value={payment.paid_amount || ""}
-  onChange={(e) => {
-    const value = e.target.value;
-    if (value === "" || parseFloat(value) >= 0) {
-      handlePaidAmountChange(index, value);
-    }
-  }}
-  min="0" // Prevents negative values
-  disabled={payment.payment_status === "Completed"}
-/>
+       <tr
+  key={payment.invoice_number}
+  className={payment.payment_status === "Cancelled" ? "cancelled-row" : ""}
+>
 
-          </td>
-          <td>
-            <textarea
-              value={payment.comment}
-              onChange={(e) => handleCommentChange(index, e.target.value)}
-              placeholder="Enter payment details (max 50 words)"
-              maxLength={250}
-              rows={3}
-              disabled={payment.payment_status === "Completed"}
-            />
-          </td>
-          <td>
-            {payment.payment_status === "Pending" && (
-              <FaCheckCircle
-                title="Submit"
-                className={`submit-icon ${payment.amount_due === 0 ? "disabled" : ""}`}
-                onClick={() => {
-                  if (payment.amount_due === 0) {
-                    alert("Payment already completed. No submission required.");
-                  } else {
-                    handleSubmit(index, payment);
-                  }
-                }}
-              />
-            )}
-          </td>
-          <td>
-              {payment.pdf_link ? (
-                <a href={`${payment.base_url}${payment.pdf_link}`} target="_blank" rel="noopener noreferrer">
-<FaFileDownload className='rowdown' title='Download PDF'/>
-</a>
-              ) : (
-<CiFileOff className='nopdf'title='No PDF Available'/>
-              )}
-            </td>
-          <td>
-             <RiInformation2Fill   title=" Payment Information" className="action-icon-payment"   // Pass customer ID
-               />
-          </td>
-          <td>
-  <button
-    className={`regen-btn ${!payment.canRegenerate ? "is-disabled" : ""}`}
-    disabled={!payment.canRegenerate}
-    onClick={() => {
-      if (payment.canRegenerate) {
-        handleGeneratePDF(payment.invoice_number);
+ <td>
+<button 
+  className={`cxpay ${payment.payment_status === "Cancelled" ? "is-disabled" : ""}`}
+  onClick={() => handleGeneratePDF(payment.invoice_number)}
+  disabled={payment.payment_status === "Cancelled"}
+  title={payment.payment_status === "Cancelled" ? "Disabled" : "Generate PDF"}
+>
+  <FaFilePdf />
+</button>
+
+
+  </td>
+  <td>{payment.invoice_number}</td>
+  <td>{payment.customer_name}</td>
+  <td>{payment.total_amount}</td>
+  <td>{payment.amount_due}</td>
+  <td>{new Date(payment.invoice_date).toLocaleDateString()}</td>
+  <td>{payment.payment_status}</td>
+
+ {/* Paid Amount */}
+<td>
+  <input
+    type="number"
+    value={payment.paid_amount || ""}
+    onChange={(e) => {
+      const value = e.target.value;
+      if (value === "" || parseFloat(value) >= 0) {
+        handlePaidAmountChange(index, value);
       }
     }}
-    title={
-      payment.canRegenerate
-        ? "Re-generate Invoice"
-        : "Regeneration unavailable.\nIf only the invoice is disabled,\nyou can re-generate it here."
-    }
-  >
-    ♻
-  </button>
+    min="0"
+    disabled={payment.payment_status !== "Pending"}
+  />
 </td>
 
-       </tr>
-      ))}
+{/* Comment */}
+<td>
+  <textarea
+    value={payment.comment}
+    onChange={(e) => handleCommentChange(index, e.target.value)}
+    placeholder="Enter payment details (max 50 words)"
+    maxLength={250}
+    rows={3}
+    disabled={payment.payment_status !== "Pending"}
+  />
+</td>
+
+
+ {/* Action Submit */}
+<td>
+  {payment.payment_status === "Pending" ? (
+    <FaCheckCircle
+      title={
+        payment.amount_due === 0
+          ? "Payment complete — nothing to submit"
+          : "Submit payment"
+      }
+      className={`submit-icon ${payment.amount_due === 0 ? "is-disabled" : ""}`}
+      onClick={() => {
+        if (payment.amount_due === 0) {
+          alert("Payment already completed. No submission required.");
+        } else {
+          handleSubmit(index, payment);
+        }
+      }}
+    />
+  ) : payment.payment_status === "Cancelled" ? (
+    <FaCheckCircle
+      title="Submission disabled — invoice cancelled"
+      className="submit-icon is-disabled"
+    />
+  ) : (
+    <CiFileOff
+      className="nopdf"
+      title="Submission disabled — not pending"
+    />
+  )}
+</td>
+
+{/* Download PDF */}
+<td>
+  {payment.payment_status === "Cancelled" ? (
+    <FaFileDownload
+      className="rowdown is-disabled"
+      title="Download disabled — invoice cancelled"
+    />
+  ) : payment.pdf_link ? (
+    <a
+      href={`${payment.base_url}${payment.pdf_link}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <FaFileDownload className="rowdown" title="Download PDF" />
+    </a>
+  ) : (
+    <CiFileOff className="nopdf" title="No PDF Available" />
+  )}
+</td>
+
+
+  <td>
+  <RiInformation2Fill
+    title={payment.payment_status === "Cancelled" ? "Disabled" : "Payment Information"}
+    className={`action-icon-payment ${payment.payment_status === "Cancelled" ? "is-disabled" : ""}`}
+  />
+</td>
+
+
+  {/* Regenerate Invoice */}
+  <td>
+    <button
+      className={`regen-btn ${payment.payment_status === "Cancelled" ? "" : "is-disabled"}`}
+      disabled={payment.payment_status !== "Cancelled"}
+      onClick={() => dispatch(recreateInvoiceAsync(payment.invoice_id))}
+      title={
+        payment.payment_status === "Cancelled"
+          ? "Re-generate Invoice"
+          : "Regeneration available only for cancelled invoices"
+      }
+    >
+      ♻
+    </button>
+  </td>
+</tr>
+     ))}
     </tbody>
   </table>
 )}

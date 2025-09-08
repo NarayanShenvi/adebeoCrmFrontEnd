@@ -4708,6 +4708,22 @@ select option {
   pointer-events: auto; /* Ensures alert works even when disabled */
   transform: scale(1.4) !important; /* Slight zoom on hover */
 }
+/* Put this at the END of Dashboard.css so it overrides earlier rules */
+.payments-table tr.cancelled-row,
+.payments-table tr.cancelled-row td {
+  color: rgba(129, 131, 131, 1) !important; /* dull font color for text cells */
+}
+/* Disabled look for inputs + textarea in cancelled row */
+.payments-table tr.cancelled-row input:disabled,
+.payments-table tr.cancelled-row textarea:disabled {
+  background-color: rgba(224, 224, 224, 0.45) !important;   
+  cursor: default;  /* normal arrow cursor */
+}
+/* When hovering over a cancelled row */
+.payments-table tr.cancelled-row:hover {
+  background-color: #f1f1f1; 
+  cursor: default;          /* no pointer change */
+}
 .cxpay{
   background: none;
   border: none;
@@ -4719,6 +4735,10 @@ select option {
 .cxpay:hover {
   color: #1c5e02;
   transform: scale(1.4) !important; /* Slight zoom on hover */
+}
+.cxpay.is-disabled {
+  color: #a4a5a4 !important;   /* dull gray */
+  cursor: default;       /* stop pointer hand */
 }
 .payments-table .action-icon-payment {
   cursor: pointer;
@@ -4734,7 +4754,25 @@ select option {
   color: #288504;
   transform: scale(1.4) !important; /* Slight zoom on hover */
 }
+.action-icon-payment.is-disabled {
+  color: #a4a5a4;  /* gray */
+  cursor: default;
+}
 
+.action-icon-payment.is-disabled:hover {
+  color: #a4a5a4 !important;
+  transform: scale(1.4) !important;
+}
+
+.submit-icon.is-disabled {
+  color: #a4a5a4;   /* dull gray */
+  cursor: default;
+}
+/* Ensure hover doesn't override */
+.submit-icon.is-disabled:hover {
+  color: #a4a5a4 !important;
+  transform: scale(1.4) !important;
+}
 
 .header-down{
   font-size: 17px;
@@ -4752,6 +4790,11 @@ select option {
   color: #1c5e02;
   transform: scale(1.4) !important; /* Slight zoom on hover */
 }
+.rowdown.is-disabled {
+  color: #a4a5a4;   /* dull gray */
+  cursor: default;
+}
+
 .regen-btn {
   background: none;
   border: none;
@@ -6958,13 +7001,17 @@ select option {
 
 /* Proforma invoice status management Section */
 .performa-invoice-status {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
   flex-grow: 1;
   padding: 20px;
-  max-width: calc(100% - 240px);
-  max-height: 100vh; 
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
   background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
   margin-left: 250px;
-  font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
 
 /* Heading */
@@ -6993,6 +7040,8 @@ select option {
   caret-color: rgb(7, 94, 121); /* Change cursor color */
   color: rgb(7, 94, 121); /* Change input text color */
   margin-top: 5%;
+  margin-bottom: 6px;
+  margin-left: 9.2%;
 }
 
 .performa-invoice-status .search-field-poinvoice-status {
@@ -7008,7 +7057,8 @@ select option {
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   margin-top: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  margin-left: 9.2%;
 }
 .search-field1-poinvoicestatus .PoinvoicestatusLoading 
 {
@@ -7018,18 +7068,18 @@ select option {
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   margin-top: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  margin-left: 9.2%;
 }
 .search-field1-poinvoicestatus select{
-  border: 1px solid #8bcfcf;
+   border: 1px solid #8bcfcf;
   border-radius: 2px;             /* Slightly rounded corners */              
   font-size: 12px;               /* Consistent font size */
   background: rgba(195, 237, 243, 0.87);
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   color: rgb(7, 94, 121); /* Change input text color */
   font-weight: 800;
-  margin-top: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 50px;
   width: 100%;
   max-width: 174px;
   height: 100vh;
@@ -7037,6 +7087,7 @@ select option {
   outline: none;
   padding-left: 10px;
   padding-top: -18px;
+  margin-left: 9.2%;
   display: block;
 } 
 .search-field1-poinvoicestatus select:focus {
@@ -7064,14 +7115,9 @@ select option {
   margin-bottom: 10px;
   max-width: 1200px; /* Adjust as needed */
   min-width: 1100px; /* Ensures form doesn't shrink too much */
+  margin: 0 auto;
 }
 
-.poinvoice-status-invoice-table thead
-{
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
 .poinvoice-status-invoice-table th, 
 .poinvoice-status-invoice-table td {
   text-align: left;
@@ -7133,19 +7179,19 @@ select option {
 }
 .poinvoice-status-invoice-table th:nth-child(3),
 .poinvoice-status-invoice-table td:nth-child(3) {
-  width: 14%; 
+  width: 16%; 
   white-space: pre-line; 
   word-wrap: break-word; 
 }
 .poinvoice-status-invoice-table th:nth-child(4),
 .poinvoice-status-invoice-table td:nth-child(4) {
-  width: 14%; 
+  width: 16%; 
   white-space: pre-line; 
   word-wrap: break-word; 
 }
 .poinvoice-status-invoice-table th:nth-child(5),
 .poinvoice-status-invoice-table td:nth-child(5) {
-  width:14%; 
+  width:17%; 
   white-space: pre-line; 
   word-wrap: break-word; 
 }
@@ -7155,7 +7201,7 @@ select option {
 }
 .poinvoice-status-invoice-table th:nth-child(7),
 .poinvoice-status-invoice-table td:nth-child(7) {
-  width: 10%; /* Fixed width */
+  width: 8%; /* Fixed width */
 }
 .poinvoice-status-invoice-table th:nth-child(8),
 .poinvoice-status-invoice-table td:nth-child(8) {
@@ -7323,17 +7369,90 @@ select option {
   cursor: not-allowed;
 }
 
+.disabled-invoice-card {
+  background-color: rgba(253, 207, 57, 0.57);
+  backdrop-filter: blur(16px);                /* frosted glass effect */
+  -webkit-backdrop-filter: blur(16px);        /* Safari support */
+  border-radius: 4px;                         /* smooth rounded corners */
+  border: 1px dashed rgba(173, 216, 230, 0.4); /* subtle tinted border */
+  padding: 16px 22px;
+  max-width: 320px;
+  margin: 20px auto;
+  margin-bottom: -50px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #111;                                 /* dark text for readability */
+  text-align: justify;
+  line-height: 1.4;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInDown 0.4s ease forwards;
+}
+
+.disabled-invoice-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+  transform: rotate(25deg);
+  pointer-events: none;
+}
+
+.disabled-invoice-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.18);
+}
+
+.disabled-invoice-card h4 {
+  margin: 0 0 5px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #011111ff; /* blue accent */
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.disabled-invoice-card p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.disabled-invoice-card p span {
+  font-weight: 600;
+  color: #023131ff;
+}
+
+/* Slide down + fade-in animation */
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Pagination Controls */
-.pagination-controls {
+.pagination-controls-poinvstatus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
   white-space: nowrap;
   margin-top: 30px;
+  flex-grow: 1;
+  max-width: calc(100% - 270px);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-left: 9.2%;
 }
 
-.pagination-controls button {
+.pagination-controls-poinvstatus button {
   cursor: pointer;
   background: none;
   border: none;
@@ -7342,17 +7461,17 @@ select option {
   transition: color 0.3s ease-in-out;
 }
 
-.pagination-controls button:hover {
+.pagination-controls-poinvstatus button:hover {
   color: #0e7204;
   transform: scale(1.4); /* Slight zoom on hover */
 }
 
-.pagination-controls button:disabled {
+.pagination-controls-poinvstatus button:disabled {
   color: gray;
   cursor: allowed;
 }
 
-.pagination-controls span {
+.pagination-controls-poinvstatus span {
   font-size: 14px;
   font-weight: bold;
   color: #444;
@@ -7361,225 +7480,132 @@ select option {
   text-align: center;
 }
 
-/* Submit Button */
-.submit-button-poinvoicestatus {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  gap: 8px; /* Adjust gap between icon and text */
-  width: 100%;
-  max-width: 30px;
-  display: block;
-  color: #069696;
-  cursor: pointer;
-  margin-right: 10px;
-  margin-top: 40px; 
-  margin-left: 97.5%;
-  transition: transform 0.2s, color 0.2s;
-}
-
-.submit-button-poinvoicestatus:disabled {
-  opacity: 0.6;
-  cursor: allowed;
-}
-
-.submit-button-poinvoicestatus:hover:not(:disabled) {
-  color: #fff;
-  background: linear-gradient(135deg, #00bfa5, #069696); /* modern gradient hover */
-  transform: translateY(-2px); /* subtle lift effect */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* subtle shadow */
-  transition: all 0.3s ease; /* smooth transition */
-}
-
-
 /* ----------- Responsive Styles ----------*/
+/* ================== RESPONSIVE ================== */
 
-/* Small screens - Mobile (up to 480px) */
+/* Small mobiles: ≤480px */
 @media (max-width: 480px) {
   .performa-invoice-status {
+    margin-left: 0; /* remove sidebar spacing */
     padding: 10px;
-    margin-left: 0;
-    max-width: 100%;
-    font-size: 12px;
+  }
+
+  .performa-invoice-status h3 {
+    font-size: 16px;
   }
 
   .search-field-poinvoice-status {
     max-width: 100%;
-    height: 28px;
-    font-size: 12px;
+    margin-left: 0;
   }
 
   .search-field1-poinvoicestatus select {
     max-width: 100%;
-    font-size: 11px;
-    height: 28px;
+    margin-left: 0;
   }
 
   .poinvoice-status-invoice-table {
-    min-width: 100%;
+    min-width: 100%; /* fit screen */
+    font-size: 11px;
+    overflow-x: auto; /* enable horizontal scroll */
+    display: block;
+  }
+
+  .disabled-invoice-card {
     max-width: 100%;
-    font-size: 10px;
-  }
-
-  .poinvoice-status-invoice-table th, 
-  .poinvoice-status-invoice-table td {
-    padding: 6px 4px;
-  }
-
-  .toggle-btn {
-    width: 40px;
-    height: 20px;
-  }
-
-  .toggle-btn::before {
-    width: 16px;
-    height: 16px;
-    top: 2px;
-    left: 2px;
-  }
-
-  .toggle-btn.disable::before {
-    transform: translateX(20px);
-  }
-
-  .submit-button-poinvoicestatus {
-    max-width: 25px;
-    margin-top: 20px;
-    margin-left: 90%;
-  }
-
-  .pagination-controls span {
+    padding: 12px;
     font-size: 12px;
+  }
+
+  .pagination-controls-poinvstatus {
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 0;
   }
 }
 
-/* Medium screens - Tablets (481px to 768px) */
-@media (min-width: 481px) and (max-width: 768px) {
+/* Tablets: ≤768px */
+@media (max-width: 768px) {
   .performa-invoice-status {
+    margin-left: 0; /* collapse sidebar */
     padding: 15px;
-    margin-left: 0;
-    max-width: 100%;
   }
 
-  .search-field-poinvoice-status {
+  .search-field-poinvoice-status,
+  .search-field1-poinvoicestatus select {
+    margin-left: 0;
     max-width: 280px;
-    height: 28px;
-    font-size: 13px;
-  }
-
-  .search-field1-poinvoicestatus select {
-    max-width: 140px;
-    height: 28px;
-    font-size: 12px;
-  }
-
-  .poinvoice-status-invoice-table {
-    min-width: 95%;
-    max-width: 100%;
-    font-size: 11px;
-  }
-
-  .poinvoice-status-invoice-table th, 
-  .poinvoice-status-invoice-table td {
-    padding: 8px 5px;
-  }
-
-  .toggle-btn {
-    width: 45px;
-    height: 22px;
-  }
-
-  .toggle-btn::before {
-    width: 18px;
-    height: 18px;
-    top: 2px;
-    left: 2px;
-  }
-
-  .toggle-btn.disable::before {
-    transform: translateX(22px);
-  }
-
-  .submit-button-poinvoicestatus {
-    max-width: 28px;
-    margin-top: 30px;
-    margin-left: 95%;
-  }
-
-  .pagination-controls span {
-    font-size: 13px;
-  }
-}
-
-/* Large screens - Small laptops (769px to 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .performa-invoice-status {
-    padding: 18px;
-    margin-left: 0;
-    max-width: 100%;
-  }
-
-  .search-field-poinvoice-status {
-    max-width: 300px;
-    height: 29px;
-    font-size: 13px;
-  }
-
-  .search-field1-poinvoicestatus select {
-    max-width: 150px;
-    height: 29px;
-    font-size: 12px;
   }
 
   .poinvoice-status-invoice-table {
     min-width: 100%;
-    max-width: 100%;
     font-size: 12px;
+    overflow-x: auto;
+    display: block;
   }
 
-  .poinvoice-status-invoice-table th, 
+  .poinvoice-status-invoice-table th,
   .poinvoice-status-invoice-table td {
-    padding: 9px 6px;
+    font-size: 12px;
+    padding: 6px;
   }
 
-  .toggle-btn {
-    width: 48px;
-    height: 23px;
+  .disabled-invoice-card {
+    max-width: 90%;
+    margin: 15px auto;
+    padding: 14px;
   }
 
-  .toggle-btn::before {
-    width: 19px;
-    height: 19px;
-    top: 2px;
-    left: 2px;
-  }
-
-  .toggle-btn.disable::before {
-    transform: translateX(24px);
-  }
-
-  .submit-button-poinvoicestatus {
-    max-width: 30px;
-    margin-top: 35px;
-    margin-left: 96%;
-  }
-
-  .pagination-controls span {
-    font-size: 14px;
+  .pagination-controls-poinvstatus {
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-left: 0;
   }
 }
+
+/* Small laptops / desktops: ≤1024px */
+@media (max-width: 1024px) {
+  .performa-invoice-status {
+    margin-left: 200px; /* narrower sidebar */
+  }
+
+  .search-field-poinvoice-status,
+  .search-field1-poinvoicestatus select {
+    max-width: 300px;
+    margin-left: 5%;
+  }
+
+  .poinvoice-status-invoice-table {
+    max-width: 100%;
+    min-width: unset;
+    font-size: 13px;
+  }
+
+  .poinvoice-status-invoice-table th,
+  .poinvoice-status-invoice-table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .disabled-invoice-card {
+    max-width: 300px;
+  }
+}
+
 
 /* Invoice status management Section */
 .invoice-status {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
   flex-grow: 1;
   padding: 20px;
-  max-width: calc(100% - 240px);
-  max-height: 100vh; 
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
   background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
   margin-left: 250px;
-  font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  position: relative;
 }
 
 /* Heading */
@@ -7590,20 +7616,6 @@ select option {
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   margin-top: 20px;
-}
-
-.invoice-status .search-container {
-  position: absolute; /* fix inside table container */
-  top: 20px;
-  left: 20px;
-  display: flex;
-  padding: 10px 0;
-  z-index: 5;
-  width: 100%;
-}
-.invoice-status .table-container {
-  margin-top: 15%;
-  width: 100%;
 }
 
 .invoice-status .search-field-invoice-status {
@@ -7623,6 +7635,8 @@ select option {
   caret-color: rgb(7, 94, 121); /* Change cursor color */
   color: rgb(7, 94, 121); /* Change input text color */
   margin-top: 5%;
+  margin-bottom: 6px;
+  margin-left: 9.2%;
 }
 
 .invoice-status .search-field-invoice-status {
@@ -7638,7 +7652,8 @@ select option {
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   margin-top: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  margin-left: 9.2%;
 }
 .search-field1-invoice-status .InvoiceStatusLoading 
 {
@@ -7648,7 +7663,8 @@ select option {
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   margin-top: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  margin-left: 9.2%;
 }
 .search-field1-invoice-status select{
   border: 1px solid #8bcfcf;
@@ -7658,8 +7674,7 @@ select option {
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   color: rgb(7, 94, 121); /* Change input text color */
   font-weight: 800;
-  margin-top: 95px;
-  margin-bottom: 20px;
+  margin-bottom: 50px;
   width: 100%;
   max-width: 174px;
   height: 100vh;
@@ -7667,6 +7682,7 @@ select option {
   outline: none;
   padding-left: 10px;
   padding-top: -18px;
+  margin-left: 9.2%;
   display: block;
 } 
 .search-field1-invoice-status select:focus {
@@ -7694,6 +7710,7 @@ select option {
   margin-bottom: 10px;
   max-width: 1200px; /* Adjust as needed */
   min-width: 1100px; /* Ensures form doesn't shrink too much */
+  margin: 0 auto;
 }
 
 .invoice-status-table th, 
@@ -7749,7 +7766,7 @@ select option {
 
 .invoice-status-table th:nth-child(1),
 .invoice-status-table td:nth-child(1) {
-  width: 3%; /* Fixed width */
+  width: 4%; /* Fixed width */
 }
 .invoice-status-table th:nth-child(2),
 .invoice-status-table td:nth-child(2) {
@@ -7790,10 +7807,6 @@ select option {
 .invoice-status-table th:nth-child(10),
 .invoice-status-table td:nth-child(10) {
   width: 9%; /* Fixed width */
-}
-.invoice-status-table th:nth-child(11),
-.invoice-status-table td:nth-child(11) {
-  width: 7%; /* Fixed width */
 }
 /* Target the last column (both th and td) */
 .invoice-status-table th:last-child,
@@ -7963,16 +7976,19 @@ select option {
 }
 
 /* Pagination Controls */
-.pagination-controls {
+.pagination-controls-invstatus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
   white-space: nowrap;
   margin-top: 30px;
+  flex-grow: 1;
+  max-width: calc(100% - 270px);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-left: 9.2%;
 }
 
-.pagination-controls button {
+.pagination-controls-invstatus button {
   cursor: pointer;
   background: none;
   border: none;
@@ -7981,54 +7997,23 @@ select option {
   transition: color 0.3s ease-in-out;
 }
 
-.pagination-controls button:hover {
+.pagination-controls-invstatus button:hover {
   color: #0e7204;
   transform: scale(1.4); /* Slight zoom on hover */
 }
 
-.pagination-controls button:disabled {
+.pagination-controls-invstatus button:disabled {
   color: gray;
   cursor: allowed;
 }
 
-.pagination-controls span {
+.pagination-controls-invstatus span {
   font-size: 14px;
   font-weight: bold;
   color: #444;
   width: 100%;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   text-align: center;
-}
-
-/* Submit Button */
-.submit-button-invoice-status {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  gap: 8px; /* Adjust gap between icon and text */
-  width: 100%;
-  max-width: 30px;
-  display: block;
-  color: #069696;
-  cursor: pointer;
-  margin-right: 10px;
-  margin-top: 40px; 
-  margin-left: 97.5%;
-  transition: transform 0.2s, color 0.2s;
-}
-
-.submit-button-invoice-status:disabled {
-  opacity: 0.6;
-  cursor: allowed;
-}
-
-.submit-button-invoice-status:hover:not(:disabled) {
-  color: #fff;
-  background: linear-gradient(135deg, #00bfa5, #069696); /* modern gradient hover */
-  transform: translateY(-2px); /* subtle lift effect */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* subtle shadow */
-  transition: all 0.3s ease; /* smooth transition */
 }
 
 /* Popup container with icon style */
@@ -8104,7 +8089,7 @@ select option {
   margin: 5px;
   padding-left: 2px;
   padding-right: 2px;
-  padding-top: 2px;
+  padding-top: 4px;
   border: none;
   border-radius: 2px;    /* small rounded corners, almost square */
   cursor: pointer;
@@ -8147,5 +8132,327 @@ select option {
   }
 }
 
+.disabled-invoice-card-invoicests {
+  background-color: rgba(253, 207, 57, 0.57);
+  backdrop-filter: blur(16px);                /* frosted glass effect */
+  -webkit-backdrop-filter: blur(16px);        /* Safari support */
+  border-radius: 4px;                         /* smooth rounded corners */
+  border: 1px dashed rgba(173, 216, 230, 0.4); /* subtle tinted border */
+  padding: 16px 22px;
+  max-width: 320px;
+  margin: 20px auto;
+  margin-bottom: -50px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #111;                                 /* dark text for readability */
+  text-align: justify;
+  line-height: 1.4;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInDown 0.4s ease forwards;
+}
+
+.disabled-invoice-card-invoicests::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+  transform: rotate(25deg);
+  pointer-events: none;
+}
+
+.disabled-invoice-card-invoicests:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.18);
+}
+
+.disabled-invoice-card-invoicests h4 {
+  margin: 0 0 5px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #011111ff; /* blue accent */
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.disabled-invoice-card-invoicests p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.disabled-invoice-card-invoicests p span {
+  font-weight: 600;
+  color: #023131ff;
+}
+
+/* Slide down + fade-in animation */
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* ----------- Responsive Styles ----------*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*Manage Funnel Section*/
+
+/* Submenu1------------>Transfer Funnel Section */
+
+.transfer-funnel-container {
+  flex-grow: 1;
+  padding: 20px;
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
+  background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
+  margin-left: 250px;
+}
+
+/* Heading */
+.transfer-funnel-container h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 50px;
+  margin-top: 20px;
+}
+
+/* Make Form Take Full Width */
+.create-user-funnel-transfer-form{
+  background-color: rgba(217, 217, 217, 0.15);
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 32px;
+  padding-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 750px; /* Adjust as needed */
+  min-width: 500px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+  align-items: center;  /* Centers children horizontally */
+
+}
+
+/* Form Group */
+.transfer-funnel-container .form-group-user-funnel{
+ display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  width: 100%;
+  max-width: 550px;
+  margin: 0 auto; /* THIS CENTERS IT */
+}
+
+/* Labels */
+.transfer-funnel-container label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+/* This targets all labels for required fields and adds the asterisk */
+.required-label::after {
+  content: " *"; /* Adds the asterisk after the label text */
+  color: rgb(223, 3, 3);    /* Makes the asterisk red */
+  font-weight: 800;
+}
+
+.create-user-funnel-transfer-form .form-select-user-funnel {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+  outline: none;   /* 🔥 remove default black outline */
+}
+
+/* Focus state for select fields */
+.create-user-funnel-transfer-form .form-select-user-funnel:focus {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+  outline: none !important;   /* 🔥 make sure no black border comes */
+}
+
+.create-user-funnel-transfer-form .form-select-user-funnel:hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+}
+
+.transfer-funnel-container form button[type="submit"]:hover {
+  color: #218838;
+  transform: scale(1.4);
+  background: transparent;
+}
+
+.submit-button-user-funnel {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px; /* Adjust gap between icon and text */
+  width: 100%;
+  max-width: 25px;
+  display: block;
+  color: #069696;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 30px; 
+  margin-left: 94%;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.submit-button-user-funnel:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.submit-button-user-funnel:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+/* ----------- Responsive Styles ----------*/
+/* ================== RESPONSIVE ================== */
+
+/* 📱 Small Screens (max 480px) */
+@media (max-width: 480px) {
+  .transfer-funnel-container {
+    margin-left: 0; /* remove left sidebar space */
+    padding: 10px;
+    width: 100%;
+  }
+
+  .transfer-funnel-container h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .create-user-funnel-transfer-form {
+    padding: 15px;
+    min-width: unset;
+    max-width: 100%;
+    gap: 10px;
+  }
+
+  .transfer-funnel-container .form-group-user-funnel {
+    max-width: 100%;
+  }
+
+  .create-user-funnel-transfer-form .form-select-user-funnel {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .submit-button-user-funnel {
+    margin-left: auto;  /* align right */
+    margin-top: 20px;
+    transform: scale(0.9);
+  }
+}
+
+/* 📲 Medium Screens (481px–768px) */
+@media (max-width: 768px) {
+  .transfer-funnel-container {
+    margin-left: 0; /* stack layout */
+    padding: 15px;
+  }
+
+  .transfer-funnel-container h3 {
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+
+  .create-user-funnel-transfer-form {
+    min-width: unset;
+    max-width: 90%;
+    padding: 20px;
+  }
+
+  .transfer-funnel-container .form-group-user-funnel {
+    max-width: 100%;
+  }
+
+  .submit-button-user-funnel {
+    margin-left: auto;
+    margin-top: 25px;
+  }
+}
+
+
+/* 💻 Large Tablets / Small Laptops (769px–1024px) */
+@media (max-width: 1024px) {
+  .transfer-funnel-container {
+    margin-left: 200px; /* slightly smaller sidebar space */
+    padding: 20px;
+  }
+
+  .create-user-funnel-transfer-form {
+    max-width: 600px; /* slightly smaller */
+  }
+
+  .transfer-funnel-container h3 {
+    font-size: 19px;
+  }
+
+  .submit-button-user-funnel {
+    margin-left: 85%;
+  }
+}
+
+
+/* Submenu1------------>Transfer Customer Data Section */
+
+
+
+
+
+
+
+

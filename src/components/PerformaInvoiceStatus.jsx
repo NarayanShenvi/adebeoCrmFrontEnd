@@ -6,8 +6,7 @@ import {
 } from "../redux/slices/proformaSlice";
 import "./dashboard/Dashboard.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { HiSave } from "react-icons/hi";
-import { FaSpinner } from 'react-icons/fa';
+import { FaExclamationTriangle, FaCheck, FaTimes } from "react-icons/fa";
 
 const PerformaInvoiceStatus = () => {
   const dispatch = useDispatch();
@@ -18,7 +17,11 @@ const PerformaInvoiceStatus = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [selectedRows, setSelectedRows] = useState({});
   const [tableData, setTableData] = useState([]);
+  const [popupRow, setPopupRow] = useState(null);
 
+  const [disabledInvoiceInfo, setDisabledInvoiceInfo] = useState(null);
+
+  
   // ✅ Extract invoice ID safely
   const getInvoiceId = (inv) =>
     inv?.proforma_id ??
@@ -80,7 +83,7 @@ const PerformaInvoiceStatus = () => {
             )
             .filter((name) =>
               name.toLowerCase().startsWith(term.toLowerCase())
-            ) // ✅ match only typed prefix
+            )
         )
       );
 
@@ -103,6 +106,8 @@ const PerformaInvoiceStatus = () => {
     setSelectedCustomer(cust);
     setSelectedRows({});
     setTableData([]);
+    // Clear disabled message when switching customer
+  setDisabledInvoiceInfo(null);
 
     if (cust) {
       try {
@@ -118,7 +123,6 @@ const PerformaInvoiceStatus = () => {
 
         const normalized = raw.map(normalizeInvoice);
 
-        // ✅ filter again for safety
         const filtered = normalized.filter((inv) =>
           (inv.customerName || "")
             .toLowerCase()
@@ -133,53 +137,53 @@ const PerformaInvoiceStatus = () => {
     }
   };
 
-  const toggleCheckbox = (id) => {
+   const toggleCheckbox = (id) => {
     setSelectedRows((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
   };
 
-  const handleToggleStatus = (invoice) => {
-    const updatedStatus = !invoice.isEnabled;
-
-    setTableData((prev) =>
-      prev.map((inv) =>
-        getInvoiceId(inv) === getInvoiceId(invoice)
-          ? { ...inv, isEnabled: updatedStatus }
-          : inv
-      )
-    );
-
-    dispatch(
-      updatePOInvoiceStatus({
-        invoiceId: getInvoiceId(invoice),
-        isEnabled: updatedStatus,
-      })
-    );
+  // 🔹 Show popup instead of immediate toggle
+  const handleToggleClick = (invoice) => {
+    setPopupRow(getInvoiceId(invoice));
   };
 
-  const handleSubmit = () => {
-    const selected = tableData.filter((inv) => selectedRows[getInvoiceId(inv)]);
-    if (selected.length === 0) {
-      alert("⚠️ No rows selected!");
-      return;
-    }
+  // 🔹 Confirm disable
+ const confirmDisable = (invoice) => {
+  const updatedStatus = false;
+  const invoiceId = getInvoiceId(invoice);
 
-    selected.forEach((inv) => {
-      dispatch(
-        updatePOInvoiceStatus({
-          invoiceId: getInvoiceId(inv),
-          isEnabled: inv.isEnabled,
-        })
-      );
+  // 1. Remove the invoice row
+  const updated = tableData.filter((inv) => getInvoiceId(inv) !== invoiceId);
+  setTableData(updated);
 
-      alert(`✅ Proforma ${inv.proforma_id} updated successfully.`);
+  // 2. Only show card if NO invoices remain
+  if (updated.length === 0) {
+    setDisabledInvoiceInfo({
+      invoiceNumber: invoiceId,
+      customerName: invoice.customerName || invoice.customer_name,
     });
+  } else {
+    setDisabledInvoiceInfo(null); // ✅ clear when rows remain
+  }
 
-    // Reset ONLY checkboxes after submit
-    setSelectedRows({});
-  };
+  // 3. Dispatch update
+  dispatch(
+    updatePOInvoiceStatus({
+      invoiceId: invoiceId,
+      isEnabled: updatedStatus,
+    })
+  );
+
+  alert(`✅ Proforma invoice ${invoiceId} disabled successfully.`);
+  setPopupRow(null);
+};
+
+const cancelDisable = () => {
+  setPopupRow(null); // closes the popup
+};
+
 
   // 🔹 Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -193,36 +197,47 @@ const PerformaInvoiceStatus = () => {
   return (
     <div className="performa-invoice-status">
       <h3>Praforma Invoice Management</h3>
+      <div>
+        <input
+          className="search-field-poinvoice-status"
+          type="text"
+          placeholder="Search by Customer Name"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
 
-      <input
-        className="search-field-poinvoice-status"
-        type="text"
-        placeholder="Search by Customer Name"
-        value={searchTerm}
-        onChange={handleSearchChange}
-      />
-
-      <div className="search-field1-poinvoicestatus">
-        {loading ? (
-          <p className="PoinvoicestatusLoading">Loading...</p>
-        ) : searchResults.length > 0 ? (
-          <select
-            onChange={handleSelectCustomer}
-            value={selectedCustomer?._id || ""}
-          >
-            <option value="" disabled>
-              Select a customer
-            </option>
-            {searchResults.map((cust) => (
-              <option key={cust._id} value={cust._id}>
-                {cust.companyName} ({cust.email})
+        <div className="search-field1-poinvoicestatus">
+          {loading ? (
+            <p className="PoinvoicestatusLoading">Loading...</p>
+          ) : searchResults.length > 0 ? (
+            <select
+              onChange={handleSelectCustomer}
+              value={selectedCustomer?._id || ""}
+            >
+              <option value="" disabled>
+                Select a customer
               </option>
-            ))}
-          </select>
-        ) : (
-          searchTerm && <p className="NoPoinvoicestatusFound">No customers found...</p>
-        )}
+              {searchResults.map((cust) => (
+                <option key={cust._id} value={cust._id}>
+                  {cust.companyName} ({cust.email})
+                </option>
+              ))}
+            </select>
+          ) : (
+            searchTerm && (
+              <p className="NoPoinvoicestatusFound">No customers found...</p>
+            )
+          )}
+        </div>
       </div>
+      {disabledInvoiceInfo && (
+  <div className="disabled-invoice-card">
+    <h4> 👍 Invoice Disabled</h4>
+    <p>
+      Proforma <span>#{disabledInvoiceInfo.invoiceNumber}</span> for customer <span>{disabledInvoiceInfo.customerName}</span> has been disabled.
+   <p></p> Choose a customer from the list above to continue managing porforma invoices.</p>
+  </div>
+)}
 
       {selectedCustomer && tableData.length > 0 && (
         <>
@@ -237,7 +252,6 @@ const PerformaInvoiceStatus = () => {
                 <th>Quantity</th>
                 <th>Unit Price</th>
                 <th>Subtotal</th>
-                <th>Status</th>
                 <th>Toggle</th>
               </tr>
             </thead>
@@ -256,14 +270,14 @@ const PerformaInvoiceStatus = () => {
                     >
                       {idx === 0 && (
                         <>
-                         <td rowSpan={items.length}>
-  <input
-    type="checkbox"
-    className="custom-checkbox-poinvoicestatus"
-    checked={isChecked}
-    onChange={() => toggleCheckbox(rowId)}
-  />
-</td>
+                          <td rowSpan={items.length}>
+                            <input
+                              type="checkbox"
+                              className="custom-checkbox-poinvoicestatus"
+                              checked={isChecked}
+                              onChange={() => toggleCheckbox(rowId)}
+                            />
+                          </td>
 
                           <td rowSpan={items.length}>{rowId}</td>
                           <td rowSpan={items.length}>
@@ -283,18 +297,39 @@ const PerformaInvoiceStatus = () => {
                       {idx === 0 && (
                         <>
                           <td rowSpan={items.length}>
-                            {invoice.isEnabled ? "Enabled" : "Disabled"}
-                          </td>
-                          <td rowSpan={items.length}>
                             <button
-                              className={`toggle-btn ${
-                                invoice.isEnabled ? "disable" : "enable"
-                              }`}
-                              onClick={() => handleToggleStatus(invoice)}
+                              className="toggle-btn disable"
+                              onClick={() => handleToggleClick(invoice)}
                               disabled={!isChecked}
                             >
-                              {invoice.isEnabled ? "Disable" : "Enable"}
+                              Disable
                             </button>
+
+                            {popupRow === rowId && (
+                              <div className="disable-popup">
+                                <div className="popup-icon">
+                                  <FaExclamationTriangle />
+                                </div>
+                                <p>
+                                  Are you sure you want to disable{" "}
+                                  <strong>{rowId}</strong>?
+                                </p>
+                                <div className="popup-actions">
+                                  <button
+                                    onClick={() => confirmDisable(invoice)}
+                                    className="popup-confirm-btn"
+                                  >
+                                    <FaCheck /> Confirm
+                                  </button>
+                                  <button
+                                    onClick={cancelDisable}
+                                    className="popup-cancel-btn"
+                                  >
+                                    <FaTimes /> Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                           </td>
                         </>
                       )}
@@ -313,17 +348,39 @@ const PerformaInvoiceStatus = () => {
                     <td>{invoice.customerName || invoice.customer_name}</td>
                     <td>{invoice.company_name || ""}</td>
                     <td colSpan={4}>No items</td>
-                    <td>{invoice.isEnabled ? "Enabled" : "Disabled"}</td>
                     <td>
                       <button
-                        className={`toggle-btn ${
-                          invoice.isEnabled ? "disable" : "enable"
-                        }`}
-                        onClick={() => handleToggleStatus(invoice)}
+                        className="toggle-btn disable"
+                        onClick={() => handleToggleClick(invoice)}
                         disabled={!isChecked}
                       >
-                        {invoice.isEnabled ? "Disable" : "Enable"}
+                        Disable
                       </button>
+                      {popupRow === rowId && (
+                        <div className="disable-popup">
+                          <div className="popup-icon">
+                            <FaExclamationTriangle />
+                          </div>
+                          <p>
+                            Are you sure you want to disable{" "}
+                            <strong>{rowId}</strong>?
+                          </p>
+                          <div className="popup-actions">
+                            <button
+                              onClick={() => confirmDisable(invoice)}
+                              className="popup-confirm-btn"
+                            >
+                              <FaCheck /> Confirm
+                            </button>
+                            <button
+                              onClick={cancelDisable}
+                              className="popup-cancel-btn"
+                            >
+                              <FaTimes /> Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );
@@ -332,61 +389,41 @@ const PerformaInvoiceStatus = () => {
           </table>
 
           {/* 🔹 Pagination Controls */}
-         <div className="pagination-controls">
-  <button
-    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-    disabled={currentPage === 1}
-  >
-    <FaChevronLeft />
-  </button>
-  <span className="page-quote">
-    Page {currentPage} of {totalPages}
-  </span>
-  <button
-    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-    disabled={currentPage === totalPages}
-  >
-    <FaChevronRight />
-  </button>
-</div>
-
+          <div className="pagination-controls-poinvstatus">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <FaChevronLeft />
+            </button>
+            <span className="page-poinvstatus">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <FaChevronRight />
+            </button>
+          </div>
         </>
       )}
-{selectedCustomer && !loading && tableData.length === 0 && (
-  <p
-    style={{
-      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
-      fontWeight: 900,
-      fontSize: '15px',
-      color: '#db6c03',
-      textAlign: 'center',
-      marginTop: '10%',
-    }}
-  >
-    No Proforma Invoices Available {selectedCustomer.customerName || selectedCustomer.customer_name}.
-  </p>
-)}
-
-    {selectedCustomer && tableData.length > 0 && (
-  
-    <button
-      type="submit"
-      disabled={loading}
-      onClick={handleSubmit}
-      className="submit-button-poinvoicestatus"
-    >
-      {loading ? (
-        <FaSpinner className="spinner" size={20} title="Submitting..." />
-      ) : (
-        <HiSave size={24} title="Submit" className="NewProduct" />
+      {selectedCustomer && !loading && tableData.length === 0 && (
+        <p
+          style={{
+            fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+            fontWeight: 900,
+            fontSize: "15px",
+            color: "#db6c03",
+            textAlign: "center",
+            marginTop: "10%",
+          }}
+        >
+          No Proforma Invoices Available{" "}
+          {selectedCustomer.companyName}.
+        </p>
       )}
-    </button>
-  
-)}
-
     </div>
-
-    
   );
 };
 

@@ -122,73 +122,6 @@
 //   };
 // };
 
-import { createSlice } from "@reduxjs/toolkit";
-import axios from "../../config/apiConfig";
-import API from "../../config/config";
-
-const initialState = {
-  funnelData: [],
-  customerComments: [],
-  loading: false,
-  error: null,
-  modalState: {
-    selectedShowCommentsCustomerId: null,
-    selectedAddCommentCustomerId: null,
-    showComments: false,
-    addComment: false,
-  },
-  pagination: {
-    currentPage: 1,
-    totalPages: 1,
-    totalRecords: 0,
-    limit: 5,
-  },
-};
-
-const funnelSlice = createSlice({
-  name: "funnel",
-  initialState,
-  reducers: {
-    funnelCustomers: (state, action) => {
-      state.loading = false;
-     // const { page, total_pages, total_records } = action.payload;
-      state.funnelData = action.payload.data;
-      state.totalPages = action.payload.total_pages;
-      state.totalRecords = action.payload.total_records;
-      state.currentPage = action.payload.page;
-      state.error = null;
-    },
-    setLoading: (state, action) => {
-      state.loading = action.payload;
-    },
-    setError: (state, action) => {
-      state.error = action.payload;
-    },
-    setCustomerComments: (state, action) => {
-      state.customerComments = action.payload;
-    },
-    addCustomerComment: (state, action) => {
-      state.customerComments.push(action.payload);
-    },
-    setModalState: (state, action) => {
-      state.modalState = { ...state.modalState, ...action.payload };
-    },
-    setPagination: (state, action) => {
-      state.pagination = { ...state.pagination, ...action.payload };
-    },
-  },
-});
-
-export const {
-  funnelCustomers,
-  setLoading,
-  setError,
-  setCustomerComments,
-  addCustomerComment,
-  setModalState,
-  setPagination,
-} = funnelSlice.actions;
-export default funnelSlice.reducer;
 
 // // Load funnel data with pagination
 // export const loadFunneldata = (page = 1, limit = 500, companyName = "") => {
@@ -259,6 +192,112 @@ export default funnelSlice.reducer;
 //   };
 // };
 
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "../../config/apiConfig";
+import API from "../../config/config";
+
+const initialState = {
+  funnelData: [],
+  customerComments: [],
+  loading: false,
+  error: null,
+  transferSuccess: null,
+  modalState: {
+    selectedShowCommentsCustomerId: null,
+    selectedAddCommentCustomerId: null,
+    showComments: false,
+    addComment: false,
+  },
+  pagination: {
+    currentPage: 1,
+    totalPages: 1,
+    totalRecords: 0,
+    limit: 5,
+  },
+};
+
+// Transfer funnel from one user to another
+export const transferFunnel = createAsyncThunk(
+  "funnel/transferFunnel",
+  async ({ fromUser, toUser }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("Access_Token");
+      const response = await axios.put(
+        `${API}/transfer_assigned_user`,
+        { fromUser, toUser },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+
+const funnelSlice = createSlice({
+  name: "funnel",
+  initialState,
+  reducers: {
+    funnelCustomers: (state, action) => {
+      state.loading = false;
+      state.funnelData = action.payload.data;
+      state.totalPages = action.payload.total_pages;
+      state.totalRecords = action.payload.total_records;
+      state.currentPage = action.payload.page;
+      state.error = null;
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+    setCustomerComments: (state, action) => {
+      state.customerComments = action.payload;
+    },
+    addCustomerComment: (state, action) => {
+      state.customerComments.push(action.payload);
+    },
+    setModalState: (state, action) => {
+      state.modalState = { ...state.modalState, ...action.payload };
+    },
+    setPagination: (state, action) => {
+      state.pagination = { ...state.pagination, ...action.payload };
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Transfer Funnel
+      .addCase(transferFunnel.pending, (state) => {
+        state.loading = true;
+        state.transferSuccess = null;
+      })
+      .addCase(transferFunnel.fulfilled, (state, action) => {
+        state.loading = false;
+        state.transferSuccess =
+          action.payload.message || "Transfer successful";
+      })
+      .addCase(transferFunnel.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
+
+
+export const {
+  funnelCustomers,
+  setLoading,
+  setError,
+  setCustomerComments,
+  addCustomerComment,
+  setModalState,
+  setPagination,
+} = funnelSlice.actions;
+export default funnelSlice.reducer;
+
+
 export const loadFunneldata = (page = 1, limit = 10, companyName = "") => {
   return async (dispatch) => {
     dispatch(setLoading(true));
@@ -312,7 +351,7 @@ export const loadFunneldata = (page = 1, limit = 10, companyName = "") => {
 
 // Load customer comments
 export const loadCustomerComments = (customerId) => {
-  return async (dispatch) => {
+  return async (dispatch) => {  
     dispatch(setLoading(true));
     try {
       const response = await axios.get(`${API}/get_adebeo_customer_comments/${customerId}`);
@@ -349,3 +388,5 @@ export const postCustomerComment = (customerId, commentText) => {
     }
   };
 };
+
+
