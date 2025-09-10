@@ -335,6 +335,7 @@ const customerSlice = createSlice({
         mobileNumber: '',
       };
     },
+    
     setModalState: (state, action) => {
       state.modalState = { ...state.modalState, ...action.payload };
     },

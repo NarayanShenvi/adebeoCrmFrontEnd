@@ -7113,8 +7113,8 @@ select option {
   padding-left: 30px;
   padding-right: 30px;
   margin-bottom: 10px;
-  max-width: 1200px; /* Adjust as needed */
-  min-width: 1100px; /* Ensures form doesn't shrink too much */
+  max-width: calc(100% - 270px); /* leaves 60px gap on the right */
+  min-width: calc(100% - 290px); /* leaves 200px gap */
   margin: 0 auto;
 }
 
@@ -7441,15 +7441,16 @@ select option {
 
 /* Pagination Controls */
 .pagination-controls-poinvstatus {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  white-space: nowrap;
-  margin-top: 30px;
   flex-grow: 1;
-  max-width: calc(100% - 270px);
-  font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  margin-left: 9.2%;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  margin-left: 121px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  white-space: nowrap;
 }
 
 .pagination-controls-poinvstatus button {
@@ -7708,8 +7709,8 @@ select option {
   padding-left: 30px;
   padding-right: 30px;
   margin-bottom: 10px;
-  max-width: 1200px; /* Adjust as needed */
-  min-width: 1100px; /* Ensures form doesn't shrink too much */
+  max-width: calc(100% - 270px); /* leaves 60px gap on the right */
+  min-width: calc(100% - 290px); /* leaves 200px gap */
   margin: 0 auto;
 }
 
@@ -7978,15 +7979,16 @@ select option {
 
 /* Pagination Controls */
 .pagination-controls-invstatus {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  white-space: nowrap;
-  margin-top: 30px;
   flex-grow: 1;
-  max-width: calc(100% - 270px);
-  font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  margin-left: 9.2%;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  margin-left: 121px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  white-space: nowrap;
 }
 
 .pagination-controls-invstatus button {
@@ -8449,11 +8451,503 @@ select option {
 
 
 /* Submenu1------------>Transfer Customer Data Section */
+/* Container */
+.manage-customer-data {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  flex-grow: 1;
+  padding: 20px;
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
+  background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
+  margin-left: 250px;
+}
 
+/* Heading */
+.manage-customer-data h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+}
 
+.manage-customer-data .search-field-customer-status {
+  width: 100%;
+  max-width: 340px;
+  height: 30px;
+  background: rgba(195, 237, 243, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  color: rgb(7, 94, 121); /* Change input text color */
+  margin-top: 5%;
+  margin-bottom: 6px;
+  margin-left: 9.2%;
+}
 
+.manage-customer-data .search-field-customer-status {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
 
+.search-field1-customer-status .NoCustomerStatusFound
+{
+  text-align: left;
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 9.2%;
+}
+.search-field1-customer-status .CustomerStatusLoading 
+{
+  text-align: left;
+  color: #069696;
+  font-size: 15px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 9.2%;
+}
+.search-field1-customer-status select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 174px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 9.2%;
+  display: block;
+} 
+.search-field1-customer-status select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-customer-status option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
 
+.customer-status-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  max-width: calc(100% - 270px); /* leaves 60px gap on the right */
+  min-width: calc(100% - 290px); /* leaves 200px gap */
+  margin: 0 auto;
+}
 
+.customer-status-table th, 
+.customer-status-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold;
+}
 
+.customer-status-table th {
+  background-color: #dfa436;
+  color: aliceblue;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:12px;
+  padding-bottom:12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.customer-status-table td {
+  background-color: rgba(231, 236, 155, 0.87);
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  font-size: 12px;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-right: 5px; /* Slight padding for column spacing */
+  color: rgba(34, 31, 31, 0.986);
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
 
+.customer-status-table th:nth-child(1),
+.customer-status-table td:nth-child(1) {
+  width: 4%; /* Fixed width */
+}
+.customer-status-table th:nth-child(2),
+.customer-status-table td:nth-child(2) {
+  width: 14%; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+.customer-status-table th:nth-child(3),
+.customer-status-table td:nth-child(3) {
+  width: 14%; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+.customer-status-table th:nth-child(4),
+.customer-status-table td:nth-child(4) {
+  width: 8%; 
+}
+.customer-status-table th:nth-child(5),
+.customer-status-table td:nth-child(5) {
+  width:14%; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+.customer-status-table th:nth-child(6),
+.customer-status-table td:nth-child(6) {
+  width: 8%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word;
+}
+.customer-status-table th:nth-child(7),
+.customer-status-table td:nth-child(7) {
+  width: 9%; /* Fixed width */
+}
+.customer-status-table th:nth-child(8),
+.customer-status-table td:nth-child(8) {
+  width: 9%; /* Fixed width */
+}
+.customer-status-table th:last-child,
+.customer-status-table td:last-child {
+  width: 5%; /* Adjust as needed */
+}
+.customer-status-table tbody tr:hover {
+  background-color: #c5a205; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Table cell checkbox styling */
+.custom-checkbox-customer-status {
+  appearance: none;         /* remove default browser style */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #069696; /* Default border color */
+  border-radius: 3px;
+  background-color: white; /* Default background */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Hover effect */
+.custom-checkbox-customer-status:hover {
+  border-color: #2c6fbb;
+  box-shadow: 0 0 6px #7fca90;
+}
+
+/* Checked state */
+.custom-checkbox-customer-status:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+.custom-checkbox-customer-status:checked::after {
+  content: "✔";
+  font-size: 14px;
+  color: #fff;
+  position: absolute;
+  top: -2px;
+  left: 2px;
+}
+
+/* Focus accessibility */
+.custom-checkbox-customer-status:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+.select-status-customer-status {
+  flex: 2; /* Larger width for dropdown */
+  min-width: 140px;
+  max-width: 150px;
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 3px;     font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+.select-status-customer-status:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+  outline: none;
+}
+.select-status-customer-status:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.select-user-customer-status {
+  flex: 2; /* Larger width for dropdown */
+  min-width: 140px;
+  max-width: 150px;
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 3px;     font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+.select-user-customer-status:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+  outline: none;
+}
+.select-user-customer-status:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.manage-customer-data form button[type="submit"]:hover {
+  color: #218838;
+  transform: scale(1.4);
+  background: transparent;
+}
+
+.submit-btn-customer-status {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 19px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+  margin-left: 4px;
+}
+
+.submit-btn-customer-status:disabled {
+  color: #a4a5a4;  /* gray */
+  cursor: default;
+}
+
+.submit-btn-customer-status:hover:not(:disabled) {
+  color: #288504;
+  transform: scale(1.4) !important; /* Slight zoom on hover */
+}
+
+/* Pagination Controls */
+.pagination-controls-custstatus {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  margin-left: 121px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.pagination-controls-custstatus button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls-custstatus button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls-custstatus button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls-custstatus span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* ================= Responsive Breakpoints ================= */
+
+/* For screens ≤ 1024px (small laptops / large tablets) */
+@media (max-width: 1024px) {
+  .manage-customer-data {
+    margin-left: 200px; /* reduce side gap */
+    padding: 15px;
+  }
+
+  .customer-status-table {
+    max-width: 100%;
+    min-width: unset;  /* allow shrinking */
+    font-size: 12px;
+  }
+
+  .customer-status-table th,
+  .customer-status-table td {
+    font-size: 11px;
+    padding: 6px;
+  }
+
+  .pagination-controls-custstatus {
+    max-width: calc(100% - 200px);
+  }
+}
+
+/* For screens ≤ 768px (tablets) */
+@media (max-width: 768px) {
+  .manage-customer-data {
+    margin-left: 0;       /* remove fixed sidebar spacing */
+    width: 100%;
+    padding: 10px;
+  }
+
+  .manage-customer-data h3 {
+    font-size: 18px;
+  }
+
+  .manage-customer-data .search-field-customer-status,
+  .search-field1-customer-status select {
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .customer-status-table {
+    display: block;        /* make table scrollable */
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .customer-status-table th,
+  .customer-status-table td {
+    font-size: 11px;
+    padding: 6px;
+  }
+
+  .pagination-controls-custstatus {
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 0;
+  }
+}
+
+/* For screens ≤ 480px (mobiles) */
+@media (max-width: 480px) {
+  .manage-customer-data {
+    margin-left: 0;
+    padding: 8px;
+  }
+
+  .manage-customer-data h3 {
+    font-size: 16px;
+  }
+
+  .manage-customer-data .search-field-customer-status,
+  .search-field1-customer-status select {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    font-size: 12px;
+  }
+
+  .customer-status-table {
+    font-size: 10px;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .customer-status-table th,
+  .customer-status-table td {
+    font-size: 10px;
+    padding: 4px;
+  }
+
+  .select-status-customer-status,
+  .select-user-customer-status {
+    min-width: unset;
+    max-width: 100%;
+    width: 100%;
+    font-size: 11px;
+  }
+
+  .pagination-controls-custstatus {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .submit-btn-customer-status {
+    font-size: 16px;
+  }
+}
+
+/* ______________________________________________________________________________________________________________ */

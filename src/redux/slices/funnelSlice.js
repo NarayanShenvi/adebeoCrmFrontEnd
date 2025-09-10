@@ -234,6 +234,36 @@ export const transferFunnel = createAsyncThunk(
   }
 );
 
+// ✅ Async thunk for update
+export const updateCustomerStatusAndAssignment = createAsyncThunk(
+  "funnel/updateCustomerStatusAndAssignment",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("Access_Token"); // get token
+
+      if (!token) {
+        return rejectWithValue("No authorization token found. Please log in again.");
+      }
+
+      const response = await axios.put(
+        `${API}/update_customer_status_and_assignment`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+
 
 const funnelSlice = createSlice({
   name: "funnel",
@@ -247,6 +277,12 @@ const funnelSlice = createSlice({
       state.currentPage = action.payload.page;
       state.error = null;
     },
+    clearFunnelState: (state) => {
+    state.funnelData = [];
+    state.pagination = { currentPage: 1, totalPages: 1 };
+    state.loading = false;
+    state.error = null;
+  },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
@@ -281,6 +317,26 @@ const funnelSlice = createSlice({
       .addCase(transferFunnel.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+       // update customer assignment + status
+      .addCase(updateCustomerStatusAndAssignment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateCustomerStatusAndAssignment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        // optional: update local funnelData if API returns updated customer
+        const updated = action.payload?.customer;
+        if (updated && updated.companyName) {
+          state.funnelData = state.funnelData.map((c) =>
+            c.companyName === updated.companyName ? updated : c
+          );
+        }
+      })
+      .addCase(updateCustomerStatusAndAssignment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
       });
   },
 });
@@ -294,6 +350,7 @@ export const {
   addCustomerComment,
   setModalState,
   setPagination,
+  clearFunnelState
 } = funnelSlice.actions;
 export default funnelSlice.reducer;
 

@@ -221,7 +221,7 @@ const CustomerSection = ({ customer}) => {
       try {
         const resultAction = await dispatch(updateCustomerAsync(updatedCustomer));
         
-        if (resultAction && resultAction.id) {
+        if (resultAction && resultAction.id) { 
           const updatedCustomerData = resultAction;
           console.log("Updated Customer Data:", updatedCustomerData);
 

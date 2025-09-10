@@ -178,7 +178,7 @@ useEffect(() => {
 const sliderRef = useRef(null); // Create a ref for the slider
   const commentsRef = useRef(null); //changes made - bugs free
   const addCommentRef = useRef(null);//changes made - bugs free  
-
+ 
   const funnelData = useSelector((state) => state.funnel.funnelData);
   const loading = useSelector((state) => state.funnel.loading);
   const error = useSelector((state) => state.funnel.error);
@@ -192,7 +192,8 @@ const sliderRef = useRef(null); // Create a ref for the slider
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   //const currentRows = funnelData.slice(indexOfFirstRow, indexOfLastRow);
-  const currentRows = funnelData;
+  const currentRows = funnelData.filter(cust => cust.isEnabled !== false);
+
 
   // Handle pagination changes
   const handleNextPage = () => {

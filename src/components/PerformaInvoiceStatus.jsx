@@ -217,11 +217,14 @@ const cancelDisable = () => {
               <option value="" disabled>
                 Select a customer
               </option>
-              {searchResults.map((cust) => (
-                <option key={cust._id} value={cust._id}>
-                  {cust.companyName} ({cust.email})
-                </option>
-              ))}
+              {searchResults
+  .filter(cust => cust.isEnabled !== false)   // only enabled customers
+  .map((cust) => (
+    <option key={cust._id} value={cust._id}>
+      {cust.companyName} ({cust.email})
+    </option>
+))}
+
             </select>
           ) : (
             searchTerm && (
@@ -237,6 +240,20 @@ const cancelDisable = () => {
       Proforma <span>#{disabledInvoiceInfo.invoiceNumber}</span> for customer <span>{disabledInvoiceInfo.customerName}</span> has been disabled.
    <p></p> Choose a customer from the list above to continue managing porforma invoices.</p>
   </div>
+)}
+{!selectedCustomer && (
+  <p
+    style={{
+            fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+            fontWeight: 900,
+            fontSize: "15px",
+            color: "#026875ff",
+            textAlign: "center",
+            marginTop: "10%",
+          }}
+  >
+    Please select a customer from the search bar to view proforma invoices.
+  </p>
 )}
 
       {selectedCustomer && tableData.length > 0 && (
