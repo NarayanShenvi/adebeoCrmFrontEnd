@@ -7809,7 +7809,6 @@ select option {
 .invoice-status-table td:nth-child(10) {
   width: 9%; /* Fixed width */
 }
-
 /* Target the last column (both th and td) */
 .invoice-status-table th:last-child,
 .invoice-status-table td:last-child {

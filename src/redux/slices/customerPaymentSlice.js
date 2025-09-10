@@ -11,7 +11,7 @@ export const fetchCustomerPaymentsAsync = createAsyncThunk(
     if (!token) throw new Error("No access token found. Please log in.");
 
     const response = await axios.get(`${API}/get_cxpayment`, {
-      params: { page, per_page },
+      params: { page, per_page,include_disabled: true },
       headers: { Authorization: `Bearer ${token}` },
     });
 
