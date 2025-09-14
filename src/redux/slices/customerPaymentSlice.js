@@ -193,20 +193,26 @@ const customerPaymentSlice = createSlice({
     builder
       .addCase(recreateInvoiceAsync.pending, (state) => { state.loading = true; })
       .addCase(recreateInvoiceAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        const updatedPayment = action.payload;
-        state.payments = state.payments.map(payment =>
-          payment.invoice_number === updatedPayment.invoice_number ? { ...payment, ...updatedPayment } : payment
-        );
-        // recreate implies invoice is no longer cancelled — remove localCancelled if present
-        if (updatedPayment.payment_status && updatedPayment.payment_status !== 'Cancelled') {
-          delete state.localCancelled[updatedPayment.invoice_number];
-        }
-      })
-      .addCase(recreateInvoiceAsync.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error?.message || "An error occurred while re-creating the invoice.";
-      });
+  state.loading = false;
+  const newInvoice = action.payload; // the newly created invoice from backend
+  const oldInvoiceId = newInvoice.old_invoice_id; // backend should return this, else pass it from frontend
+
+  // Step 1: Add new invoice to the list (insert at front)
+  state.payments.unshift(newInvoice);
+
+  // Step 2: Find old invoice and mark it as 'Regenerated' and disable regeneration
+  const oldIndex = state.payments.findIndex(p => p.invoice_id === oldInvoiceId);
+  if (oldIndex >= 0) {
+    state.payments[oldIndex].payment_status = "Regenerated";
+    state.payments[oldIndex].canRegenerate = false;
+  }
+
+  // Step 3: Remove from localCancelled if present
+  if (oldInvoiceId && state.localCancelled[oldInvoiceId]) {
+    delete state.localCancelled[oldInvoiceId];
+  }
+});
+
 
     // disable (when called from payments slice)
     builder

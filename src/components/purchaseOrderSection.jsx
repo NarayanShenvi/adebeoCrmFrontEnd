@@ -308,22 +308,39 @@ const CreatePurchaseOrder = () => {
               </tr>
             </thead>
             <tbody>
-              {recentOrders.map((order) => (
-                <tr key={order._id}>
-                  <td>{order.po_number}</td>
-                  <td>{order.customer_name}</td>
-                  <td>{order.product_name}</td>
-                  <td>{order.vendor}</td>
-                  <td> ₹&nbsp;{order.total_amount.toFixed(2)}</td>
-                  <td>{order.status}</td>
-                  <td>
-                  <a href={`${order.base_url}${order.pdf_link}`} target="_blank" rel="noopener noreferrer">
-                  Download PDF
-                  </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {recentOrders.map((order) => {
+    const isCancelled = order.status === "Cancelled";
+
+    return (
+      <tr
+        key={order._id}
+        className={isCancelled ? "cancelled-row-po" : ""}
+        title={isCancelled ? "This PO is cancelled with the invoice" : ""}
+      >
+        <td>{order.po_number}</td>
+        <td>{order.customer_name}</td>
+        <td>{order.product_name}</td>
+        <td>{order.vendor}</td>
+        <td>₹&nbsp;{order.total_amount.toFixed(2)}</td>
+        <td>{order.status}</td>
+        <td>
+          {isCancelled ? (
+            <span style={{ color: "#888" }}>PDF Disabled</span>
+          ) : (
+            <a
+              href={`${order.base_url}${order.pdf_link}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download PDF
+            </a>
+          )}
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
+
           </table>
         ) : (
           <p className="no-purchase-orders">No Recent Purchase Orders Found.</p>

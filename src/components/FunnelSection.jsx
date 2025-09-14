@@ -17,17 +17,21 @@ import TimePicker from 'react-time-picker';
 import 'react-time-picker/dist/TimePicker.css';
 import 'react-clock/dist/Clock.css';
 
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+
+
 const FunnelSection = () => {
   const dispatch = useDispatch();
   const [selectedCustomerId, setSelectedCustomerId] = useState(null); // Track selected customer changes made
  
 //tableref part removed
 const [taskTime, setTaskTime] = useState("12:00");
-
-
-
-
-  
+const resetTaskInputs = () => {
+  setNewTask('');
+  setTaskTime('12:00');
+};
 const [showTaskPopup, setShowTaskPopup] = useState(false);
 const [selectedTaskCustomerId, setSelectedTaskCustomerId] = useState(null);
 const [selectedDate, setSelectedDate] = useState(new Date());
@@ -56,7 +60,6 @@ const filteredMonthlyTasks = Object.entries(tasks)
   )
   .sort((a, b) => new Date(b.originalDateStr) - new Date(a.originalDateStr));
 
-
   const isValidTime = (time) => {
     const match = /^(\d{2}):(\d{2})$/.exec(time);
     if (!match) return false;
@@ -69,15 +72,20 @@ const filteredMonthlyTasks = Object.entries(tasks)
 
   const handleAddTask = () => {
     if (!newTask.trim()) {
-      alert("❌ Please enter a task.");
+    toast.error("Please enter a task.");
       return;
     }
-  
+   
     if (!taskTime || typeof taskTime !== "string") {
-      alert("❌ Please select a valid time.");
+    toast.error("Please select a valid time.");
       return;
     }
-  
+
+    if (!isValidTime(taskTime)) {
+    toast.warn("Invalid time format!! Please use HH:mm (e.g., 09:30). Hours should be 00–23 and minutes 00–59.");
+    return;
+}
+
     const [hoursStr, minutesStr] = taskTime.split(":");
     const hours = parseInt(hoursStr, 10);
     const minutes = parseInt(minutesStr, 10);
@@ -87,7 +95,7 @@ const filteredMonthlyTasks = Object.entries(tasks)
       hours < 0 || hours > 23 ||
       minutes < 0 || minutes > 59
     ) {
-      alert("❌ Invalid time! Hours must be between 00–23 and minutes 00–59.");
+    toast.warn("Invalid time format!! Please use HH:mm (e.g., 09:30). Hours should be 00–23 and minutes 00–59.");
       return;
     }
   
@@ -95,8 +103,8 @@ const filteredMonthlyTasks = Object.entries(tasks)
     const taskExists = tasks[dateKey]?.some(task => task.time === taskTime);
   
     if (taskExists) {
-      alert("❌ A task already exists at this time on the selected day.");
-      return;
+    toast.error("A task already exists at this time on the selected day!!.");
+          return;
     }
   
     const newTaskObj = {
@@ -113,6 +121,11 @@ const filteredMonthlyTasks = Object.entries(tasks)
     setTasks(updatedTasks);
     setNewTask("");
     setTaskTime("12:00");
+  resetTaskInputs(); // ✅ Reset after success
+
+    toast.success("Task added successfully!"); // ✅ success toast
+      resetTaskInputs(); // ✅ Reset after success
+
   };
   
 
@@ -143,6 +156,11 @@ const handleSaveEditedTask = () => {
   setEditingTaskId(null);
   setNewTask('');
   setTaskTime('');
+    
+
+    toast.success("Task updated successfully!"); // ✅ success toast
+    resetTaskInputs(); // ✅ Reset after success
+
 };
 
 
@@ -154,6 +172,7 @@ const handleCloseTaskPopup = (e) => {
   if (taskPopupRef.current && !taskPopupRef.current.contains(e.target)) {
     setShowTaskPopup(false);
     setSelectedTaskCustomerId(null);
+      resetTaskInputs(); // ✅ Reset on close
   }
 };
 
@@ -163,6 +182,13 @@ useEffect(() => {
     document.removeEventListener("mousedown", handleCloseTaskPopup);
   };
 }, []);
+
+// ✅ Extra safety: reset when popup closes via effect
+useEffect(() => {
+  if (!showTaskPopup) {
+    resetTaskInputs();
+  }
+}, [showTaskPopup]);
 
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -308,37 +334,42 @@ const sliderRef = useRef(null); // Create a ref for the slider
     setNewComment(e.target.value);
   };
 
-  const handleSubmitComment = () => {
-    if (modalState.selectedAddCommentCustomerId && newComment.trim()) {
-      dispatch(postCustomerComment(modalState.selectedAddCommentCustomerId, newComment));
-      setNewComment('');
-      dispatch(setModalState({ addComment: false }));
-    } else {
-      alert('Please select a customer and enter a comment.');
-    }
-  };
-  
-  const handleShowQuotes = (customerId) => {
+const handleSubmitComment = (e) => {
+  e.preventDefault(); // ✅ stop any default form submission
+  if (modalState.selectedAddCommentCustomerId && newComment.trim()) {
+    dispatch(postCustomerComment(modalState.selectedAddCommentCustomerId, newComment));
+    setNewComment('');
+    dispatch(setModalState({ addComment: false }));
+toast.success("Comment saved successfully!");  } else {
+toast.error("Please select a customer and enter a comment!!!.");  }
+};
+
+  const handleShowQuotes = (customerId, companyName) => {
     dispatch(setModalState({
       showQuoteSlider: true,
-      selectedQuoteCustomerId: customerId
+      selectedQuoteCustomerId: customerId,
+      selectedQuoteCustomerName: companyName  // add Name
+
     }));
   };
-  
   
   
   const handleCloseQuotes = () => {
     dispatch(setModalState({
       showQuoteSlider: false,
-      selectedQuoteCustomerId: null
+      selectedQuoteCustomerId: null,
+      selectedQuoteCustomerName: null
+
     }));
   };
 
 
-  const handleShowInvoice = (customerId) => {
+  const handleShowInvoice = (customerId, companyName) => {
     dispatch(setModalState({
       showInvoiceSlider: true,
-      selectedInvoiceCustomerId: customerId
+      selectedInvoiceCustomerId: customerId,
+      selectedInvoiceCustomerName: companyName  // add Name
+
       
     }));
   };
@@ -346,22 +377,28 @@ const sliderRef = useRef(null); // Create a ref for the slider
   const handleCloseInvoice = () => {
     dispatch(setModalState({
       showInvoiceSlider: false,
-      selectedInvoiceCustomerId: null
+      selectedInvoiceCustomerId: null,
+      selectedInvoiceCustomerName: null
+
     }));
   };
   
 
-  const handleShowPOInvoice = (customerId) => {
+  const handleShowPOInvoice = (customerId, companyName) => {
     dispatch(setModalState({
       showPOInvoiceSlider: true,
-      selectedPOInvoiceCustomerId: customerId
+      selectedPOInvoiceCustomerId: customerId,
+      selectedPOInvoiceCustomerName: companyName  // add Name
+
     }));
   };
   
   const handleClosePOInvoice = () => {
     dispatch(setModalState({
       showPOInvoiceSlider: false,
-      selectedPOInvoiceCustomerId: null
+      selectedPOInvoiceCustomerId: null,
+      selectedPOInvoiceCustomerName: null
+
     }));
   };
   
@@ -449,20 +486,16 @@ const sliderRef = useRef(null); // Create a ref for the slider
   }}
 />
 
-
-
-
-
      <span className="icon-gap"></span> {/* Gap between groups */}
      <FaHandHoldingDollar 
   title="Quotes" 
   className="action-icon" 
-  onClick={() => handleShowQuotes(item._id)} // Pass customer ID
+  onClick={() => handleShowQuotes(item._id, item.companyName)} // Pass customer ID
 />
      
-     <FaIndianRupeeSign title=" Porforma Invoice" className="action-icon"   onClick={() => handleShowPOInvoice(item._id)} // Pass customer ID 
+     <FaIndianRupeeSign title=" Porforma Invoice" className="action-icon"   onClick={() => handleShowPOInvoice(item._id, item.companyName)} // Pass customer ID 
      />
-     <RiInformation2Fill   title=" Customer Information" className="action-icon"    onClick={() => handleShowInvoice(item._id)} // Pass customer ID
+     <RiInformation2Fill   title=" Customer Information" className="action-icon"    onClick={() => handleShowInvoice(item._id, item.companyName)} // Pass customer ID
      />
      </span> : item.comments}
 
@@ -484,7 +517,16 @@ const sliderRef = useRef(null); // Create a ref for the slider
         </div>
       ) : (
         // changes made -- classname added
-        <p className="no-data">No data available</p> 
+        <p style={{
+      textAlign: "center",
+      fontSize: "18px",
+      fontWeight: "bold",
+      color: "#069696",
+      padding: "20px",
+      width: "100%",
+      marginTop: "49%",
+      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+    }}>No data available</p> 
         
       )}
 
@@ -530,30 +572,33 @@ const sliderRef = useRef(null); // Create a ref for the slider
         <MdOutlineCancel onClick={handleCloseAddCommentModal} title='Cancel' className='cancelcomment'/>
         <HiSave onClick={handleSubmitComment} title='Submit' className='submitcomment'/>
       </div>
-      <p className="alert-box">Comment saved successfully! ✅</p>
     </div>
   </div>
-)}
+)}<ToastContainer />
 {/* to here Add Comment Modal -- bugs free */}
 
     {modalState.showQuoteSlider && modalState.selectedQuoteCustomerId && (
   <QuoteSlider 
-    customerId={modalState.selectedQuoteCustomerId} 
+    customerId={modalState.selectedQuoteCustomerId}
+    companyName={modalState.selectedQuoteCustomerName} // ✅ pass the name 
     onClose={handleCloseQuotes} 
   />
 )}
 {modalState.showInvoiceSlider && modalState.selectedInvoiceCustomerId && (
   <InvoiceSlider 
     customerId={modalState.selectedInvoiceCustomerId} 
+    companyName={modalState.selectedInvoiceCustomerName} // ✅ pass the name
     onClose={handleCloseInvoice} 
   />
 )}
 {modalState.showPOInvoiceSlider && modalState.selectedPOInvoiceCustomerId && (
   <POInvoiceSlider 
     customerId={modalState.selectedPOInvoiceCustomerId} 
+    companyName={modalState.selectedPOInvoiceCustomerName} // ✅ pass the name
     onClose={handleClosePOInvoice} 
   />
 )}
+
 
 {/* Popup */}
 {showTaskPopup && selectedTaskCustomerId && (
@@ -589,25 +634,54 @@ const sliderRef = useRef(null); // Create a ref for the slider
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             placeholder="Enter task details..."
-          />    <div className="time-picker-container">
-<TimePicker
-          value={taskTime}
-          onChange={setTaskTime}
-          format="HH:mm"
-          disableClock={true} // Disable clock icon
-        />
-          {editingTaskId ? (
-            <button onClick={handleSaveEditedTask} className='taskbtn'>Save Task</button>
-          ) : (
-            <button
-  onClick={handleAddTask}
-  className="taskbtn"
-  disabled={!newTask.trim()}
+          />    
+          
+  <div className="time-picker-container" >
+  <input
+    type="text"
+    value={taskTime}
+    onChange={(e) => setTaskTime(e.target.value)}
+    placeholder="HH:mm"
+    maxLength={5}
+  />
+  <span
+  id="timeHelp"
+  role={isValidTime(taskTime) ? undefined : "alert"}
+  style={
+    isValidTime(taskTime)
+      ? { fontSize: "12px", color: "#6c757d", display: "block", maxWidth: "280px",   // control wrapping width
+          whiteSpace: "normal",
+          lineHeight: "1.4", } // helper style
+      : {
+          fontSize: "12px",
+          color: "#d6312bff",
+          fontWeight: "600",
+          marginTop: "-18px",
+          marginBottom:"-5px",
+          display: "block",
+          textAlign: "justify",
+          maxWidth: "280px",  
+           WebkitLineClamp: 2, // limit to 2 lines
+          WebkitBoxOrient: "vertical", // adjust width so it wraps into 2 lines
+          whiteSpace: "normal",
+          wordBreak: "break-word",
+          lineHeight: "1.4",
+        }
+  }
 >
-  Add Task
-</button>
+  {isValidTime(taskTime)
+    ? " "
+    : "⚠️ Please enter a valid time in HH:mm. Hours 00–23, minutes 00–59."}
+</span>
 
-          )} </div>
+  {editingTaskId ? (
+    <button onClick={handleSaveEditedTask} className='taskbtn'>Save Task</button>
+  ) : (
+    <button onClick={handleAddTask} className='taskbtn' disabled={!newTask.trim()}>
+      Add Task
+    </button>
+  )}
+</div>
         </div>
 
       </div>

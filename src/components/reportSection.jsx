@@ -147,7 +147,7 @@ const ReportSection = () => {
       <Form.Label >Company Name</Form.Label>          
       <Form.Control
         type="text"
-        placeholder="Search company name"
+        placeholder="Enter company name"
         value={companyName}
         onChange={(e) => setCompanyName(e.target.value)}
       />
@@ -176,7 +176,7 @@ const ReportSection = () => {
 
     </Form.Group>
   </Col>
-  <Col  md={1}>
+  <Col  md={1}> 
     <Form.Group className="form-group">
       <Form.Label className="invisible">&nbsp;</Form.Label> {/* Keeps button aligned */}
       <button type="submit" className="report-button" title='Generate Report'><LuFileCheck2 className='filecheck'/>

@@ -7,8 +7,14 @@ import { MdAddBox, MdDelete  } from "react-icons/md";
 import { FaSpinner, FaFilePdf, FaHackerNewsSquare } from 'react-icons/fa';
 import {  FaChevronLeft, FaChevronRight } from "react-icons/fa"; //import statements are changed and some new imports are added
 import { createPortal } from "react-dom";
+import { FaLightbulb } from "react-icons/fa6";
+import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+import { BiSolidMessageRoundedError } from "react-icons/bi";
+import { IoIosWarning } from "react-icons/io";
+import { BiSolidCommentCheck } from "react-icons/bi";
 
-const QuoteSlider = ({ customerId, onClose }) => {
+const QuoteSlider = ({ customerId, companyName, onClose }) => {
   const dispatch = useDispatch();
   const { products } = useSelector((state) => state.products); // List of products from Redux
   const quoteState = useSelector((state) => state.quote); // Getting entire quote state
@@ -169,43 +175,147 @@ const handleLineChange = (index, field, value) => {
   console.log('Quantity before processing:', line.quantity);
 
   // 1) Discount edits: validate + alert for ALL (single + combo)
+  // 1) Discount edits: validate + alert for ALL (single + combo)
   if (field === 'discount') {
-    let product = null;
+    let product = null; 
     let maxDiscount = 100;
-
     if (line.selectionType === 'single') {
       product = products.find(p => p._id === line.productId);
       if (!product) {
-        alert("💡 Please select a product first, before entering a discount!");
+        toast.warn("Please select a product first, before entering a discount!", {
+                                position: "top-right",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                style: { background: "rgba(78, 121, 202, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <FaLightbulb 
+                                 style={{ fontSize: '20px', color: 'white' }} />
+                            });
         setQuoteLines(newQuoteLines);
         line.discount = 0;
         return;
       }
-      maxDiscount = parseFloat(product.maxDiscount) || 100;
-    } 
+      let discount = parseFloat(value) || 0;
+      maxDiscount = parseFloat(product.maxDiscount) || 100;   
+    if (discount < 0) {
+            toast.error("Discount cannot be negative!", {
+                                            position: "top-right",
+                                            autoClose: 4000,
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: true,
+                                            progress: undefined,
+                                            theme: "colored", // "light", "dark", or "colored"
+                                            style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                              fontSize: "14px",       // ✅ Change font size
+                                              fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                              fontWeight: "bold",    // ✅ Make text bold
+                                             },
+                                             icon: <BiSolidMessageRoundedError  
+                                             style={{ fontSize: '20px', color: 'white' }} />
+                                        });
+            discount = 0;
+          } else if (discount > maxDiscount) {
+            toast.error(`Maximum discount allowed is ${maxDiscount}₹!`, {
+                                            position: "top-right",
+                                            autoClose: 4000,
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: true,
+                                            progress: undefined,
+                                            theme: "colored", // "light", "dark", or "colored"
+                                            style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                              fontSize: "14px",       // ✅ Change font size
+                                              fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                              fontWeight: "bold",    // ✅ Make text bold
+                                             },
+                                             icon: <BiSolidMessageRoundedError  
+                                             style={{ fontSize: '20px', color: 'white' }} />
+                                        });
+            discount = maxDiscount;
+          }
+          line.discount = discount; 
+        } 
     else if (line.selectionType === 'combo') {
       const combo =
         combos.find(c => c.comboCode === line.productId) ||
         combos.find(c => c.comboCode === line.selectedCombo);
       if (!combo) {
-        alert("💡 Please select a combo first, before entering a discount!");
+        toast.warn("Please select a combo first, before entering a discount!", {
+                                position: "top-right",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                style: { background: "rgba(78, 121, 202, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <FaLightbulb 
+                                 style={{ fontSize: '20px', color: 'white' }} />
+                            });
         setQuoteLines(newQuoteLines);
         line.discount = 0;
         return;
       }
-      maxDiscount = parseFloat(combo.maxDiscount) || 100; // ✅ enforce combo maxDiscount too
-    }
-
-    let discount = parseFloat(value) || 0;
-
-    if (discount < 0) {
-      alert("⛔ Discount cannot be negative!");
-      discount = 0;
-    } else if (discount > maxDiscount) {
-      alert(`🚫 Maximum discount allowed is ${maxDiscount}₹!`);
+     let discount = parseFloat(value) || 0;
+     maxDiscount = parseFloat(combo.maxDiscount) || 100;
+     
+           if (discount < 0) {
+             toast.error("Discount cannot be negative!", {
+                                             position: "top-right",
+                                             autoClose: 4000,
+                                             hideProgressBar: false,
+                                             closeOnClick: true,
+                                             pauseOnHover: true,
+                                             draggable: true,
+                                             progress: undefined,
+                                             theme: "colored", // "light", "dark", or "colored"
+                                             style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                               fontSize: "14px",       // ✅ Change font size
+                                               fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                               fontWeight: "bold",    // ✅ Make text bold
+                                              },
+                                              icon: <BiSolidMessageRoundedError  
+                                              style={{ fontSize: '20px', color: 'white' }} />
+                                         });
+             discount = 0;
+           } else if (discount > maxDiscount) {
+      toast.error(`Maximum discount allowed is ${maxDiscount}₹!`, {
+                                position: "top-right",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <BiSolidMessageRoundedError  
+                                 style={{ fontSize: '20px', color: 'white' }} />
+                            });
       discount = maxDiscount;
     }
     line.discount = discount;
+  }
   }
 
   // 2) Recalculate on quantity or discount
@@ -337,7 +447,6 @@ calculateFinalTotal(totalCost, overallDiscount);
 
 const handleOverallDiscountChange = (e) => {
 let discountValue = parseFloat(e.target.value) || 0;
-const maxOverallDiscount = 100; // Maximum allowed discount
 
 // Check if at least one product is selected
 const hasProductOrCombo = quoteLines.some(
@@ -345,16 +454,44 @@ const hasProductOrCombo = quoteLines.some(
 );
 
 if (!hasProductOrCombo) {  
-  alert("💡 Please select a product or combo first, before entering an overall discount!");
+  toast.warn("Please select a product or combo first, before entering an overall discount!", {
+                                position: "top-right",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                style: { background: "rgba(78, 121, 202, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <FaLightbulb 
+                                 style={{ fontSize: '20px', color: 'white' }} />
+                            });
   return;
 }
 
 if (discountValue < 0) {
-  alert("⛔ Overall Discount cannot be negative!");
+  toast.error("Overall Discount cannot be negative!", {
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <BiSolidMessageRoundedError  
+                                 style={{ fontSize: '20px', color: 'white' }} />
+                            });
   discountValue = 0;
-} else if (discountValue > maxOverallDiscount) {
-  alert(`🚫 Maximum allowed Overall Discount is ${maxOverallDiscount}₹!`);
-  discountValue = maxOverallDiscount;
 }
 
 setOverallDiscount(discountValue);
@@ -392,25 +529,88 @@ const calculateFinalTotal = (totalAmount, discount) => {
 
   // ✅ Validation 1: Customer must be selected
   if (!customerId) {
-    alert("⚠️ Please select a customer before submitting the quote!");
+    toast.warn("Please select a customer before submitting the quote!", {
+                                position: "top-right",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                 },
+                                 icon: <IoIosWarning  
+                                 style={{ fontSize: '25px', color: 'white' }} />
+                            });
     return;
   }
 
   // ✅ Validation 2: At least one product line required
   if (quoteLines.length === 0) {
-    alert("⚠️ Please add at least one product before submitting!");
+    toast.warn("Please add at least one product before submitting!", {
+                                position: "top-right",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <IoIosWarning  
+                                 style={{ fontSize: '25px', color: 'white' }} />
+                            });
     return;
   }
 
   // ✅ Validation 3: Product ID must be present
   if (quoteLines.some(line => !line.productId)) {
-    alert("⚠️ One or more lines are missing a product!");
+    toast.warn("One or more lines are missing a product!", {
+                                position: "top-right",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <IoIosWarning  
+                                 style={{ fontSize: '25px', color: 'white' }} />
+                            });
     return;
   }
 
   // ✅ Validation 4: Quantity must be > 0
   if (quoteLines.some(line => line.quantity <= 0)) {
-    alert("⚠️ Quantity must be greater than 0 for all products!");
+    toast.warn("Quantity must be greater than 0 for all products!", {
+                                position: "top-right",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <IoIosWarning  
+                                 style={{ fontSize: '25px', color: 'white' }} />
+                            });
     return;
   }
 
@@ -453,7 +653,23 @@ const calculateFinalTotal = (totalAmount, discount) => {
   console.log("📝 Dispatching createQuote action:", quoteData);
   dispatch(createQuote(quoteData));
 
-  alert("✅ Quote submitted successfully!");
+  toast.success("Quote submitted successfully!", {
+                                position: "top-right",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                style: { background: "rgba(74, 163, 66, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <BiSolidCommentCheck  
+                                 style={{ fontSize: '20px', color: 'white' }} />
+                            });
 
   // ✅ Reset the form fields after submission
   setQuoteLines([{
@@ -514,10 +730,14 @@ useEffect(() => {
 
 <div ref={wrapperRef}  className="quote-slider show">
       <div className="quote-slider-content">
+                 <ToastContainer />
+
         <div className="quote-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-  <h4 >Create a New Quote For</h4> 
-  <p >Customer Name </p>
+  <div className="qt-header">
+  <h4>Create a New Quote For:</h4>
+  <span className="qt-companyname">{companyName || "Customer"}</span>
+</div>
 </div>
           <MdOutlineCancel onClick={onClose} className="close-slider" title="Close" />
         </div>
@@ -714,7 +934,6 @@ useEffect(() => {
   min="0"
   max={products.find(product => product._id === line.productId)?.maxDiscount || 100}
   placeholder={`Discount`}
-  required
 />
 
               <select

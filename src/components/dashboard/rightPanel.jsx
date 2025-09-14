@@ -49,7 +49,10 @@ const customerLoading = useSelector((state) => state.customer?.loading);
   const loadReports =() =>  {
   //  dispatch(fetchReportsAsync());
   }
-
+  const loadAdmin =() => {
+  //  dispatch(fetchAdminAsync());
+  }
+  
   useEffect(() => {
     if (selectedSection === 'funnel') {
       getFunnel(); // Load funnel data when 'funnel' section is selected
@@ -65,6 +68,9 @@ const customerLoading = useSelector((state) => state.customer?.loading);
       }
         else if (selectedSection === 'reports'){
         loadReports();
+        }
+        else if (selectedSection === 'admin'){
+        loadAdmin();
         }
     }, [selectedSection, dispatch]);
 
@@ -83,7 +89,7 @@ const customerLoading = useSelector((state) => state.customer?.loading);
       case 'reports':
         return <Createreport/>;
       case 'admin':
-        return <Admin />; // ✅ Add this line
+        return <Admin />; 
      
       default:
         return <div className='default_msg'>Select a section from the menu.</div>;

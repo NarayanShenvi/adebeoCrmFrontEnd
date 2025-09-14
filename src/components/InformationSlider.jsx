@@ -3,7 +3,7 @@ import { MdOutlineCancel } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAdebeoOrders } from '../redux/slices/informationSlice';
 
-const InvoiceSlider = ({ customerId, onClose }) => {
+const InvoiceSlider = ({ customerId, companyName, onClose }) => {
   const dispatch = useDispatch();
   const { orders, status, error } = useSelector((state) => state.information);
   const [activeTab, setActiveTab] = useState('');
@@ -77,9 +77,12 @@ const InvoiceSlider = ({ customerId, onClose }) => {
       <div className="invoice-slider-content" >
         <div className="invoice-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <h4>Account Overview of
+            <div className="invoice-header">
+            <h4>Account Overview of:
             </h4>
-            <p>Customer Name</p>
+              <span className="invcompany-name">{companyName || "Customer"}</span>
+</div>
+
           </div>
           <MdOutlineCancel onClick={onClose} className="close-slider" title="Close" />
         </div>

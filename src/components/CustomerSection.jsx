@@ -18,7 +18,7 @@ import { HiMiniUserPlus } from "react-icons/hi2";
 import { FaUserEdit } from "react-icons/fa";
 import { ImUserCheck } from "react-icons/im";
 import { FaSpinner } from 'react-icons/fa';
-import { loadCustomerComments, postCustomerComment } from "../redux/slices/customerSlice";
+import { setCustomerList, loadCustomerComments, postCustomerComment } from "../redux/slices/customerSlice";
 import { setModalState } from "../redux/slices/customerSlice";
 import { FaEye, FaPlusSquare } from "react-icons/fa";
 import { MdOutlineCancel } from "react-icons/md";
@@ -26,7 +26,9 @@ import { HiSave } from "react-icons/hi";
 import { fetchProductsAsync } from '../redux/slices/productSlice'; // Import fetchProductsAsync
 import Select from 'react-select'; // Import react-select
 import {  FaFaceMeh  } from "react-icons/fa6";//chages made- bugs free
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 
 const CustomerSection = ({ customer}) => {
@@ -38,7 +40,10 @@ const CustomerSection = ({ customer}) => {
   const error = useSelector((state) => state.customers?.error || null);
   const successMessage = useSelector((state) => state.customers?.successMessage || '');
   const selectedCustomer = useSelector((state) => state.customers?.selectedCustomer || null);
-  
+  // show loading state for customer search (used only for the dropdown UI)
+const customersLoading = useSelector((state) => state.customers?.loading || false);
+const [selectedCustomerId, setSelectedCustomerId] = useState("");
+
   const commentsRef = useRef(null); //changes made - bugs free
       const addCommentRef = useRef(null);//changes made - bugs free
 
@@ -196,10 +201,53 @@ const CustomerSection = ({ customer}) => {
     }
   }, [isEditMode, selectedCustomer]);
 
-  // Handle search input change
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  
+// Your input handler stays the same
+const handleSearchChange = (e) => {
+  setSearchQuery(e.target.value);
+};
+const handleSelectChange = (e) => {
+  const customerId = e.target.value;
+  setSelectedCustomerId(customerId);
+
+  const selectedCustomer = customers.find((c) => c._id === customerId);
+  if (selectedCustomer) {
+    dispatch(setSelectedCustomer(selectedCustomer));
+    setState({
+      companyName: selectedCustomer.companyName,
+      address: selectedCustomer.address,
+      // other fields...
+    });
+                toast.success("Customer selected successfully!");
+    
+  }
+  
+};
+
+// Control the API call here
+useEffect(() => {
+  if (searchQuery.trim().length < 3) {
+    dispatch(setCustomerList([])); // clear old results
+    return;
+  }
+
+  // Only fire API if >= 3 chars
+  dispatch(fetchCustomerAsync(searchQuery));
+}, [searchQuery, dispatch]);
+
+
+// Then in useEffect control the API call:
+useEffect(() => {
+  if (searchQuery.trim().length < 3) {
+    // Clear results if less than 3 chars
+    dispatch(setCustomerList([]));
+    return;
+  }
+
+  // Dispatch only when query >= 3
+  dispatch(fetchCustomerAsync(searchQuery));
+}, [searchQuery, dispatch]);
+
 
   const handleFocus = () => {
     // Manually reset the selected products when the select is focused
@@ -280,9 +328,14 @@ const CustomerSection = ({ customer}) => {
           setSelectedProducts([]);
           dispatch(resetSelectedCustomer());
           dispatch(clearCustomers());
+                    toast.success("Customer updated successfully!");
+                    dispatch(clearSuccessMessage());
+          
         } else {
           console.log("Error in resultAction:", resultAction);
           console.error("Error updating customer:", resultAction?.error || "Unknown error");
+                    toast.error("Failed to update customer.");
+          
         }
       } catch (err) {
         console.error("Error submitting customer data:", err);
@@ -294,8 +347,9 @@ const CustomerSection = ({ customer}) => {
       console.log("Create Customer Payload:", customerPayload);
 
       try {
-        await dispatch(createCustomerAsync(customerPayload));
-
+        const resultAction = await dispatch(createCustomerAsync(customerData));
+         if (createCustomerAsync.fulfilled.match(resultAction)) {
+                  toast.success("Customer created successfully");
         // Clear form after successful creation
         setState({
           companyName: '',
@@ -322,6 +376,15 @@ const CustomerSection = ({ customer}) => {
 
         // Optionally reset selected products after creation
         setSelectedProducts([]);
+      }
+        else {
+                  const errorMessage =
+                    resultAction.payload?.message || resultAction.error?.message || "Failed to create customer";
+              
+                  toast.error(errorMessage);         // ✅ Show toast only
+                  dispatch(clearError());            // ✅ Clear Redux error so it doesn't show below the form
+                
+                }
       } catch (err) {
         console.error("Error creating customer:", err);
       }
@@ -330,109 +393,83 @@ const CustomerSection = ({ customer}) => {
 //  const [subArea, setSubArea] = useState("");
 //const [area, setArea] = useState("");
   // Toggle between Edit and Create mode
-  const handleToggleEditMode = () => {
-    setIsEditMode((prevMode) => {
-      const newMode = !prevMode;
-      if (!newMode) {
-        // Reset state and products only when creating a new customer
-        setState({
-          companyName: '',
-          ownerName: '',
-          primaryEmail: '',
-          mobileNumber: '',
-          address: '',
-          altemail: '',
-          city: '',
-          comments: [],
-          gstin: '',
-          funnelType: '',
-          insta: '',
-          linkedin: '',
-          pincode: '',
-          primaryLocality: '',
-          secondaryLocality: '',
-          state: '',
-          website: '',
-          subArea:'',
-          area :'',
-          companyType:''
-        });
+const handleToggleEditMode = () => {
+  setIsEditMode((prevMode) => {
+    const newMode = !prevMode;
 
-        // Clear selected products when switching to create mode
-        setSelectedProducts([]); // Reset selected products
-        dispatch(clearCustomers());
-        dispatch(resetSelectedCustomer());
-     
-         // Dispatch action to clear the selected customer in Redux state
-        //dispatch(resetSelectedCustomer());
+    if (!newMode) {
+      // Reset state and products only when creating a new customer
+      setState({
+        companyName: '',
+        ownerName: '',
+        primaryEmail: '',
+        mobileNumber: '',
+        address: '',
+        altemail: '',
+        city: '',
+        comments: [],
+        gstin: '',
+        funnelType: '',
+        insta: '',
+        linkedin: '',
+        pincode: '',
+        primaryLocality: '',
+        secondaryLocality: '',
+        state: '',
+        website: '',
+        subArea: '',
+        area: '',
+        companyType: ''
+      });
 
-      // Clear the search query and reset the customer list
-      //setSearchQuery('');
-      //dispatch(fetchCustomerAsync(''));  // Dispatch with empty string to reset the customer list
-      }
-      if (newMode) {
-        dispatch(clearError());
-      }
-      return newMode;
-    });
+      // Reset product selection
+      setSelectedProducts([]);
 
-    // Clear search query and reset success message on toggle
-    setSearchQuery('');
-    dispatch(clearSuccessMessage());
-  };
+      // Reset dropdown
+      setSelectedCustomerId('');
 
-  // const handleToggleEditMode = () => {
-  //   setIsEditMode((prevMode) => {
-  //     const newMode = !prevMode;
-  
-  //     if (!newMode) {
-  //       // Switching to create mode, reset the customer form state
-  //       setState({
-  //         companyName: '',
-  //         ownerName: '',
-  //         primaryEmail: '',
-  //         mobileNumber: '',
-  //         address: '',
-  //         altemail: '',
-  //         city: '',
-  //         comments: [],
-  //         gstin: '',
-  //         funnelType: '',
-  //         insta: '',
-  //         linkedin: '',
-  //         pincode: '',
-  //         primaryLocality: '',
-  //         secondaryLocality: '',
-  //         state: '',
-  //         website: ''
-  //       });
-  
-  //       // Clear selected products when switching to create mode
-  //       setSelectedProducts([]); // Reset selected products
-  
-  //       // Clear the customers list (from Redux state)
-  //       dispatch(clearCustomers());
-  
-  //       // Clear any errors in the Redux state before switching to create mode
-  //      // dispatch(clearError());
-  
-  //       // Reset the customer search query if needed
-  //       setSearchQuery('');
-  //     }
-  
-  //     // If switching to edit mode, you may want to reset any previously selected customer info
-  //     if (newMode) {
-  //       dispatch(resetSelectedCustomer());
-  //     }
-  
-  //     return newMode;
-  //   });
-  
-  //   // Clear success message when toggling modes
-  //   dispatch(clearSuccessMessage());
-  // };
- 
-  useEffect(() => {
+      // Clear customers from Redux
+      dispatch(clearCustomers());
+      dispatch(resetSelectedCustomer());
+    } else {
+      // If entering Edit mode, clear out any previous form state
+      setState({
+        companyName: '',
+        ownerName: '',
+        primaryEmail: '',
+        mobileNumber: '',
+        address: '',
+        altemail: '',
+        city: '',
+        comments: [],
+        gstin: '',
+        funnelType: '',
+        insta: '',
+        linkedin: '',
+        pincode: '',
+        primaryLocality: '',
+        secondaryLocality: '',
+        state: '',
+        website: '',
+        subArea: '',
+        area: '',
+        companyType: ''
+      });
+      setSelectedProducts([]);
+      setSelectedCustomerId('');
+    }
+
+    return newMode;
+  });
+
+  // Always clear search + messages when toggling
+  setSearchQuery('');
+  dispatch(clearSuccessMessage());
+  dispatch(clearError());
+};
+
+
+ useEffect(() => {
     debouncedSearch(searchQuery);
   }, [searchQuery, debouncedSearch]);
 
@@ -534,6 +571,8 @@ const handleSubmitComment = () => {
       });
 };
 
+useEffect(() => {
+}, [customers]);
 
 
   return (
@@ -553,50 +592,46 @@ const handleSubmitComment = () => {
       {successMessage && <p className="success">{successMessage}</p>}
       {error && <p className="error1">{error}</p>}
            {/* Search field for Edit mode */}
-           {isEditMode && (
-            <div>
-              <input
-                type="text"
-                className='search-field'
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder="Search by company name"
-                disabled={loading}
-              />
-              <div className='search-field1'>
-                {loading ? (
-                  <p className='CustomerLoading'>Loading...</p>
-                ) : customers.length > 0 ? (
-                  <select
-                  onChange={(e) => {
-                    const selectedCustomer = customers.find(
-                      (customer) => customer._id === e.target.value
-                    );
-                    dispatch(setSelectedCustomer(selectedCustomer));  // Set the selected customer in the store
-                    setState({
-                      companyName: selectedCustomer.companyName,
-                      address: selectedCustomer.address,
-                      // Set other fields...
-                    });
-                  }}
-                  value={selectedCustomer?._id || ''}  // Ensure the dropdown is controlled
-                >
-                  <option value="" disabled>Select a customer</option>
-                  {customers.map((customer) => (
-                    <option key={customer._id} value={customer._id}>
-                      {customer.companyName}
-                    </option>
-                  ))}
-                </select>
-                ) : (
-                  <p className='NoCustomersFound'>No customers found...</p>
-                )}
-              </div>
-            </div>
-          )}
+          {isEditMode && (
+  <div>
+    <input
+      type="text"
+      className="search-field"
+      value={searchQuery}
+      onChange={handleSearchChange}
+      placeholder="Search by company name"
+      disabled={loading}
+    />
+    <div className="search-field1">
+      {searchQuery.length > 0 && searchQuery.length < 3 ? (
+        <p className="TypeMoreCust">Type at least 3 characters to search</p>
+      ) : searchQuery.length >= 3 ? (
+        customersLoading ? (
+          <p className="CustomerLoading">Loading...</p>
+        ) : (customers && customers.length > 0) || selectedCustomerId  ? (
+          <select
+  onChange={handleSelectChange}
+  value={selectedCustomerId}
+>
+  <option value="" disabled>
+    Select a customer
+  </option>
+  {customers.map((customer) => (
+    <option key={customer._id} value={customer._id}>
+      {customer.companyName}
+    </option>
+  ))}
+</select>
 
+        ) : (
+          <p className="NoCustomersFound">No customers found...</p>
+        )
+      ) : null}
+    </div>
+  </div>
+)}
+<ToastContainer />
 
-     
       {/* The Form is always visible in both modes */}
       <Form onSubmit={handleSubmit} className='customer-form'>
         <Row className="g-5">
@@ -765,9 +800,9 @@ const handleSubmitComment = () => {
           <Form.Control
             type="email"
             placeholder="Enter alternative email address"
-            name="altEmail"
-            value={state.altEmail}
-            onChange={(e) => setState({ ...state, altEmail: e.target.value })}
+            name="altemail"
+            value={state.altemail}
+            onChange={(e) => setState({ ...state, altemail: e.target.value })}
             disabled={loading} 
           />
         </Form.Group>

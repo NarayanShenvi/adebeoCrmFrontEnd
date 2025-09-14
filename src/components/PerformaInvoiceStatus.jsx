@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react"; // ✅ Added useEffect, useCallback for debounced search
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchPOInvoicesByCustomer,
@@ -7,8 +7,9 @@ import {
 import "./dashboard/Dashboard.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaExclamationTriangle, FaCheck, FaTimes } from "react-icons/fa";
+import { debounce } from "lodash"; // ✅ Added debounce for search
 
-const PerformaInvoiceStatus = () => {
+const PerformaInvoiceStatus = () => { 
   const dispatch = useDispatch();
   const { error, loading } = useSelector((state) => state.proformaInvoice);
 
@@ -18,10 +19,11 @@ const PerformaInvoiceStatus = () => {
   const [selectedRows, setSelectedRows] = useState({});
   const [tableData, setTableData] = useState([]);
   const [popupRow, setPopupRow] = useState(null);
-
   const [disabledInvoiceInfo, setDisabledInvoiceInfo] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false); // ✅ Added for debounced search
+const [selectedCustomerId, setSelectedCustomerId] = useState("");
+const [hasFetched, setHasFetched] = useState(false);
 
-  
   // ✅ Extract invoice ID safely
   const getInvoiceId = (inv) =>
     inv?.proforma_id ??
@@ -55,50 +57,76 @@ const PerformaInvoiceStatus = () => {
     };
   };
 
-  // ✅ Search customers (always filter, no "all list")
-  const handleSearchChange = async (e) => {
+  // ------------------- 🔎 DEBOUNCED SEARCH LOGIC START ----------------------
+  const debouncedSearch = useCallback(
+    debounce(async (term) => {
+      if (!term.trim()) {
+        setSearchResults([]);
+        setSearchLoading(false);
+        return;
+      }
+
+      setSearchLoading(true);
+
+      try {
+        const result = await dispatch(fetchPOInvoicesByCustomer(term)).unwrap();
+
+        const invoices = Array.isArray(result)
+          ? result
+          : Array.isArray(result?.invoices)
+          ? result.invoices
+          : [];
+
+        const names = Array.from(
+          new Set(
+            invoices
+              .map(
+                (inv) =>
+                  inv.customerName || inv.customer_name || inv.customer || ""
+              )
+              .filter((name) =>
+                name.toLowerCase().startsWith(term.toLowerCase())
+              )
+          )
+        );
+
+        if (names.length === 0) {
+          setSearchResults([]);
+        } else {
+          const suggestions = names.map((name) => ({
+            _id: name,
+            companyName: name,
+            email: "",
+          }));
+          setSearchResults(suggestions);
+        }
+      } catch (err) {
+        console.error("Error searching customers:", err);
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 500),
+    [dispatch]
+  );
+
+  useEffect(() => {
+    debouncedSearch(searchTerm);
+  }, [searchTerm, debouncedSearch]);
+
+  const handleSearchChange = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
 
-    if (!term.trim()) {
+    // ✅ Set loading immediately on typing
+    if (term.trim()) {
+      setSearchLoading(true);
+    } else {
       setSearchResults([]);
-      return;
-    }
-
-    try {
-      const result = await dispatch(fetchPOInvoicesByCustomer(term)).unwrap();
-
-      const invoices = Array.isArray(result)
-        ? result
-        : Array.isArray(result?.invoices)
-        ? result.invoices
-        : [];
-
-      const names = Array.from(
-        new Set(
-          invoices
-            .map(
-              (inv) =>
-                inv.customerName || inv.customer_name || inv.customer || ""
-            )
-            .filter((name) =>
-              name.toLowerCase().startsWith(term.toLowerCase())
-            )
-        )
-      );
-
-      const suggestions = names.map((name) => ({
-        _id: name,
-        companyName: name,
-        email: "",
-      }));
-
-      setSearchResults(suggestions);
-    } catch (err) {
-      console.error("Error searching customers:", err);
-      setSearchResults([]);
+      setSearchLoading(false);
     }
   };
+  // ------------------- 🔎 DEBOUNCED SEARCH LOGIC END ----------------------
 
   const handleSelectCustomer = async (e) => {
     const selectedId = e.target.value;
@@ -107,7 +135,9 @@ const PerformaInvoiceStatus = () => {
     setSelectedRows({});
     setTableData([]);
     // Clear disabled message when switching customer
-  setDisabledInvoiceInfo(null);
+    setDisabledInvoiceInfo(null);
+      setHasFetched(false);  // reset before fetching
+
 
     if (cust) {
       try {
@@ -133,11 +163,13 @@ const PerformaInvoiceStatus = () => {
       } catch (err) {
         console.error("Error fetching invoices for customer:", err);
         setTableData([]);
-      }
+      } finally {
+      setHasFetched(true); // <-- MUST be here
+    }
     }
   };
 
-   const toggleCheckbox = (id) => {
+  const toggleCheckbox = (id) => {
     setSelectedRows((prev) => ({
       ...prev,
       [id]: !prev[id],
@@ -150,40 +182,39 @@ const PerformaInvoiceStatus = () => {
   };
 
   // 🔹 Confirm disable
- const confirmDisable = (invoice) => {
-  const updatedStatus = false;
-  const invoiceId = getInvoiceId(invoice);
+  const confirmDisable = (invoice) => {
+    const updatedStatus = false;
+    const invoiceId = getInvoiceId(invoice);
 
-  // 1. Remove the invoice row
-  const updated = tableData.filter((inv) => getInvoiceId(inv) !== invoiceId);
-  setTableData(updated);
+    // 1. Remove the invoice row
+    const updated = tableData.filter((inv) => getInvoiceId(inv) !== invoiceId);
+    setTableData(updated);
 
-  // 2. Only show card if NO invoices remain
-  if (updated.length === 0) {
-    setDisabledInvoiceInfo({
-      invoiceNumber: invoiceId,
-      customerName: invoice.customerName || invoice.customer_name,
-    });
-  } else {
-    setDisabledInvoiceInfo(null); // ✅ clear when rows remain
-  }
+    // 2. Only show card if NO invoices remain
+    if (updated.length === 0) {
+      setDisabledInvoiceInfo({
+        invoiceNumber: invoiceId,
+        customerName: invoice.customerName || invoice.customer_name,
+      });
+    } else {
+      setDisabledInvoiceInfo(null); // ✅ clear when rows remain
+    }
 
-  // 3. Dispatch update
-  dispatch(
-    updatePOInvoiceStatus({
-      invoiceId: invoiceId,
-      isEnabled: updatedStatus,
-    })
-  );
+    // 3. Dispatch update
+    dispatch(
+      updatePOInvoiceStatus({
+        invoiceId: invoiceId,
+        isEnabled: updatedStatus,
+      })
+    );
 
-  alert(`✅ Proforma invoice ${invoiceId} disabled successfully.`);
-  setPopupRow(null);
-};
+    alert(`✅ Proforma invoice ${invoiceId} disabled successfully.`);
+    setPopupRow(null);
+  };
 
-const cancelDisable = () => {
-  setPopupRow(null); // closes the popup
-};
-
+  const cancelDisable = () => {
+    setPopupRow(null); // closes the popup
+  };
 
   // 🔹 Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -194,6 +225,11 @@ const cancelDisable = () => {
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow);
 
+useEffect(() => {
+  setSelectedCustomerId(""); // reset dropdown whenever new search results arrive
+}, [searchResults]);
+
+  
   return (
     <div className="performa-invoice-status">
       <h3>Praforma Invoice Management</h3>
@@ -207,27 +243,29 @@ const cancelDisable = () => {
         />
 
         <div className="search-field1-poinvoicestatus">
-          {loading ? (
+          {searchLoading ? ( // ✅ Updated to use searchLoading
             <p className="PoinvoicestatusLoading">Loading...</p>
-          ) : searchResults.length > 0 ? (
+          ) : searchResults && searchResults.length > 0 ? (
             <select
-              onChange={handleSelectCustomer}
-              value={selectedCustomer?._id || ""}
-            >
-              <option value="" disabled>
-                Select a customer
-              </option>
-              {searchResults
-  .filter(cust => cust.isEnabled !== false)   // only enabled customers
-  .map((cust) => (
+  onChange={(e) => {
+    const id = e.target.value;
+    setSelectedCustomerId(id); // reset local value so React registers change
+    handleSelectCustomer(e);    // call your existing handler
+  }}
+  value={selectedCustomerId}
+>
+  <option value="" disabled>
+    Select a customer
+  </option>
+  {searchResults.map((cust) => (
     <option key={cust._id} value={cust._id}>
       {cust.companyName} ({cust.email})
     </option>
-))}
+  ))}
+</select>
 
-            </select>
           ) : (
-            searchTerm && (
+            !searchLoading && searchTerm && ( // ✅ Only show "No customers found" after search completes
               <p className="NoPoinvoicestatusFound">No customers found...</p>
             )
           )}
@@ -246,7 +284,7 @@ const cancelDisable = () => {
     style={{
             fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
             fontWeight: 900,
-            fontSize: "15px",
+            fontSize: "19px",
             color: "#026875ff",
             textAlign: "center",
             marginTop: "10%",
@@ -256,7 +294,7 @@ const cancelDisable = () => {
   </p>
 )}
 
-      {selectedCustomer && tableData.length > 0 && (
+{selectedCustomer && tableData.length > 0 && (
         <>
           <table className="poinvoice-status-invoice-table">
             <thead>
@@ -269,7 +307,7 @@ const cancelDisable = () => {
                 <th>Quantity</th>
                 <th>Unit Price</th>
                 <th>Subtotal</th>
-                <th>Toggle</th>
+                <th>Disable</th>
               </tr>
             </thead>
             <tbody>
@@ -425,7 +463,7 @@ const cancelDisable = () => {
           </div>
         </>
       )}
-      {selectedCustomer && !loading && tableData.length === 0 && (
+{selectedCustomer && hasFetched && tableData.length === 0 && (
         <p
           style={{
             fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',

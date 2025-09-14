@@ -256,17 +256,18 @@ useEffect(() => {
   {/* Regenerate Invoice */}
   <td>
     <button
-      className={`regen-btn ${payment.payment_status === "Cancelled" ? "" : "is-disabled"}`}
-      disabled={payment.payment_status !== "Cancelled"}
-      onClick={() => dispatch(recreateInvoiceAsync(payment.invoice_id))}
-      title={
-        payment.payment_status === "Cancelled"
-          ? "Re-generate Invoice"
-          : "Regeneration available only for cancelled invoices"
-      }
-    >
-      ♻
-    </button>
+  className={`regen-btn ${payment.canRegenerate ? "" : "is-disabled"}`}
+  disabled={!payment.canRegenerate}
+  onClick={() => dispatch(recreateInvoiceAsync({ invoice_id: payment.invoice_id, old_invoice_id: payment.invoice_id }))}
+  title={
+    payment.canRegenerate
+      ? "Re-generate Invoice"
+      : "Regeneration only allowed for cancelled invoices"
+  }
+>
+  ♻
+</button>
+
   </td>
 </tr>
      ))}

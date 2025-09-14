@@ -59,7 +59,9 @@ const [selectedCategory, setSelectedCategory] = useState('');
   priceINR: 0,               // ✅ new backend field
 });
 
-  
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [selectedSearchValue, setSelectedSearchValue] = useState('');
+
   const [searchResults, setSearchResults] = useState([]); // For holding search results
   const [singleFormData, setSingleFormData] = useState({
   productName: '',
@@ -310,6 +312,7 @@ const handleSearchChange = async (e) => {
     setSearchResults([]);
     return;
   }
+  setSearchLoading(true); // ✅ start loader
 
   try {
     let responseData = [];
@@ -319,9 +322,11 @@ const handleSearchChange = async (e) => {
       const response = await axios.get(`${API}/load_edit_adebeo_products`, {
         params: { productName: term },
       });
-      responseData = response.data.data || [];
-      // FILTER: only include products that are NOT combos
-      responseData = responseData.filter(p => !p.comboCode && p.type === "product");
+      responseData = (response.data.data || [])
+    .filter((p) => !p.comboCode && p.type === "product")
+    .filter((p) =>
+      p.productName?.toLowerCase().startsWith(term.toLowerCase())
+    ); // ✅ only products starting with search term
     } else {
       // Combo product search
       const token = localStorage.getItem("Access_Token");
@@ -329,15 +334,20 @@ const handleSearchChange = async (e) => {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         params: { name: term },
       });
-      responseData = response.data.data || [];
-      // FILTER: only include products that are combos
-      responseData = responseData.filter(p => !!p.comboCode);
+      responseData = (response.data.data || [])
+    .filter((p) => !!p.comboCode)
+    .filter((p) =>
+      p.comboDisplayName?.toLowerCase().startsWith(term.toLowerCase())
+    ); // ✅ only combos that start with term
     }
 
     setSearchResults(responseData);
   } catch (error) {
     console.error("Error fetching search results:", error);
     setSearchResults([]);
+  }
+  finally {
+    setSearchLoading(false); // ✅ stop loader
   }
 };
 
@@ -385,9 +395,7 @@ setComboProducts(
     salesCost: p.salesCost !== undefined ? parseFloat(p.salesCost) : "" // ✅ keep true value
   }))
 );
-  }
-
-  setSearchResults([]);
+  }  
 };
 
 
@@ -486,6 +494,9 @@ const handleSubmit = async (e) => {
   }
 };
 
+useEffect(() => {
+  setSelectedSearchValue('');
+}, [searchResults]);
 
   return (
 <div className="product-section">
@@ -620,33 +631,40 @@ const handleSubmit = async (e) => {
     />
 
     {/* Search results dropdown */}
-    <div className="search-field1-prod">
-      {loading ? (
-        <p className="ProductsLoading">Loading...</p>
-      ) : searchResults.length > 0 ? (
-        <select
-  onChange={handleSelectProduct}
-  value={!isCombo ? formData._id || "" : formData.productCode || ""}
+<div className="search-field1-prod">
+  {searchTerm.length > 0 && searchTerm.length < 3 ? (
+    <p className="TypeMoreProd">Type at least 3 characters to search</p>
+  ) : searchLoading ? (
+    <p className="ProductsLoading">Loading...</p>
+  ) : searchResults.length > 0 ? (
+    <select
+  onChange={(e) => {
+    const value = e.target.value;
+    setSelectedSearchValue(value); // update the dropdown's controlled value
+    handleSelectProduct(e);        // call your existing logic
+  }}
+  value={selectedSearchValue}       // controlled by new state
 >
-  <option value="" disabled>
-    {isCombo ? "Select a combo product" : "Select a product"}
-  </option>
-  {searchResults.map((product) => (
-    <option
-      key={!isCombo ? product._id : product.comboCode}
-      value={!isCombo ? product._id : product.comboCode}
-    >
-      {isCombo
-        ? `${product.comboDisplayName} (Code: ${product.comboCode})`
-        : `${product.productName} (Code: ${product.productCode})`}
-    </option>
-  ))}
-</select>
+      <option value="" disabled>
+        {isCombo ? "Select a combo product" : "Select a product"}
+      </option>
+      {searchResults.map((product) => (
+        <option
+          key={!isCombo ? product._id : product.comboCode}
+          value={!isCombo ? product._id : product.comboCode}
+        >
+          {isCombo
+            ? `${product.comboDisplayName} (Code: ${product.comboCode})`
+            : `${product.productName} (Code: ${product.productCode})`}
+        </option>
+      ))}
+    </select>
+  ) : (
+    searchTerm.length >= 3 && <p className="NoProductsFound">No products found...</p>
+  )}
+</div>
 
-      ) : (
-        <p className="NoProductsFound">No products found...</p>
-      )}
-    </div>
+
   </div>
 )}
 

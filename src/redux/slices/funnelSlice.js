@@ -208,6 +208,7 @@ const initialState = {
     showComments: false,
     addComment: false,
   },
+  
   pagination: {
     currentPage: 1,
     totalPages: 1,
@@ -409,7 +410,7 @@ export const loadFunneldata = (page = 1, limit = 10, companyName = "") => {
 // Load customer comments
 export const loadCustomerComments = (customerId) => {
   return async (dispatch) => {  
-    dispatch(setLoading(true));
+    // dispatch(setLoading(true));
     try {
       const response = await axios.get(`${API}/get_adebeo_customer_comments/${customerId}`);
       if (response.data && response.data.comments) {
@@ -431,7 +432,6 @@ export const loadCustomerComments = (customerId) => {
 // Post a customer comment
 export const postCustomerComment = (customerId, commentText) => {
   return async (dispatch) => {
-    dispatch(setLoading(true));
     try {
       const payload = { comment: commentText, customer_id: customerId };
       const response = await axios.post(`${API}/create_adebeo_customer_comments`, payload);

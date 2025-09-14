@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react"; // ✅ Added useEffect, useCallback for debounced search
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchInvoicesByCustomer,
@@ -7,8 +7,8 @@ import {
 import "./dashboard/Dashboard.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaExclamationTriangle, FaCheck, FaTimes } from "react-icons/fa";
-// top of file
 import { setPaymentStatus, upsertPayment } from '../redux/slices/customerPaymentSlice';
+import { debounce } from "lodash"; // ✅ Added debounce for search
 
 const InvoiceStatus = () => {
   const dispatch = useDispatch();  
@@ -19,12 +19,14 @@ const InvoiceStatus = () => {
   const [selectedRows, setSelectedRows] = useState({});
   const [tableData, setTableData] = useState([]);
   const [popupRow, setPopupRow] = useState(null);
-  const [disableOption, setDisableOption] = useState({}); // store radio selection per row
+  const [disableOption, setDisableOption] = useState({}); 
   const { loading, invoices, status, error } = useSelector(
     (state) => state.information
   );
   const [hasFetched, setHasFetched] = useState(false);
   const [disabledInvoiceInfo, setDisabledInvoiceInfo] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false); 
+ const [selectedCustomerId, setSelectedCustomerId] = useState("");
 
   const getInvoiceId = (inv) =>
     inv?.invoice_id ?? inv?.id ?? inv?.invoice_number ?? inv?._id ?? inv?.code;
@@ -46,92 +48,125 @@ const InvoiceStatus = () => {
           ? inv.enabled
           : typeof inv?.is_enabled === "boolean"
           ? inv.is_enabled
-          : true, // ✅ default to true if nothing is provided
+          : true,
     };
   };
 
-  // 🔎 Search API
-  const handleSearchChange = async (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
+  // ------------------- 🔎 DEBOUNCED SEARCH LOGIC START ----------------------
+  const debouncedSearch = useCallback(
+    debounce(async (term) => {
+      if (!term.trim()) {
+        setSearchResults([]);
+        setSearchLoading(false);
+        return;
+      }
 
-    if (!term.trim()) {
-      setSearchResults([]);
-      return;
-    }
+      setSearchLoading(true);
 
-    try {
-      const result = await dispatch(fetchInvoicesByCustomer(term)).unwrap();
+      try {
+        const result = await dispatch(fetchInvoicesByCustomer(term)).unwrap();
 
-      const invoices = Array.isArray(result)
-        ? result
-        : Array.isArray(result?.payments)
-        ? result.payments
-        : [];
+        const invoices = Array.isArray(result)
+          ? result
+          : Array.isArray(result?.payments)
+          ? result.payments
+          : [];
 
-      const names = Array.from(
-        new Set(
-          invoices
-            .map((inv) => inv.customer_name || inv.customer || "")
-            .filter((name) =>
-              name.toLowerCase().startsWith(term.toLowerCase())
-            )
-        )
-      );
+        const names = Array.from(
+          new Set(
+            invoices
+              .map((inv) => inv.customer_name || inv.customer || "")
+              .filter((name) =>
+                name.toLowerCase().startsWith(term.toLowerCase())
+              )
+          )
+        );
 
-      const suggestions = names.map((name) => ({
-        _id: name,
-        customer_name: name,
-      }));
+        if (names.length === 0) {
+          setSearchResults([]);
+        } else {
+          const suggestions = names.map((name) => ({
+            _id: name,
+            customer_name: name,
+          }));
+          setSearchResults(suggestions);
+        }
+      } catch (err) {
+        console.error("Error searching customers:", err);
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 500),
+    [dispatch]
+  );
 
-      setSearchResults(suggestions);
-    } catch (err) {
-      console.error("Error searching customers:", err);
-      setSearchResults([]);
-    }
-  };
+  useEffect(() => {
+  if (searchTerm.length >= 2) {
+    debouncedSearch(searchTerm);
+  } else {
+    // prevent debouncedSearch for short input
+    debouncedSearch.cancel(); // stop any pending debounce
+  }
+}, [searchTerm, debouncedSearch]);
 
-const handleSelectCustomer = async (e) => {
-  const selectedId = e.target.value;
-  const cust = searchResults.find((c) => c._id === selectedId);
 
-  
-  setSelectedCustomer(cust);
-  setSelectedRows({});
-  setTableData([]);
-  setHasFetched(false);
+  const handleSearchChange = (e) => {
+  const term = e.target.value;
+  setSearchTerm(term);
 
-  setDisabledInvoiceInfo(null);
-  if (cust) {
-    try {
-      const result = await dispatch(
-        fetchInvoicesByCustomer(cust.customer_name)
-      ).unwrap();
-
-      const raw = Array.isArray(result)
-        ? result
-        : Array.isArray(result?.payments)
-        ? result.payments
-        : [];
-
-      const normalized = raw.map(normalizeInvoice);
-
-      const filtered = normalized.filter((inv) =>
-        (inv.customerName || "")
-          .toLowerCase()
-          .startsWith(cust.customer_name.toLowerCase())
-      );
-
-      setTableData(filtered);
-    } catch (err) {
-      console.error("Error fetching invoices for customer:", err);
-      setTableData([]);
-    } finally {
-      setHasFetched(true);
-    }
+  if (!term.trim() || term.length < 2) {
+    // If empty or less than 2 letters, clear results and stop loading
+    setSearchResults([]);
+    setSearchLoading(false);
+  } else {
+    // Only trigger loading for 2 or more letters
+    setSearchLoading(true);
   }
 };
 
+
+  // ------------------- 🔎 DEBOUNCED SEARCH LOGIC END ----------------------
+
+  const handleSelectCustomer = async (e) => {
+    const selectedId = e.target.value;
+    const cust = searchResults.find((c) => c._id === selectedId);
+
+    setSelectedCustomer(cust);
+    setSelectedRows({});
+    setTableData([]);
+    setHasFetched(false);
+    setDisabledInvoiceInfo(null);
+
+    if (cust) {
+      try {
+        const result = await dispatch(
+          fetchInvoicesByCustomer(cust.customer_name)
+        ).unwrap();
+
+        const raw = Array.isArray(result)
+          ? result
+          : Array.isArray(result?.payments)
+          ? result.payments
+          : [];
+
+        const normalized = raw.map(normalizeInvoice);
+
+        const filtered = normalized.filter((inv) =>
+          (inv.customerName || "")
+            .toLowerCase()
+            .startsWith(cust.customer_name.toLowerCase())
+        );
+
+        setTableData(filtered);
+      } catch (err) {
+        console.error("Error fetching invoices for customer:", err);
+        setTableData([]);
+      } finally {
+        setHasFetched(true);
+      }
+    }
+  };
 
   const toggleCheckbox = (id) => {
     setSelectedRows((prev) => ({
@@ -161,76 +196,62 @@ const handleSelectCustomer = async (e) => {
   };
 
   const confirmDisable = (invoice) => {
-  const selectedOption = disableOption[getInvoiceId(invoice)];
-  if (!selectedOption) {
-    alert("⚠️ Please select an option before confirming!");
-    return;
-  }
+    const selectedOption = disableOption[getInvoiceId(invoice)];
+    if (!selectedOption) {
+      alert("⚠️ Please select an option before confirming!");
+      return;
+    }
 
-  const invoiceId = getInvoiceId(invoice);
+    const invoiceId = getInvoiceId(invoice);
+    const updated = tableData.filter((inv) => getInvoiceId(inv) !== invoiceId);
 
-  // Remove from InvoiceStatus table only
-const updated = tableData.filter((inv) => getInvoiceId(inv) !== invoiceId);
+    if (updated.length === 0) {
+      setDisabledInvoiceInfo({
+        invoiceNumber: invoice.invoice_number,
+        customerName: invoice.customer_name || invoice.customerName,
+      });
+    } else {
+      setDisabledInvoiceInfo(null);
+    }
 
-// 🔹 If no rows left, show card
-if (updated.length === 0) {
-  setDisabledInvoiceInfo({
-    invoiceNumber: invoice.invoice_number,
-    customerName: invoice.customer_name || invoice.customerName,
-  });
-} else {
-  setDisabledInvoiceInfo(null);  // clear card when there are still invoices
-}
+    dispatch(
+      disableInvoice({
+        invoice_id: invoiceId,
+        isEnableInvoicePurchase: selectedOption === "withPO",
+        isEnabled: false,
+      })
+    )
+      .then(() => {
+        dispatch(
+          setPaymentStatus({
+            invoice_number: invoice.invoice_number,
+            payment_status: "Cancelled",
+          })
+        );
 
-  // 🔹 Update backend + CustomerPayment slice
-  dispatch(
-    disableInvoice({
-      invoice_id: invoiceId,
-      isEnableInvoicePurchase: selectedOption === "withPO",
-      isEnabled: false,
-    })
-  )
-      dispatch(
-    disableInvoice({
-      invoice_id: invoiceId,
-      isEnableInvoicePurchase: selectedOption === "withPO",
-      isEnabled: false,
-    })
-  )
-    .then(() => {
-      // mark it Cancelled in CustomerPayment (so it stays in that table)
-      dispatch(
-        setPaymentStatus({
-          invoice_number: invoice.invoice_number,
-          payment_status: "Cancelled",
-        })
-      );
+        dispatch(
+          upsertPayment({
+            invoice_number: invoice.invoice_number,
+            customer_name: invoice.customer_name || invoice.customerName || '',
+            total_amount: invoice.total_amount ?? invoice.amount ?? null,
+            amount_due: invoice.amount_due ?? null,
+            invoice_date: invoice.invoice_date ?? null,
+            payment_status: "Cancelled",
+            isEnableInvoicePurchase: false,
+          })
+        );
 
-      // ensure the payments list contains a minimal record for this invoice (so it won't disappear)
-      dispatch(
-        upsertPayment({
-          invoice_number: invoice.invoice_number,
-          customer_name: invoice.customer_name || invoice.customerName || '',
-          total_amount: invoice.total_amount ?? invoice.amount ?? null,
-          amount_due: invoice.amount_due ?? null,
-          invoice_date: invoice.invoice_date ?? null,
-          payment_status: "Cancelled",
-          isEnableInvoicePurchase: false,
-          // add other fields you want visible by default (pdf_link, base_url) or keep null
-        })
-      );
+        alert(`✅ Invoice ${invoice.invoice_number} disabled successfully.`);
+        setPopupRow(null);
+      })
+      .catch((err) => {
+        console.error("Disable invoice failed", err);
+        alert("❌ Failed to disable invoice. Try again.");
+      });
 
-      alert(`✅ Invoice ${invoice.invoice_number} disabled successfully.`);
-      setPopupRow(null);
-    })
-    .catch((err) => {
-      console.error("Disable invoice failed", err);
-      alert("❌ Failed to disable invoice. Try again.");
-    });
-  setTableData(updated);
-};
+    setTableData(updated);
+  };
 
-  // 📄 Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
   const totalPages = Math.ceil(tableData.length / rowsPerPage);
@@ -239,7 +260,11 @@ if (updated.length === 0) {
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = tableData.slice(indexOfFirstRow, indexOfLastRow);
 
-   return (
+  useEffect(() => {
+  setSelectedCustomerId(""); // reset dropdown when new search results arrive
+}, [searchResults]);
+
+  return (
     <div className="invoice-status">
       <h3>Invoice Management</h3>
 
@@ -252,57 +277,60 @@ if (updated.length === 0) {
           onChange={handleSearchChange}
           className="search-field-invoice-status"
         />
-        <div className="search-field1-invoice-status">
-          {loading ? (
-            <p className="InvoiceStatusLoading">Loading...</p>
-          ) : searchResults.length > 0 ? (
-            <select
-              onChange={handleSelectCustomer}
-              value={selectedCustomer?._id || ""}
-            >
-              <option value="" disabled>
-                Select a customer
-              </option>
-              {searchResults
-  .filter(cust => cust.isEnabled !== false) // hide disabled customers
-  .map((cust) => (
-    <option key={cust._id} value={cust._id}>
-      {cust.customer_name}
-    </option>
-))}
-
-            </select>
-          ) : (
-            searchTerm && (
-              <p className="NoInvoiceStatusFound">No customers found...</p>
-            )
-          )}
-        </div>
+       <div className="search-field1-invoice-status">
+  {searchLoading ? (
+    <p className="InvoiceStatusLoading">Loading...</p>
+  ) : searchTerm && searchTerm.length < 2 ? (
+    <p className="InvoiceStatusWarning">Please type 2 or more letters...</p>
+  ) : searchResults.length > 0 ? (
+    <select
+      onChange={(e) => {
+        const id = e.target.value;
+        setSelectedCustomerId(id);
+        handleSelectCustomer(e);
+      }}
+      value={selectedCustomerId}
+    >
+      <option value="" disabled>
+        Select a customer
+      </option>
+      {searchResults.map((cust) => (
+        <option key={cust._id} value={cust._id}>
+          {cust.customer_name}
+        </option>
+      ))}
+    </select>
+  ) : (
+    searchTerm && <p className="NoInvoiceStatusFound">No customers found...</p>
+  )}
+</div>
       </div>
-{disabledInvoiceInfo && (
-  <div className="disabled-invoice-card-invoicests">
-    <h4> 👍 Invoice Disabled</h4>
-    <p>
-      Invoice <span>#{disabledInvoiceInfo.invoiceNumber}</span> for customer{" "}
-      <span>{disabledInvoiceInfo.customerName}</span> has been disabled.
-    </p>
-    <p>Choose a customer from the list above to continue managing invoices.</p>
-  </div>
-)}
-{!selectedCustomer && (
-  <p
-   style={{
+
+      {/* Disabled invoice info */}
+      {disabledInvoiceInfo && (
+        <div className="disabled-invoice-card-invoicests">
+          <h4> 👍 Invoice Disabled</h4>
+          <p>
+            Invoice <span>#{disabledInvoiceInfo.invoiceNumber}</span> for customer{" "}
+            <span>{disabledInvoiceInfo.customerName}</span> has been disabled.
+          </p>
+          <p>Choose a customer from the list above to continue managing invoices.</p>
+        </div>
+      )}
+      {!selectedCustomer && (
+        <p
+          style={{
             fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
             fontWeight: 900,
-            fontSize: "15px",
+            fontSize: "19px",
             color: "#026875ff",
             textAlign: "center",
             marginTop: "10%",
           }}
-  >
-    Please select a customer from the search bar to view invoices.
-  </p>
-)}
+        >
+          Please select a customer from the search bar to view invoices.
+        </p>
+      )}
 
       {/* Bottom Section: Table */}
       {selectedCustomer && tableData.length > 0 && (
@@ -320,121 +348,113 @@ if (updated.length === 0) {
                 <th>Sub Total</th>
                 <th>Total Amount</th>
                 <th>Amount Due</th>
-                <th>Toggle</th>
+                <th>Disable</th>
               </tr>
             </thead>
             <tbody>
-  {currentRows.map((invoice) => {
-    const rowId = getInvoiceId(invoice);
-    const isChecked = !!selectedRows[rowId];
-    const items = Array.isArray(invoice.items) ? invoice.items : [];
+              {currentRows.map((invoice) => {
+                const rowId = getInvoiceId(invoice);
+                const isChecked = !!selectedRows[rowId];
+                const items = Array.isArray(invoice.items) ? invoice.items : [];
 
-    return items.map((item, idx) => (
-      <tr
-        key={`${rowId}-${idx}`}
-        className={isChecked ? "editable" : ""}
-      >
-        {idx === 0 && (
-          <>
-            <td rowSpan={items.length}>
-              <input
-                type="checkbox"
-                className="custom-checkbox-invoice-status"
-                checked={isChecked}
-                onChange={() => toggleCheckbox(rowId)}
-              />
-            </td>
-            <td rowSpan={items.length}>{invoice.invoice_number}</td>
-            <td rowSpan={items.length}>{invoice.customer_name}</td>
-            <td rowSpan={items.length}>{invoice.invoice_date}</td>
-          </>
-        )}
+                return items.map((item, idx) => (
+                  <tr key={`${rowId}-${idx}`} className={isChecked ? "editable" : ""}>
+                    {idx === 0 && (
+                      <>
+                        <td rowSpan={items.length}>
+                          <input
+                            type="checkbox"
+                            className="custom-checkbox-invoice-status"
+                            checked={isChecked}
+                            onChange={() => toggleCheckbox(rowId)}
+                          />
+                        </td>
+                        <td rowSpan={items.length}>{invoice.invoice_number}</td>
+                        <td rowSpan={items.length}>{invoice.customer_name}</td>
+                        <td rowSpan={items.length}>{invoice.invoice_date}</td>
+                      </>
+                    )}
+                    <td>{item.description}</td>
+                    <td>{item.quantity}</td>
+                    <td>{item.unit_price}</td>
+                    <td>{item.sub_total}</td>
 
-        <td>{item.description}</td>
-        <td>{item.quantity}</td>
-        <td>{item.unit_price}</td>
-        <td>{item.sub_total}</td>
+                    {idx === 0 && (
+                      <>
+                        <td rowSpan={items.length}>{invoice.total_amount}</td>
+                        <td rowSpan={items.length}>{invoice.amount_due}</td>
+                        <td rowSpan={items.length}>
+                          <button
+                            className={`toggle-btn ${invoice.isEnabled ? "disable" : "enable"}`}
+                            onClick={() => handleToggleStatus(invoice)}
+                            disabled={!isChecked}
+                          >
+                            {invoice.isEnabled ? "Disable" : "Enable"}
+                          </button>
 
-        {idx === 0 && (
-          <>
-            <td rowSpan={items.length}>{invoice.total_amount}</td>
-            <td rowSpan={items.length}>{invoice.amount_due}</td>
-            <td rowSpan={items.length}>
-              <button
-                className={`toggle-btn ${
-                  invoice.isEnabled ? "disable" : "enable"
-                }`}
-                onClick={() => handleToggleStatus(invoice)}
-                disabled={!isChecked}
-              >
-                {invoice.isEnabled ? "Disable" : "Enable"}
-              </button>
+                          {popupRow === rowId && (
+                            <div className="disable-popup">
+                              <div className="popup-icon">
+                                <FaExclamationTriangle />
+                              </div>
+                              <p>
+                                For <strong>{invoice.invoice_number}</strong> do you want to disable:
+                              </p>
 
-              {popupRow === rowId && (
-                <div className="disable-popup">
-                  <div className="popup-icon">
-                    <FaExclamationTriangle />
-                  </div>
-                  <p>
-                    For <strong>{invoice.invoice_number}</strong> do you want to
-                    disable:
-                  </p>
+                              <label>
+                                <input
+                                  type="radio"
+                                  name={`disable-${rowId}`}
+                                  value="onlyInvoice"
+                                  onChange={() =>
+                                    setDisableOption((prev) => ({
+                                      ...prev,
+                                      [rowId]: "onlyInvoice",
+                                    }))
+                                  }
+                                  checked={disableOption[rowId] === "onlyInvoice"}
+                                />
+                                Invoice only
+                              </label>
+                              <label>
+                                <input
+                                  type="radio"
+                                  name={`disable-${rowId}`}
+                                  value="withPO"
+                                  onChange={() =>
+                                    setDisableOption((prev) => ({
+                                      ...prev,
+                                      [rowId]: "withPO",
+                                    }))
+                                  }
+                                  checked={disableOption[rowId] === "withPO"}
+                                />
+                                Invoice with Purchase Order
+                              </label>
 
-                  <label>
-                    <input
-                      type="radio"
-                      name={`disable-${rowId}`}
-                      value="onlyInvoice"
-                      onChange={() =>
-                        setDisableOption((prev) => ({
-                          ...prev,
-                          [rowId]: "onlyInvoice",
-                        }))
-                      }
-                      checked={disableOption[rowId] === "onlyInvoice"}
-                    />
-                    Invoice only
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name={`disable-${rowId}`}
-                      value="withPO"
-                      onChange={() =>
-                        setDisableOption((prev) => ({
-                          ...prev,
-                          [rowId]: "withPO",
-                        }))
-                      }
-                      checked={disableOption[rowId] === "withPO"}
-                    />
-                    Invoice with Purchase Order
-                  </label>
-
-                  <div className="popup-actions">
-                    <button
-                      onClick={() => confirmDisable(invoice)}
-                      className="popup-confirm-btn"
-                    >
-                      <FaCheck /> Confirm
-                    </button>
-                    <button
-                      onClick={() => setPopupRow(null)}
-                      className="popup-cancel-btn"
-                    >
-                      <FaTimes /> Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-            </td>
-          </>
-        )}
-      </tr>
-    ));
-  })}
-</tbody>
-
+                              <div className="popup-actions">
+                                <button
+                                  onClick={() => confirmDisable(invoice)}
+                                  className="popup-confirm-btn"
+                                >
+                                  <FaCheck /> Confirm
+                                </button>
+                                <button
+                                  onClick={() => setPopupRow(null)}
+                                  className="popup-cancel-btn"
+                                >
+                                  <FaTimes /> Cancel
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ));
+              })}
+            </tbody>
           </table>
 
           {/* Pagination */}

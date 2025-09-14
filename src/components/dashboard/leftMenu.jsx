@@ -1,15 +1,29 @@
 //import React from 'react';
 import logo from "../dashboard/logo1.png";
 import React, { useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
+
 
 const LeftMenu = ({ onMenuItemClick }) => {
   const [activeButton, setActiveButton] = useState(null);
 
-  const handleButtonClick = (menuItem) => 
-    {
-    setActiveButton(menuItem);
-    onMenuItemClick(menuItem); // Call the function to change content
-  };
+   // Decode token directly to get role
+    const token = localStorage.getItem('Access_Token');
+    let role = null;
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        role = decoded.role;
+      } catch (e) {
+        console.error('Invalid token');
+      }
+    }
+  
+    const handleButtonClick = (menuItem) => {
+      setActiveButton(menuItem);
+      onMenuItemClick(menuItem);
+    };
+
   return (
     <div className="left-menu">
       <div className='logo'>
@@ -20,11 +34,22 @@ const LeftMenu = ({ onMenuItemClick }) => {
       <ul className="menu-list"> 
       <li><button className={activeButton === 'funnel' ? 'active' : ''} onClick={() => handleButtonClick('funnel')}>Funnel</button></li>
       <li><button className={activeButton === 'customers' ? 'active' : ''} onClick={() => handleButtonClick('customers')}>Customers</button></li>
-      <li><button className={activeButton === 'products' ? 'active' : ''} onClick={() => handleButtonClick('products')}>Products</button></li>
-      <li><button className={activeButton === 'purchase_orders' ? 'active' : ''} onClick={() => handleButtonClick('purchase_orders')}>Purchase Orders</button></li>
-      <li><button className={activeButton === 'cx_payment' ? 'active' : ''} onClick={() => handleButtonClick('cx_payment')}>Cx Payment</button></li>
+      
+      {role === 'admin' && (
+          <li>
+            <button
+              className={activeButton === 'products' ? 'active' : ''}
+              onClick={() => handleButtonClick('products')}
+            >
+              Products
+            </button>
+          </li>
+        )}
+      
+      {role === 'admin' && (<li><button className={activeButton === 'purchase_orders' ? 'active' : ''} onClick={() => handleButtonClick('purchase_orders')}>Purchase Orders</button></li> )}
+      {role === 'admin' && (<li><button className={activeButton === 'cx_payment' ? 'active' : ''} onClick={() => handleButtonClick('cx_payment')}>Cx Payment</button></li> )}
       <li><button className={activeButton === 'reports' ? 'active' : ''} onClick={() => handleButtonClick('reports')}>Reports</button></li>
-      <li><button className={activeButton === 'admin' ? 'active' : ''} onClick={() => handleButtonClick('admin')}>Admin</button></li>
+      {role === 'admin' && (<li><button className={activeButton === 'admin' ? 'active' : ''} onClick={() => handleButtonClick('admin')}>Admin</button></li> )}
     </ul>
     </div>
   );

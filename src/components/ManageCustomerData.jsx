@@ -37,6 +37,8 @@ const ManageCustomerData = () => {
   const funnel = useSelector((state) => state.funnel);
   const { funnelData = [], loading: funnelLoading, pagination = {} } = funnel;
   const { currentPage: funnelCurrent = 1, totalPages = 1 } = pagination;
+const [selectedCustomerId, setSelectedCustomerId] = useState("");
+const [localSearchLoading, setLocalSearchLoading] = useState(false);
 
   const { users = [], loading: usersLoading } = useSelector(
     (state) => state.users
@@ -102,19 +104,35 @@ const ManageCustomerData = () => {
   }, [dispatch]);
 
   // Debounced customer search
-  useEffect(() => {
-    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    if (!searchQuery || searchQuery.trim() === "") return;
-    searchDebounceRef.current = setTimeout(() => {
-      dispatch(fetchCustomerAsync(searchQuery.trim()));
-    }, 450);
-    return () => {
-      if (searchDebounceRef.current) {
-        clearTimeout(searchDebounceRef.current);
-        searchDebounceRef.current = null;
-      }
-    };
-  }, [searchQuery, dispatch]);
+ useEffect(() => {
+  if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+
+  const trimmedQuery = searchQuery.trim();
+
+  if (trimmedQuery.length < 3) {
+    dispatch(clearCustomers());
+    setLocalSearchLoading(false);
+    return;
+  }
+
+  setLocalSearchLoading(true); // start search
+
+  searchDebounceRef.current = setTimeout(async () => {
+    try {
+      await dispatch(fetchCustomerAsync(trimmedQuery));
+    } finally {
+      setLocalSearchLoading(false); // search done
+    }
+  }, 450);
+
+  return () => {
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+      searchDebounceRef.current = null;
+    }
+  };
+}, [searchQuery, dispatch]);
+
 
   // When selectedCustomer changes, load funnel data and reset local controls for rows
   useEffect(() => {
@@ -131,7 +149,13 @@ const ManageCustomerData = () => {
 
   const usernameList = useMemo(() => users.map((u) => u.username), [users]);
 
-  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+const handleSearchChange = (e) => {
+  const val = e.target.value;
+  setSearchQuery(val);
+
+  // Clear previous search results immediately
+  dispatch(clearCustomers());
+};
 
   const handleCustomerSelect = (e) => {
     const id = e.target.value;
@@ -221,42 +245,50 @@ const ManageCustomerData = () => {
       loadFunneldata(next, perPage, selectedCustomer?.companyName || "")
     );
   };
+useEffect(() => {
+  setSelectedCustomerId(""); // reset dropdown whenever search results change
+}, [customers, dispatch]);
 
   return (
     <div className="manage-customer-data">
       <h3>Manage Customer Data</h3>
 
       <div>
-        <input
-          type="text"
-          className="search-field-customer-status"
-          placeholder="Search by Company name"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-        <div className="search-field1-customer-status" >
-          {customersLoading ? (
-            <p className="CustomerStatusLoading">Loading...</p>
-          ) : customers && customers.length > 0 ? (
-            <select
-              value={selectedCustomer?._id || ""}
-              onChange={handleCustomerSelect}
-            >
-              <option value="" disabled>
-                Select a customer
-              </option>
-              {customers.map((c) => (
-                <option key={c._id} value={c._id}>
-                  {c.companyName}
-                </option>
-              ))}
-            </select>
-          ) : (
-            searchQuery && <p className="NoCustomerStatusFound">No customers found...</p>
-          )}
-        </div>
-      </div>
+  <input
+    type="text"
+    className="search-field-customer-status"
+    placeholder="Search by Company name"
+    value={searchQuery}
+    onChange={handleSearchChange}
+  />
+  <div className="search-field1-customer-status">
+  {searchQuery.length >= 3 ? (
+  localSearchLoading || customersLoading ? (
+    <p className="CustomerStatusLoading">Loading...</p>
+  ) : customers.length > 0 ? (
+    <select
+      value={selectedCustomerId}
+      onChange={(e) => {
+        const id = e.target.value;
+        setSelectedCustomerId(id);
+        handleCustomerSelect(e);
+      }}
+    >
+      <option value="" disabled>Select a customer</option>
+      {customers.map((c) => (
+        <option key={c._id} value={c._id}>{c.companyName}</option>
+      ))}
+    </select>
+  ) : (
+    <p className="NoCustomerStatusFound">No customers found...</p>
+  )
+) : searchQuery.length > 0 && searchQuery.length < 3 ? (
+  <p className="TypeMoreCustData">Type at least 3 characters to search</p>
+) : null}
 
+</div>
+
+</div>
       {funnelLoading ? (
         <div style={{
             fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',

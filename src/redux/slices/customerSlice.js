@@ -298,6 +298,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axios from "../../config/apiConfig";  // Your axios instance with token
 import API from "../../config/config";  // API path (for base URL or other configurations)
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 const initialState = {
   newCustomer: {
@@ -477,58 +478,90 @@ export const postCustomerComment = (customerId, commentText) => {
 // Create a new customer (POST)
 
 
-export const createCustomerAsync = (newCustomer) => async (dispatch) => {
-  dispatch(setCreateLoading(true));  // Start loading for create
-  dispatch(clearError()); // Clear any previous error
+// export const createCustomerAsync = (newCustomer) => async (dispatch) => {
+//   dispatch(setCreateLoading(true));  // Start loading for create
+//   dispatch(clearError()); // Clear any previous error
   
-  // Retrieve token from localStorage
-  const token = localStorage.getItem('Access_Token');
+//   // Retrieve token from localStorage
+//   const token = localStorage.getItem('Access_Token');
   
-  if (!token) {
-    // If no token found, reject the request
-    dispatch(setError("No authentication token found. Please login."));
-    dispatch(setCreateLoading(false));  // End loading if there's no token
-    return;
-  }
+//   if (!token) {
+//     // If no token found, reject the request
+//     dispatch(setError("No authentication token found. Please login."));
+//     dispatch(setCreateLoading(false));  // End loading if there's no token
+//     return;
+//   }
 
-  try {
-    const response = await axios.post(`${API}/create_adebeo_customers`, newCustomer);
+//   try {
+//     const response = await axios.post(`${API}/create_adebeo_customers`, newCustomer);
     
-    // Log the response to ensure it has the expected structure
-    console.log("API Response:", response);
+//     // Log the response to ensure it has the expected structure
+//     console.log("API Response:", response);
     
-    if (response && response.data) {
+//     if (response && response.data) {
+//       const data = response.data;
+
+//       // Check for error or success status
+//       if (data.status === 'error' || data.success === false) {
+//         // Handle the error response from the API
+//         dispatch(setError(data.message || 'An error occurred while creating the customer.'));
+//       } else {
+//         // Add the new customer to the state
+//         dispatch(setCustomerList((prevCustomers) => [...prevCustomers, data]));
+        
+//         // Log before showing the alert to confirm the code is reaching this point
+//         console.log("Success, showing alert:", data.message || 'Customer created successfully!');
+        
+//         // Show success alert message
+//         alert(data.message || 'Customer created successfully!');
+
+//         dispatch(setSuccessMessage(data.message || 'Customer created successfully!'));
+//         dispatch(resetNewCustomer());
+//       }
+//     }
+//   } catch (error) {
+//     // Log the error in the catch block to see if it's being triggered
+//     console.error("Error while creating customer:", error);
+    
+//     // Handle network or unexpected errors
+//     dispatch(setError(error.response?.data?.message || 'Success'));
+//   } finally {
+//     dispatch(setCreateLoading(false));  // End loading for create
+//   }
+// };
+
+
+export const createCustomerAsync = createAsyncThunk(
+  'customers/createCustomer',
+  async (newCustomer, { rejectWithValue }) => {
+    const token = localStorage.getItem('Access_Token');
+    if (!token) {
+      return rejectWithValue({ message: "No authentication token found!! Please Login.." });
+    }
+
+    try {
+      const response = await axios.post(`${API}/create_adebeo_customers`, newCustomer, {
+        validateStatus: () => true, // ✅ Prevent Axios from throwing
+      });
+
+      if (response.status >= 400) {
+        return rejectWithValue({ message: response.data.message || "Customer creation failed" });
+      }
+
       const data = response.data;
 
-      // Check for error or success status
       if (data.status === 'error' || data.success === false) {
-        // Handle the error response from the API
-        dispatch(setError(data.message || 'An error occurred while creating the customer.'));
-      } else {
-        // Add the new customer to the state
-        dispatch(setCustomerList((prevCustomers) => [...prevCustomers, data]));
-        
-        // Log before showing the alert to confirm the code is reaching this point
-        console.log("Success, showing alert:", data.message || 'Customer created successfully!');
-        
-        // Show success alert message
-        alert(data.message || 'Customer created successfully!');
-
-        dispatch(setSuccessMessage(data.message || 'Customer created successfully!'));
-        dispatch(resetNewCustomer());
+        return rejectWithValue({ message: data.message || "Customer creation failed" });
       }
-    }
-  } catch (error) {
-    // Log the error in the catch block to see if it's being triggered
-    console.error("Error while creating customer:", error);
-    
-    // Handle network or unexpected errors
-    dispatch(setError(error.response?.data?.message || 'Success'));
-  } finally {
-    dispatch(setCreateLoading(false));  // End loading for create
-  }
-};
 
+      return data;
+    } catch (error) {
+      return rejectWithValue({
+        message: error.response?.data?.message || "Something went wrong",
+      });
+    }
+  }
+);
 
 //Fetch customers based on company name (GET)
 // export const fetchCustomerAsync = (companyName) => async (dispatch) => {
@@ -549,7 +582,10 @@ export const createCustomerAsync = (newCustomer) => async (dispatch) => {
 // };
 
 // Fetch customers based on company name (GET)
+let lastQuery = ""; // Track the latest search query globally
+
 export const fetchCustomerAsync = (companyName) => async (dispatch) => {
+  lastQuery = companyName; // Save the current query
   dispatch(setLoading(true));
   dispatch(clearError());  // Clear any previous error message before initiating a new request
 
@@ -570,23 +606,31 @@ export const fetchCustomerAsync = (companyName) => async (dispatch) => {
       }
     });
 
-    if (response && response.data && response.data.data) {
-      const customers = response.data.data;
-      if (customers.length === 0) {
-        dispatch(setError('No customer data found'));
+    // ✅ Only update if this response matches the latest query
+    if (companyName === lastQuery) {
+      if (response && response.data && response.data.data) {
+        const customers = response.data.data;
+        if (customers.length === 0) {
+          dispatch(setError('No customer data found'));
+        } else {
+          dispatch(setCustomerList(customers));
+        }
       } else {
-        dispatch(setCustomerList(customers));
+        dispatch(setError('No customer data found'));
       }
-    } else {
-      dispatch(setError('No customer data found'));
     }
   } catch (error) {
-    // Handle any unexpected errors from the server or network issues
-    dispatch(setError(error.response?.data?.message || 'Failed to fetch customers.'));
+    if (companyName === lastQuery) {
+      // Handle any unexpected errors from the server or network issues
+      dispatch(setError(error.response?.data?.message || 'Failed to fetch customers.'));
+    }
   } finally {
-    dispatch(setLoading(false));  // End loading
+    if (companyName === lastQuery) {
+      dispatch(setLoading(false));  // End loading
+    }
   }
 };
+
 
 // export const fetchCustomerAsync = (companyName) => async (dispatch) => {
 //   dispatch(setLoading(true));

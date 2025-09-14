@@ -231,6 +231,12 @@ const CategorySection = () => {
     }));
   };
 
+  // 🔑 Reset dropdown whenever new search results come in
+useEffect(() => {
+  setSelectedSearchValue("");
+}, [searchResults]);
+
+
   return (
     <div className="category-section">
       <h3>{mode === 'add' ? 'Add New Category' : 'Edit Category'}</h3>
@@ -249,38 +255,42 @@ const CategorySection = () => {
             className='search-field-cat'
             type="text"
             placeholder="Search Category Name"
-            value={searchTerm}
+            value={searchTerm} 
             onChange={handleSearchChange}
           />
 
           <div className='search-field1-cat'>
-            {searchLoading ? (
-              <p className='CategoriesLoading'>⏳ Loading...</p>
-            ) : searchError ? (
-              <p className='NoCategoriesFound'>{searchError}</p>
-            ) : searchResults.length > 0 ? (
-              <select
-                onChange={handleSelectCategory}
-                value={selectedSearchValue} // 🔑 use independent select state, not formData._id
-              >
-                <option value="" disabled>Select category</option>
-                {searchResults.map((cat, idx) => {
-                  const optionValue = makeOptionValue(cat, idx);
-                  return (
-                    <option
-                      key={cat._id || cat.Category_Code || `${cat.Category_Name}-${idx}`}
-                      value={optionValue}
-                    >
-                      {cat.Category_Name} ({cat.Category_Code})
-                    </option>
-                  );
-                })}
-              </select>
+  {searchTerm.length >= 3 ? (
+    searchLoading ? (
+      <p className='CategoriesLoading'>⏳ Loading...</p>
+    ) : searchError ? (
+      <p className='NoCategoriesFound'>{searchError}</p>
+    ) : searchResults.length > 0 ? (
+      <select
+        onChange={handleSelectCategory}
+        value={selectedSearchValue} // keep controlled
+      >
+        <option value="" disabled>Select category</option>
+        {searchResults.map((cat, idx) => {
+          const optionValue = makeOptionValue(cat, idx);
+          return (
+            <option
+              key={cat._id || cat.Category_Code || `${cat.Category_Name}-${idx}`}
+              value={optionValue}
+            >
+              {cat.Category_Name} ({cat.Category_Code})
+            </option>
+          );
+        })}
+      </select>
+    ) : (
+      <p className='NoCategoriesFound'>No categories found...</p>
+    )
+  ) : searchTerm.length > 0 && searchTerm.length < 3 ? (
+    <p className="TypeMoreCategories">Type at least 3 characters to search</p>
+  ) : null}
+</div>
 
-            ) : (
-              <p className='NoCategoriesFound'>No categories found...</p>
-            )}
-          </div>
         </div>
       )}
 

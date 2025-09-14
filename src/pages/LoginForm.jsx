@@ -6,6 +6,9 @@ import logo from "../assets/logo.png";
 import { useNavigate } from 'react-router-dom';  // Updated to useNavigate
 import { loginUser } from "../redux/slices/authSlice";  
 
+import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+import { MdOutlineWifiOff } from "react-icons/md";
 
 const Login = () => 
 {
@@ -17,19 +20,70 @@ const Login = () =>
 
     const handleLogin = (e) => 
         {
-          e.preventDefault();
-          setError(""); 
-          dispatch(loginUser(username, password))  // ✅ This now returns a Promise
-         .then((data) => 
+            e.preventDefault();
+            dispatch(loginUser(username, password))  // ✅ This now returns a Promise
+            .then((data) => 
             {
-              console.log("User logged in successfully!", data);
-              navigate('/dashboardPage');  // Use navigate instead of history.push
+                console.log("User logged in successfully!", data);
+                navigate('/dashboardPage');  // Use navigate instead of history.push
             })
-         .catch((err) => 
+            
+            .catch((err) => 
             {
-              console.log("Error logging in:", err);
-              setError("Invalid username or password."); // Show error on failure
+                console.log("Error logging in:", err);
+                if (err.response) {
+                    toast.error("Invalid username or password.", {
+                        position: "top-center",
+                        autoClose: 4000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored", // "light", "dark", or "colored"
+                        style: { background: "rgba(226, 70, 70, 0.87)", color: "white", 
+                          fontSize: "13px",       // ✅ Change font size
+                          fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                          fontWeight: "bold",    // ✅ Make text bold
+                         }
+                    });
+                  } else if (err.request) {
+                    toast.error("Network error. Please check your internet connection.", {
+                        position: "top-center",
+                        autoClose: 4000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored", // "light", "dark", or "colored"
+                        style: { background: "rgba(78, 121, 202, 0.87)", color: "white", 
+                          fontSize: "14px",       // ✅ Change font size
+                          fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                          fontWeight: "bold",    // ✅ Make text bold
+                         },
+                         icon: <MdOutlineWifiOff
+                         style={{ fontSize: '20px', color: 'white' }} />
+                    });
+                  } else {
+                    toast.error("An unexpected error occurred. Please refresh and try again.", {
+                        position: "top-center",
+                        autoClose: 4000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored", // "light", "dark", or "colored"
+                        style: { background: "rgba(226, 70, 70, 0.87)", color: "white", 
+                          fontSize: "13px",       // ✅ Change font size
+                          fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                          fontWeight: "bold",    // ✅ Make text bold
+                         }
+                    });
+                }
             });
+           
         };
                       
     return(
@@ -49,13 +103,14 @@ const Login = () =>
                     <FaLock className="icon"/>
                 </div>
 
-                {/* 🔴 Show error message if login fails */}
-                {err && <p className="error-message">{err}</p>}
-
+                
                 <button onClick={handleLogin}>LOGIN</button>
             </form>
         </div>
+         {/* Add ToastContainer to show toasts */}
+         <ToastContainer />
         </div>
+        
     );
 };
 
