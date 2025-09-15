@@ -470,7 +470,11 @@ toast.error("Please select a customer and enter a comment!!!.");  }
    <td>{item.area}</td>
    <td>{item.mobileNumber}</td>
    <td>{item.primaryEmail}</td>
-   <td>{item.products}</td>
+   <td>
+    {item.products.map((p, index) => (
+      <div key={index}>{p.productName}</div>
+    ))}
+  </td>
    <td>{Array.isArray(item.comments) ? 
      <span className="icon-container">
       {/* changes made--icons */}
