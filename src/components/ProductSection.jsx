@@ -18,7 +18,9 @@ import {
   fetchComboProductsAsync,
   updateComboProductAsync
 } from '../redux/slices/productSlice';
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const ProductSection = () => {
   const dispatch = useDispatch();
@@ -96,40 +98,15 @@ const [selectedCategory, setSelectedCategory] = useState('');
   
   // Effect to reset form if switching between add/edit modes
   useEffect(() => {
-    if (mode === 'edit' && productToEdit) {
-      setFormData(productToEdit);  // Set data for edit mode
-    } else {
-      setFormData({
-       productName: '',
-  productCode: '',
-  ProductDisplay: '',
-  ProductCompanyName: '',
-  Contact: '',
-  address: '',
-  companyGstin: '',
-  primaryLocality: '',
-  secondaryLocality: '',
-  city: '',
-  state: '',
-  pincode: '',
-  email: '',
-  salesCode: '',
-  purchaseCost: '',
-  salesCost: '',
-  drStatus: '',
-  maxDiscount: '',
-  type: "product",            // ✅ new backend field
-  prodisEnabled: false,
-  subscriptionDuration: "1 Year",
-  showCostFields: false,
-  categoryCode: selectedCategory || "", // single string
-  isUSD: false,               // ✅ new backend field
-priceUSD: 0,               // ✅ new backend field
-  priceINR: 0,               // ✅ new backend field
+  if (mode === 'edit' && productToEdit) {
+    setFormData(productToEdit);
+    setSelectedCategory(productToEdit.categoryCode || ""); // ✅ set category for edit
+  } else {
+    setFormData({ ...defaultSingleFormData });
+    setSelectedCategory(""); // ✅ reset dropdown when switching to add
+  }
+}, [mode, productToEdit]);
 
-      });
-    }
-  }, [mode, productToEdit]);
  // Function to reset single product form
 const [resetCounter, setResetCounter] = useState(0); // force re-render
 const defaultSingleFormData = {
@@ -155,7 +132,7 @@ const defaultSingleFormData = {
   prodisEnabled: false,       // default
   subscriptionDuration: "1 Year", // default
   showCostFields: false,      // default
-  categoryCode: "",           // default
+  categoryCode: '',           // default
   isUSD: false,               // default
   priceUSD: 0,                // default
   priceINR: 0,                // default
@@ -412,11 +389,11 @@ const handleSubmit = async (e) => {
       const result = await dispatch(updateProductAsync(payload));
 
       if (result?.message) {
-        alert(result.message); // success message from backend
+        toast.success(result.message); // success message from backend
         resetSingleForm();
   resetComboForm();
       } else if (result?.error) {
-        alert(result.error);
+        toast.error(result.error);
         
       }
     } else {
@@ -438,11 +415,11 @@ const handleSubmit = async (e) => {
       const result = await dispatch(updateComboProductAsync(payload));
 
       if (result?.message) {
-        alert(result.message); // e.g. "Combo updated successfully"
+        toast.success(result.message); // e.g. "Combo updated successfully"
         resetSingleForm();
   resetComboForm();
       } else if (result?.error) {
-        alert(result.error);
+        toast.error(result.error);
         
       }
     }
@@ -456,11 +433,11 @@ const handleSubmit = async (e) => {
       const result = await dispatch(addProductAsync(payload));
 
       if (result?.message) {
-        alert(result.message);
+        toast.success(result.message);
         resetSingleForm();
   resetComboForm();
       } else if (result?.error) {
-        alert(result.error);
+        toast.error(result.error);
         
       }
     } else {
@@ -482,12 +459,12 @@ const handleSubmit = async (e) => {
       const result = await dispatch(addComboProductAsync(payload));
 
       if (result?.message) {
-        alert(result.message); // success message
+        toast.success(result.message); // success message
         // Clear form after successful creation
        resetSingleForm();
   resetComboForm();
       } else if (result?.error) {
-        alert(result.error);
+        toast.error(result.error);
         
       }
     }
@@ -501,7 +478,7 @@ useEffect(() => {
   return (
 <div className="product-section">
 <h3>{mode === 'add' ? 'Add New Product' : 'Edit Product'}</h3>
-      
+   <ToastContainer />   
 <div
   onClick={() => {
     if (mode === 'add') {

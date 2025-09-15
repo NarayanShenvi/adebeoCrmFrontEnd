@@ -5,10 +5,16 @@ import { HiSave } from 'react-icons/hi';
 import { FaCheckToSlot } from "react-icons/fa6";
 import { BiSolidMessageSquareEdit } from "react-icons/bi";
 import { HiSquaresPlus } from "react-icons/hi2";
-import axios from "../config/apiConfig";
+import axios from "../config/apiConfig"; 
 import API from "../config/config";
 import { useDispatch } from 'react-redux';
 import { addProductCategoryAsync, updateProductCategoryAsync } from '../redux/slices/addProductCategoy';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify"; 
+import { BiSolidMessageRoundedError } from "react-icons/bi";
+import { IoIosWarning } from "react-icons/io";
+import { BiSolidCommentCheck } from "react-icons/bi";
 
 const CategorySection = () => {
   const [mode, setMode] = useState('add');
@@ -142,7 +148,24 @@ const CategorySection = () => {
   try {
     if (mode === 'edit') {
       if (!formData.Category_Code) {
-        alert("Category Code is required for update");
+        toast.warn("Category Code is required for update", {
+                                                    position: "top-right",
+                                                      toastClassName: "toast-warn-zfix", 
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
         setFormLoading(false);
         return;
       }
@@ -154,7 +177,24 @@ const CategorySection = () => {
       }));
 
       if (updateProductCategoryAsync.fulfilled.match(action)) {
-        alert(action.payload?.message || "Category updated successfully");
+        toast.success(action.payload?.message || "Category updated successfully", {
+                                                      position: "top-right",
+                                                      toastClassName: "toast-warn-zfix",
+                                                      autoClose: 4000,
+                                                      hideProgressBar: false,
+                                                      closeOnClick: true,
+                                                      pauseOnHover: true,
+                                                      draggable: true,
+                                                      progress: undefined,
+                                                      theme: "colored", // "light", "dark", or "colored"
+                                                      style: { background: "rgba(74, 163, 66, 1)", color: "white", 
+                                                        fontSize: "14px",       // ✅ Change font size
+                                                        fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                        fontWeight: "bold",    // ✅ Make text bold
+                                                       },
+                                                       icon: <BiSolidCommentCheck  
+                                                       style={{ fontSize: '20px', color: 'white' }} />
+                                                  });
         resetForm();
       } else if (updateProductCategoryAsync.rejected.match(action)) {
         let msg = '';
@@ -169,9 +209,41 @@ const CategorySection = () => {
         }
 
         if (/status code 400/i.test(msg) || /(already\s*exists|duplicate|category\s*exists)/i.test(msg)) {
-          alert('Category with this code already exists');
+          toast.error('Category with this code already exists', {
+                                                          autoClose: 4000,
+                                                          toastClassName: "toast-warn-zfix",
+                                                          hideProgressBar: false,
+                                                          closeOnClick: true,
+                                                          pauseOnHover: true,
+                                                          draggable: true,
+                                                          progress: undefined,
+                                                          theme: "colored", // "light", "dark", or "colored"
+                                                          style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                            fontSize: "14px",       // ✅ Change font size
+                                                            fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                            fontWeight: "bold",    // ✅ Make text bold
+                                                           },
+                                                           icon: <BiSolidMessageRoundedError  
+                                                           style={{ fontSize: '20px', color: 'white' }} />
+                                                      });
         } else {
-          alert(msg);
+          toast.error(msg, {
+                                                          autoClose: 4000,
+                                                          toastClassName: "toast-warn-zfix",
+                                                          hideProgressBar: false,
+                                                          closeOnClick: true,
+                                                          pauseOnHover: true,
+                                                          draggable: true,
+                                                          progress: undefined,
+                                                          theme: "colored", // "light", "dark", or "colored"
+                                                          style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                            fontSize: "14px",       // ✅ Change font size
+                                                            fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                            fontWeight: "bold",    // ✅ Make text bold
+                                                           },
+                                                           icon: <BiSolidMessageRoundedError  
+                                                           style={{ fontSize: '20px', color: 'white' }} />
+                                                      });
         }
       }
     } else {
@@ -179,7 +251,24 @@ const CategorySection = () => {
       const action = await dispatch(addProductCategoryAsync(formData));
 
       if (addProductCategoryAsync.fulfilled.match(action)) {
-        alert(action.payload?.message || "Category added successfully");
+        toast.success(action.payload?.message || "Category added successfully", {
+                                                      position: "top-right",
+                                                      toastClassName: "toast-warn-zfix",
+                                                      autoClose: 4000,
+                                                      hideProgressBar: false,
+                                                      closeOnClick: true,
+                                                      pauseOnHover: true,
+                                                      draggable: true,
+                                                      progress: undefined,
+                                                      theme: "colored", // "light", "dark", or "colored"
+                                                      style: { background: "rgba(74, 163, 66, 1)", color: "white", 
+                                                        fontSize: "14px",       // ✅ Change font size
+                                                        fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                        fontWeight: "bold",    // ✅ Make text bold
+                                                       },
+                                                       icon: <BiSolidCommentCheck  
+                                                       style={{ fontSize: '20px', color: 'white' }} />
+                                                  });
         resetForm();
       } else if (addProductCategoryAsync.rejected.match(action)) {
         let msg = '';
@@ -194,9 +283,41 @@ const CategorySection = () => {
         }
 
         if (/status code 400/i.test(msg) || /(already\s*exists|duplicate|category\s*exists)/i.test(msg)) {
-          alert('Category with this code already exists');
+          toast.error('Category with this code already exists', {
+                                                          autoClose: 4000,
+                                                          toastClassName: "toast-warn-zfix",
+                                                          hideProgressBar: false,
+                                                          closeOnClick: true,
+                                                          pauseOnHover: true,
+                                                          draggable: true,
+                                                          progress: undefined,
+                                                          theme: "colored", // "light", "dark", or "colored"
+                                                          style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                            fontSize: "14px",       // ✅ Change font size
+                                                            fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                            fontWeight: "bold",    // ✅ Make text bold
+                                                           },
+                                                           icon: <BiSolidMessageRoundedError  
+                                                           style={{ fontSize: '20px', color: 'white' }} />
+                                                      });
         } else {
-          alert(msg);
+          toast.error(msg, {
+                                                          autoClose: 4000,
+                                                          toastClassName: "toast-warn-zfix",
+                                                          hideProgressBar: false,
+                                                          closeOnClick: true,
+                                                          pauseOnHover: true,
+                                                          draggable: true,
+                                                          progress: undefined,
+                                                          theme: "colored", // "light", "dark", or "colored"
+                                                          style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                            fontSize: "14px",       // ✅ Change font size
+                                                            fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                            fontWeight: "bold",    // ✅ Make text bold
+                                                           },
+                                                           icon: <BiSolidMessageRoundedError  
+                                                           style={{ fontSize: '20px', color: 'white' }} />
+                                                      });
         }
       }
     }
@@ -213,9 +334,41 @@ const CategorySection = () => {
     }
 
     if (/status code 400/i.test(msg) || /(already\s*exists|duplicate|category\s*exists)/i.test(msg)) {
-      alert('Category with this code already exists');
+      toast.error('Category with this code already exists', {
+                                                      autoClose: 4000,
+                                                      toastClassName: "toast-warn-zfix",
+                                                      hideProgressBar: false,
+                                                      closeOnClick: true,
+                                                      pauseOnHover: true,
+                                                      draggable: true,
+                                                      progress: undefined,
+                                                      theme: "colored", // "light", "dark", or "colored"
+                                                      style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                        fontSize: "14px",       // ✅ Change font size
+                                                        fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                        fontWeight: "bold",    // ✅ Make text bold
+                                                       },
+                                                       icon: <BiSolidMessageRoundedError  
+                                                       style={{ fontSize: '20px', color: 'white' }} />
+                                                  });
     } else {
-      alert(msg);
+      toast.error(msg, {
+                                                      autoClose: 4000,
+                                                      toastClassName: "toast-warn-zfix",
+                                                      hideProgressBar: false,
+                                                      closeOnClick: true,
+                                                      pauseOnHover: true,
+                                                      draggable: true,
+                                                      progress: undefined,
+                                                      theme: "colored", // "light", "dark", or "colored"
+                                                      style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                        fontSize: "14px",       // ✅ Change font size
+                                                        fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                        fontWeight: "bold",    // ✅ Make text bold
+                                                       },
+                                                       icon: <BiSolidMessageRoundedError  
+                                                       style={{ fontSize: '20px', color: 'white' }} />
+                                                  });
     }
   } finally {
     setFormLoading(false);
@@ -240,6 +393,7 @@ useEffect(() => {
   return (
     <div className="category-section">
       <h3>{mode === 'add' ? 'Add New Category' : 'Edit Category'}</h3>
+      <ToastContainer />
 
       <div onClick={handleModeToggle}>
         {mode === 'add' ? (

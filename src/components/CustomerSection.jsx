@@ -217,9 +217,7 @@ const handleSelectChange = (e) => {
       companyName: selectedCustomer.companyName,
       address: selectedCustomer.address,
       // other fields...
-    });
-                toast.success("Customer selected successfully!");
-    
+    });    
   }
   
 };
@@ -327,7 +325,6 @@ useEffect(() => {
           // Optionally reset selected products
           setSelectedProducts([]);
           dispatch(resetSelectedCustomer());
-          dispatch(clearCustomers());
                     toast.success("Customer updated successfully!");
                     dispatch(clearSuccessMessage());
           
@@ -611,7 +608,7 @@ useEffect(() => {
         ) : (customers && customers.length > 0) || selectedCustomerId  ? (
           <select
   onChange={handleSelectChange}
-  value={selectedCustomerId}
+  value={selectedCustomerId ?? ""}   // 👈 ensures controlled
 >
   <option value="" disabled>
     Select a customer

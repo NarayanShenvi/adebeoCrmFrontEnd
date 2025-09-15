@@ -10,7 +10,7 @@ export const fetchActivityReport = createAsyncThunk(
       // Create the query parameters object, ensuring that companyName is excluded if it's an empty string
       const params = {
         startDate,
-        endDate,
+        endDate,  
         user,
         page,
         per_page: perPage,
@@ -18,8 +18,10 @@ export const fetchActivityReport = createAsyncThunk(
 
       // Only add companyName if it's not an empty string
       if (companyName && companyName.trim() !== "") {
-        params.companyName = companyName;
+// Instead of params.company_name
+params.companyName = companyName; 
       }
+console.log("Final API Request:", `${API}/activity_report`, params);
 
       // Log the parameters being sent to the API for debugging
       console.log("Fetching activity report with parameters:", params);

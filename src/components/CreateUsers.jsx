@@ -6,6 +6,12 @@ import { Form, Row, Col } from 'react-bootstrap';
 import { HiSave } from "react-icons/hi";
 import { FaSpinner } from 'react-icons/fa';
 import './dashboard/Dashboard.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify"; 
+import { BiSolidMessageRoundedError } from "react-icons/bi";
+import { IoIosWarning } from "react-icons/io";
+import { BiSolidCommentCheck } from "react-icons/bi";
 
 const CreateUsers = () => {
   const dispatch = useDispatch();
@@ -46,7 +52,24 @@ const [formData, setFormData] = useState(initialState);
     const { userName, password, role } = formData;
 
     if (!userName || !password || !role) {
-      alert('Please fill in all required fields.');
+      toast.warn('Please fill in all required fields.', {
+                                            position: "top-right",
+                                              toastClassName: "toast-warn-zfix", 
+                                            autoClose: 4000,
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: true,
+                                            progress: undefined,
+                                            theme: "colored", // "light", "dark", or "colored"
+                                             style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                              fontSize: "14px",       // ✅ Change font size
+                                              fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                              fontWeight: "bold",    // ✅ Make text bold
+                                             },
+                                             icon: <IoIosWarning  
+                                             style={{ fontSize: '25px', color: 'white' }} />
+                                        });
       setLoading(false);
       return;
     }
@@ -61,7 +84,24 @@ const [formData, setFormData] = useState(initialState);
       );
       unwrapResult(action);
 
-      alert('User created successfully!');
+      toast.success('User created successfully!', {
+                                              position: "top-right",
+                                              toastClassName: "toast-warn-zfix",
+                                              autoClose: 4000,
+                                              hideProgressBar: false,
+                                              closeOnClick: true,
+                                              pauseOnHover: true,
+                                              draggable: true,
+                                              progress: undefined,
+                                              theme: "colored", // "light", "dark", or "colored"
+                                              style: { background: "rgba(74, 163, 66, 1)", color: "white", 
+                                                fontSize: "14px",       // ✅ Change font size
+                                                fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                fontWeight: "bold",    // ✅ Make text bold
+                                               },
+                                               icon: <BiSolidCommentCheck  
+                                               style={{ fontSize: '20px', color: 'white' }} />
+                                          });
 
             resetForm(); // clear form
 
@@ -79,11 +119,59 @@ const [formData, setFormData] = useState(initialState);
       }
 
       if (/status code 400/i.test(msg) || /request failed with status code 400/i.test(msg)) {
-        alert('User already exists.');
+        toast.error('User already exists.', {
+                                                autoClose: 4000,
+                                                toastClassName: "toast-warn-zfix",
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: true,
+                                                progress: undefined,
+                                                theme: "colored", // "light", "dark", or "colored"
+                                                style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                  fontSize: "14px",       // ✅ Change font size
+                                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                  fontWeight: "bold",    // ✅ Make text bold
+                                                 },
+                                                 icon: <BiSolidMessageRoundedError  
+                                                 style={{ fontSize: '20px', color: 'white' }} />
+                                            });
       } else if (/(already\s*exists|duplicate|user\s*exists)/i.test(msg)) {
-        alert('User already exists.');
+        toast.error('User already exists.', {
+                                                autoClose: 4000,
+                                                toastClassName: "toast-warn-zfix",
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: true,
+                                                progress: undefined,
+                                                theme: "colored", // "light", "dark", or "colored"
+                                                style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                  fontSize: "14px",       // ✅ Change font size
+                                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                  fontWeight: "bold",    // ✅ Make text bold
+                                                 },
+                                                 icon: <BiSolidMessageRoundedError  
+                                                 style={{ fontSize: '20px', color: 'white' }} />
+                                            });
       } else {
-        alert(msg);
+        toast.error(msg, {
+                                                autoClose: 4000,
+                                                toastClassName: "toast-warn-zfix",
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: true,
+                                                progress: undefined,
+                                                theme: "colored", // "light", "dark", or "colored"
+                                                style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                  fontSize: "14px",       // ✅ Change font size
+                                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                  fontWeight: "bold",    // ✅ Make text bold
+                                                 },
+                                                 icon: <BiSolidMessageRoundedError  
+                                                 style={{ fontSize: '20px', color: 'white' }} />
+                                            });
       }
     } finally {
       setLoading(false);
@@ -93,6 +181,8 @@ const [formData, setFormData] = useState(initialState);
   return (
     <div className="user-section" >
       <h3>Create New User</h3>
+      <ToastContainer />
+      
       <Form className="create-user-form" onSubmit={handleSubmit} ref={formRef}>
         <Form.Group className="form-group-user">
           <Form.Label className="required-label">User Name </Form.Label>

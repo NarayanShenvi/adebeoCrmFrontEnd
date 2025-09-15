@@ -5,7 +5,9 @@ import API from '../config/config';
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { HiDocumentArrowDown } from "react-icons/hi2";
 import { FaSpinner, FaFilePdf } from 'react-icons/fa';
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const CreatePurchaseOrder = () => {
   const dispatch = useDispatch();
@@ -42,7 +44,7 @@ const CreatePurchaseOrder = () => {
   // Handle Discount Input Change
   const handleDiscountChange = useCallback((index, value) => {
     if (value < 0 || value > 2000) {
-      setError('Discount value must be between 0 and 2000.');
+      toast.error('Discount value must be between 0 and 2000.');
       return;
     }
 
@@ -55,7 +57,7 @@ const CreatePurchaseOrder = () => {
   // Handle Purchase Order Generation
   const handleGeneratePurchaseOrder = async () => {
     if (!selectedProforma) {
-      setError('Please select a Proforma!');
+    toast.error("Please select a Proforma!");
       return;
     }
 
@@ -83,18 +85,30 @@ const CreatePurchaseOrder = () => {
     
     try {
       // Dispatch createPurchaseOrder action to handle order creation via Redux
-      await dispatch(createPurchaseOrder({ proforma_id: selectedProforma, itemsWithDiscount }));
-      if (orderStatus === 'success') {
-        alert('Purchase Order Created Successfully!');
-        dispatch(fetchPurchaseOrders({ page: currentPage, rows_per_page: rowsPerPage }));
-        dispatch(fetchProformas());
-      }
-    } catch (error) {
-      setError('Failed to create Purchase Order. Please try again.');
-      console.error('Error creating purchase order:', error);
+    const result = await dispatch(
+      createPurchaseOrder({ proforma_id: selectedProforma, itemsWithDiscount })
+    ).unwrap();
+    
+          // ✅ Success toast (backend message or default)
+    if (result?.message) {
+      toast.success(result.message);
+    } else {
+      toast.success("Purchase Order Created Successfully!");
     }
+
+    dispatch(fetchPurchaseOrders({ page: currentPage, rows_per_page: rowsPerPage }));
+    dispatch(fetchProformas());
+  } catch (error) {
+    // ✅ Error toast (backend error or default)
+    const errMsg =
+      error?.message ||
+      error?.error ||
+      "Failed to create Purchase Order!! Please try again.";
+    toast.error(errMsg);
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   // Handle Page Change for Recent Orders
   const handleRecentOrdersPageChange = (page) => {
@@ -152,6 +166,7 @@ const CreatePurchaseOrder = () => {
     <div className="purchase-order-container">
       {/* Top Section */}      
       <h3>Purchase Orders</h3>
+<ToastContainer />
 
       <div className="top-section">
         <div className="select-proforma">

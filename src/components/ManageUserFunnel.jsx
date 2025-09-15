@@ -5,6 +5,12 @@ import { fetchUsers } from "../redux/slices/userSlice";
 import "./dashboard/Dashboard.css";
 import { RiUserShared2Fill } from "react-icons/ri";
 import { FaSpinner} from "react-icons/fa";  // add these imports
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify"; 
+import { BiSolidMessageRoundedError } from "react-icons/bi";
+import { IoIosWarning } from "react-icons/io";
+import { BiSolidCommentCheck } from "react-icons/bi";
 
 const ManageUserFunnel = () => {
   const dispatch = useDispatch();
@@ -27,7 +33,24 @@ const ManageUserFunnel = () => {
 
   const handleToUserChange = (e) => {
     if (!fromUser) {
-      alert("💡 Please select From User first");
+      toast.warn("Please select From User first", {
+                                      position: "top-right",
+                                      toastClassName: "toast-warn-zfix",
+                                      autoClose: 4000,
+                                      hideProgressBar: false,
+                                      closeOnClick: true,
+                                      pauseOnHover: true,
+                                      draggable: true,
+                                      progress: undefined,
+                                      theme: "colored", // "light", "dark", or "colored"
+                                       style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                        fontSize: "14px",       // ✅ Change font size
+                                        fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                        fontWeight: "bold",    // ✅ Make text bold
+                                       },
+                                       icon: <IoIosWarning  
+                                       style={{ fontSize: '25px', color: 'white' }} />
+                                  });
       return;
     }
     setToUser(e.target.value);
@@ -36,25 +59,78 @@ const ManageUserFunnel = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!fromUser || !toUser) {
-      alert(" ⚠️ Please select both From and To users before submitting!!");
+      toast.warn("Please select both From and To users before submitting!!", {
+                                position: "top-right",
+                                toastClassName: "toast-warn-zfix",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <IoIosWarning  
+                                 style={{ fontSize: '25px', color: 'white' }} />
+                            });
       return;
     }
 
     dispatch(transferFunnel({ fromUser, toUser }))
       .unwrap()
       .then((res) => {
-        alert(res.message || " ✅ Funnel transferred successfully!");
+        toast.success(res.message || "Funnel transferred successfully!", {
+                                        position: "top-right",
+                                        toastClassName: "toast-warn-zfix",
+                                        autoClose: 4000,
+                                        hideProgressBar: false,
+                                        closeOnClick: true,
+                                        pauseOnHover: true,
+                                        draggable: true,
+                                        progress: undefined,
+                                        theme: "colored", // "light", "dark", or "colored"
+                                        style: { background: "rgba(74, 163, 66, 1)", color: "white", 
+                                          fontSize: "14px",       // ✅ Change font size
+                                          fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                          fontWeight: "bold",    // ✅ Make text bold
+                                         },
+                                         icon: <BiSolidCommentCheck  
+                                         style={{ fontSize: '20px', color: 'white' }} />
+                                    });
+        
         setFromUser("");
         setToUser("");
       })
       .catch((err) => {
-        alert(err || " ⛔ Error transferring funnel");
+        toast.error(err || " ⛔ Error transferring funnel", {
+                                        autoClose: 4000,
+                                        toastClassName: "toast-warn-zfix",
+                                        hideProgressBar: false,
+                                        closeOnClick: true,
+                                        pauseOnHover: true,
+                                        draggable: true,
+                                        progress: undefined,
+                                        theme: "colored", // "light", "dark", or "colored"
+                                        style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                          fontSize: "14px",       // ✅ Change font size
+                                          fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                          fontWeight: "bold",    // ✅ Make text bold
+                                         },
+                                         icon: <BiSolidMessageRoundedError  
+                                         style={{ fontSize: '20px', color: 'white' }} />
+                                    });
       });
   };
 
   return (
     <div className="transfer-funnel-container">
       <h3>Transfer User Funnel</h3>
+            <ToastContainer />
+      
       <form onSubmit={handleSubmit} className="create-user-funnel-transfer-form">
 
         <div className="form-group-user-funnel">
@@ -83,11 +159,6 @@ const ManageUserFunnel = () => {
           <label  className="required-label">To User</label>
           <select
             value={toUser}
-            onClick={() => {
-              if (!fromUser) {
-                alert("💡 Please select From User first");
-              }
-            }}
             onChange={handleToUserChange}
             className="form-select-user-funnel"
           >
@@ -109,7 +180,24 @@ const ManageUserFunnel = () => {
   onClick={(e) => {
     if (!fromUser || !toUser) {
       e.preventDefault();
-      alert("⚠️ Please make sure you selected both From User and To User before submitting!!");
+      toast.warn("Please make sure you selected both From User and To User before submitting!!", {
+                                position: "top-right",
+                                toastClassName: "toast-warn-zfix",
+                                autoClose: 4000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                                theme: "colored", // "light", "dark", or "colored"
+                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                  fontSize: "14px",       // ✅ Change font size
+                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                  fontWeight: "bold",    // ✅ Make text bold
+                                 },
+                                 icon: <IoIosWarning  
+                                 style={{ fontSize: '25px', color: 'white' }} />
+                            });
     }
   }}
 >

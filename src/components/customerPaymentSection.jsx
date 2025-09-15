@@ -9,6 +9,9 @@ import { FaFileDownload, FaFilePdf } from 'react-icons/fa'; // added
 import { CiFileOff } from "react-icons/ci"; // added
 import { FaDownload } from "react-icons/fa6";// added
 import { recreateInvoiceAsync } from '../redux/slices/customerPaymentSlice';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const CustomerPaymentSection = () => {
   const dispatch = useDispatch();
@@ -113,6 +116,7 @@ useEffect(() => {
   return (
     <div className="customer-payment-section">
       <h2>Customer Payments</h2>
+<ToastContainer />
 
       {/* Display the payment records in a table */}
       {/* Show "No payments found" outside the table if there are no payments */}
@@ -148,7 +152,14 @@ useEffect(() => {
  <td>
 <button 
   className={`cxpay ${payment.payment_status === "Cancelled" ? "is-disabled" : ""}`}
-  onClick={() => handleGeneratePDF(payment.invoice_number)}
+onClick={() => {
+    if (payment.payment_status === "Cancelled") {
+      toast.info("This invoice is cancelled. PDF cannot be generated.");
+    } else {
+      toast.info(`PDF for Invoice ${payment.invoice_number} is generated..`);
+      handleGeneratePDF(payment.invoice_number);
+    }
+  }}
   disabled={payment.payment_status === "Cancelled"}
   title={payment.payment_status === "Cancelled" ? "Disabled" : "Generate PDF"}
 >
@@ -204,22 +215,26 @@ useEffect(() => {
       }
       className={`submit-icon ${payment.amount_due === 0 ? "is-disabled" : ""}`}
       onClick={() => {
-        if (payment.amount_due === 0) {
-          alert("Payment already completed. No submission required.");
-        } else {
-          handleSubmit(index, payment);
-        }
-      }}
+    if (payment.amount_due === 0) {
+      toast.info(`Payment for ${payment.invoice_number}is  already completed. No submission required.`);
+    } else {
+      toast.info(`Submitting payment for Invoice ${payment.invoice_number}...`);
+      handleSubmit(index, payment);
+    }
+  }}
     />
   ) : payment.payment_status === "Cancelled" ? (
     <FaCheckCircle
       title="Submission disabled — invoice cancelled"
       className="submit-icon is-disabled"
+            onClick={() => toast.info(`For ${payment.invoice_number}, Submission disabled. Invoice is cancelled.`)}
+
     />
   ) : (
     <CiFileOff
       className="nopdf"
       title="Submission disabled — not pending"
+            onClick={() => toast.info(`Payment for ${payment.invoice_number}is  already completed. No submission required.`)}
     />
   )}
 </td>
@@ -230,17 +245,21 @@ useEffect(() => {
     <FaFileDownload
       className="rowdown is-disabled"
       title="Download disabled — invoice cancelled"
+      onClick={() => toast.info(`For ${payment.invoice_number}, Download disabled. Invoice is cancelled.`)}
     />
   ) : payment.pdf_link ? (
     <a
       href={`${payment.base_url}${payment.pdf_link}`}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => toast.info(`Downloading PDF for Invoice ${payment.invoice_number}`)}
     >
       <FaFileDownload className="rowdown" title="Download PDF" />
     </a>
   ) : (
-    <CiFileOff className="nopdf" title="No PDF Available" />
+    <CiFileOff className="nopdf" title="No PDF Available" 
+        onClick={() => toast.info(`No PDF available for ${payment.invoice_number} invoice.`)}
+/>
   )}
 </td>
 
@@ -258,7 +277,13 @@ useEffect(() => {
     <button
   className={`regen-btn ${payment.canRegenerate ? "" : "is-disabled"}`}
   disabled={!payment.canRegenerate}
-  onClick={() => dispatch(recreateInvoiceAsync({ invoice_id: payment.invoice_id, old_invoice_id: payment.invoice_id }))}
+  onClick={() =>
+     {
+    if (!payment.canRegenerate) {
+      toast.info(`Regeneration only allowed for cancelled invoices. ${payment.invoice_number} is not cancelled!!`);
+    } else {
+      toast.info(`Re-generating Invoice ${payment.invoice_number}...`);
+       dispatch(recreateInvoiceAsync({ invoice_id: payment.invoice_id, old_invoice_id: payment.invoice_id }));} }}
   title={
     payment.canRegenerate
       ? "Re-generate Invoice"

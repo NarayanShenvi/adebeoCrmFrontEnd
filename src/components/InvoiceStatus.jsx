@@ -9,6 +9,12 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaExclamationTriangle, FaCheck, FaTimes } from "react-icons/fa";
 import { setPaymentStatus, upsertPayment } from '../redux/slices/customerPaymentSlice';
 import { debounce } from "lodash"; // ✅ Added debounce for search
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify"; 
+import { BiSolidMessageRoundedError } from "react-icons/bi";
+import { IoIosWarning } from "react-icons/io";
+import { BiSolidCommentCheck } from "react-icons/bi";
 
 const InvoiceStatus = () => {
   const dispatch = useDispatch();  
@@ -198,7 +204,24 @@ const InvoiceStatus = () => {
   const confirmDisable = (invoice) => {
     const selectedOption = disableOption[getInvoiceId(invoice)];
     if (!selectedOption) {
-      alert("⚠️ Please select an option before confirming!");
+      toast.warn("Please select an option before confirming!", {
+                                                  position: "top-right",
+                                                  toastClassName: "toast-warn-zfix",
+                                                  autoClose: 4000,
+                                                  hideProgressBar: false,
+                                                  closeOnClick: true,
+                                                  pauseOnHover: true,
+                                                  draggable: true,
+                                                  progress: undefined,
+                                                  theme: "colored", // "light", "dark", or "colored"
+                                                   style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                    fontSize: "14px",       // ✅ Change font size
+                                                    fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                    fontWeight: "bold",    // ✅ Make text bold
+                                                   },
+                                                   icon: <IoIosWarning  
+                                                   style={{ fontSize: '25px', color: 'white' }} />
+                                              });
       return;
     }
 
@@ -241,12 +264,45 @@ const InvoiceStatus = () => {
           })
         );
 
-        alert(`✅ Invoice ${invoice.invoice_number} disabled successfully.`);
+        toast.success(`Invoice ${invoice.invoice_number} disabled successfully.`, {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                    style: { background: "rgba(74, 163, 66, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <BiSolidCommentCheck  
+                                                     style={{ fontSize: '20px', color: 'white' }} />
+                                                });
         setPopupRow(null);
       })
       .catch((err) => {
         console.error("Disable invoice failed", err);
-        alert("❌ Failed to disable invoice. Try again.");
+        toast.error(`Failed to disable invoice ${invoice.invoice_number}. Try again`, {
+                                            autoClose: 4000,
+                                            toastClassName: "toast-warn-zfix",
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: true,
+                                            progress: undefined,
+                                            theme: "colored", // "light", "dark", or "colored"
+                                            style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                              fontSize: "14px",       // ✅ Change font size
+                                              fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                              fontWeight: "bold",    // ✅ Make text bold
+                                             },
+                                             icon: <BiSolidMessageRoundedError  
+                                             style={{ fontSize: '20px', color: 'white' }} />
+                                        });
       });
 
     setTableData(updated);
@@ -267,7 +323,7 @@ const InvoiceStatus = () => {
   return (
     <div className="invoice-status">
       <h3>Invoice Management</h3>
-
+<ToastContainer />
       {/* Top Section */}
       <div>
         <input
@@ -398,7 +454,7 @@ const InvoiceStatus = () => {
                                 <FaExclamationTriangle />
                               </div>
                               <p>
-                                For <strong>{invoice.invoice_number}</strong> do you want to disable:
+                                For invoice <strong>{invoice.invoice_number}</strong> do you want to disable:
                               </p>
 
                               <label>

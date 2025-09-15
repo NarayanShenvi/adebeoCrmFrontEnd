@@ -23,6 +23,12 @@ import {
 } from "react-icons/fa";
 import "./dashboard/Dashboard.css";
 import { HiSave } from "react-icons/hi";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify"; 
+import { BiSolidMessageRoundedError } from "react-icons/bi";
+import { IoIosWarning } from "react-icons/io";
+import { BiSolidCommentCheck } from "react-icons/bi";
 
 const ManageCustomerData = () => {
   const dispatch = useDispatch();
@@ -182,11 +188,45 @@ const handleSearchChange = (e) => {
 
   const openSubmitPopup = (rowId) => {
     if (!checkedRows[rowId]) {
-      alert("⚠️ Please check the row first before submitting.");
+      toast.warn("Please check the row first before submitting.", {
+                                            position: "top-right",
+                                            toastClassName: "toast-warn-zfix",
+                                            autoClose: 4000,
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: true,
+                                            progress: undefined,
+                                            theme: "colored", // "light", "dark", or "colored"
+                                             style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                              fontSize: "14px",       // ✅ Change font size
+                                              fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                              fontWeight: "bold",    // ✅ Make text bold
+                                             },
+                                             icon: <IoIosWarning  
+                                             style={{ fontSize: '25px', color: 'white' }} />
+                                        });
       return;
     }
     if (!rowAssignment[rowId] || !rowStatus[rowId]) {
-      alert("⚠️ Please select both, User and Status before submitting.");
+      toast.warn("Please select both, User and Status before submitting.", {
+                                            position: "top-right",
+                                            toastClassName: "toast-warn-zfix",
+                                            autoClose: 4000,
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: true,
+                                            progress: undefined,
+                                            theme: "colored", // "light", "dark", or "colored"
+                                             style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                              fontSize: "14px",       // ✅ Change font size
+                                              fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                              fontWeight: "bold",    // ✅ Make text bold
+                                             },
+                                             icon: <IoIosWarning  
+                                             style={{ fontSize: '25px', color: 'white' }} />
+                                        });
       return;
     }
     setPopupRowId(rowId);
@@ -205,8 +245,43 @@ const handleSearchChange = (e) => {
     };
 
     const res = await dispatch(updateCustomerStatusAndAssignment(payload)).unwrap();
-    alert(`✅ Customer ${row.companyName} updated`);
+    toast.success(`Customer ${row.companyName} updated`, {
+                                            position: "top-right",
+                                            toastClassName: "toast-warn-zfix",
+                                            autoClose: 4000,
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: true,
+                                            progress: undefined,
+                                            theme: "colored", // "light", "dark", or "colored"
+                                            style: { background: "rgba(74, 163, 66, 1)", color: "white", 
+                                              fontSize: "14px",       // ✅ Change font size
+                                              fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                              fontWeight: "bold",    // ✅ Make text bold
+                                             },
+                                             icon: <BiSolidCommentCheck  
+                                             style={{ fontSize: '20px', color: 'white' }} />
+                                        });
 
+    // ✅ Update Assigned By locally (so UI reflects immediately)
+    const updatedFunnel = funnelData.map((item) =>
+      item._id === row._id ? { ...item, insertBy: assignedTo } : item
+    );
+    dispatch({ type: "funnel/setFunnelData", payload: updatedFunnel });
+
+    setRowAssignment((prev) => {
+      const updated = { ...prev };
+      delete updated[row._id];
+      return updated;
+    });
+
+    setRowStatus((prev) => {
+      const updated = { ...prev };
+      delete updated[row._id];
+      return updated;
+    });
+    
     // Close popup
     setPopupRowId(null);
 
@@ -223,7 +298,23 @@ const handleSearchChange = (e) => {
     );
   } catch (err) {
     console.error("Submit error", err);
-    alert(err || "Failed to update customer");
+    toast.error(err || "Failed to update customer", {
+                                            autoClose: 4000,
+                                            toastClassName: "toast-warn-zfix",
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: true,
+                                            progress: undefined,
+                                            theme: "colored", // "light", "dark", or "colored"
+                                            style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                              fontSize: "14px",       // ✅ Change font size
+                                              fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                              fontWeight: "bold",    // ✅ Make text bold
+                                             },
+                                             icon: <BiSolidMessageRoundedError  
+                                             style={{ fontSize: '20px', color: 'white' }} />
+                                        });
   } finally {
     setIsSubmittingRow((s) => ({ ...s, [row._id]: false }));
   }
@@ -252,6 +343,7 @@ useEffect(() => {
   return (
     <div className="manage-customer-data">
       <h3>Manage Customer Data</h3>
+            <ToastContainer />
 
       <div>
   <input
@@ -338,7 +430,7 @@ useEffect(() => {
                         <td>{item.address}</td>
                         <td>{item.mobileNumber}</td>
                         <td>{item.primaryEmail}</td>
-                        <td>{item.insertBy}</td>
+<td>{item.insertBy}</td>
                         <td>
                           <select
                             value={rowAssignment[rowId] || ""}

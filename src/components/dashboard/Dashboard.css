@@ -7322,7 +7322,7 @@ select option {
 
 .poinvoice-status-invoice-table th:nth-child(1),
 .poinvoice-status-invoice-table td:nth-child(1) {
-  width: 6%; /* Fixed width */
+  width: 5%; /* Fixed width */
 }
 .poinvoice-status-invoice-table th:nth-child(2),
 .poinvoice-status-invoice-table td:nth-child(2) {
@@ -7348,7 +7348,7 @@ select option {
 }
 .poinvoice-status-invoice-table th:nth-child(6),
 .poinvoice-status-invoice-table td:nth-child(6) {
-  width: 7%; /* Fixed width */
+  width: 6%; /* Fixed width */
 }
 .poinvoice-status-invoice-table th:nth-child(7),
 .poinvoice-status-invoice-table td:nth-child(7) {
@@ -7358,6 +7358,11 @@ select option {
 .poinvoice-status-invoice-table td:nth-child(8) {
   width: 11%; /* Fixed width */
 }
+.poinvoice-status-invoice-table th:last-child,
+.poinvoice-status-invoice-table td:last-child {
+  width: 8%; /* Fixed width */
+}
+
 /* Target the last column (both th and td) */
 .poinvoice-status-invoice-table tbody tr:hover {
   background-color: #c5a205; /* Light blue background on hover */
@@ -9253,3 +9258,7 @@ select option {
 }
 
 /* ______________________________________________________________________________________________________________ */
+.toast-warn-zfix {
+  z-index: 999999 !important;   /* keep toast above menus/buttons */
+  pointer-events: auto !important; /* let hover actually pause */
+}

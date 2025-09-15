@@ -8,6 +8,12 @@ import "./dashboard/Dashboard.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaExclamationTriangle, FaCheck, FaTimes } from "react-icons/fa";
 import { debounce } from "lodash"; // ✅ Added debounce for search
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify"; 
+import { BiSolidMessageRoundedError } from "react-icons/bi";
+import { IoIosWarning } from "react-icons/io";
+import { BiSolidCommentCheck } from "react-icons/bi";
 
 const PerformaInvoiceStatus = () => { 
   const dispatch = useDispatch();
@@ -23,6 +29,7 @@ const PerformaInvoiceStatus = () => {
   const [searchLoading, setSearchLoading] = useState(false); // ✅ Added for debounced search
 const [selectedCustomerId, setSelectedCustomerId] = useState("");
 const [hasFetched, setHasFetched] = useState(false);
+
 
   // ✅ Extract invoice ID safely
   const getInvoiceId = (inv) =>
@@ -182,35 +189,75 @@ const [hasFetched, setHasFetched] = useState(false);
   };
 
   // 🔹 Confirm disable
-  const confirmDisable = (invoice) => {
-    const updatedStatus = false;
-    const invoiceId = getInvoiceId(invoice);
+const confirmDisable = (invoice) => {
+  const updatedStatus = false;
+  const invoiceId = getInvoiceId(invoice);
 
-    // 1. Remove the invoice row
-    const updated = tableData.filter((inv) => getInvoiceId(inv) !== invoiceId);
-    setTableData(updated);
+  // 1. Remove the invoice row
+  const updated = tableData.filter((inv) => getInvoiceId(inv) !== invoiceId);
+  setTableData(updated);
 
-    // 2. Only show card if NO invoices remain
-    if (updated.length === 0) {
-      setDisabledInvoiceInfo({
-        invoiceNumber: invoiceId,
-        customerName: invoice.customerName || invoice.customer_name,
-      });
-    } else {
-      setDisabledInvoiceInfo(null); // ✅ clear when rows remain
-    }
+  // 2. Only show card if NO invoices remain
+  if (updated.length === 0) {
+    setDisabledInvoiceInfo({
+      invoiceNumber: invoiceId,
+      customerName: invoice.customerName || invoice.customer_name,
+    });
+  } else {
+    setDisabledInvoiceInfo(null);
+  }
 
-    // 3. Dispatch update
-    dispatch(
-      updatePOInvoiceStatus({
-        invoiceId: invoiceId,
-        isEnabled: updatedStatus,
-      })
-    );
+  // 3. Dispatch update with success + error handling
+  dispatch(
+    updatePOInvoiceStatus({
+      invoiceId: invoiceId,
+      isEnabled: updatedStatus,
+    })
+  )
+    .unwrap() // ✅ this converts rejected promises into catch-able errors
+    .then(() => {
+      toast.success(`Proforma invoice ${invoiceId} disabled successfully.`, {
+                                                          position: "top-right",
+                                                          toastClassName: "toast-warn-zfix",
+                                                          autoClose: 4000,
+                                                          hideProgressBar: false,
+                                                          closeOnClick: true,
+                                                          pauseOnHover: true,
+                                                          draggable: true,
+                                                          progress: undefined,
+                                                          theme: "colored", // "light", "dark", or "colored"
+                                                          style: { background: "rgba(74, 163, 66, 1)", color: "white", 
+                                                            fontSize: "14px",       // ✅ Change font size
+                                                            fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                            fontWeight: "bold",    // ✅ Make text bold
+                                                           },
+                                                           icon: <BiSolidCommentCheck  
+                                                           style={{ fontSize: '20px', color: 'white' }} />
+                                                      });
+    })
+    .catch((err) => {
+      console.error("Disable failed", err);
+      toast.error(`Failed to disable proforma invoice ${invoiceId}. Try again`, {
+                                                    autoClose: 4000,
+                                                    toastClassName: "toast-warn-zfix",
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                    style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <BiSolidMessageRoundedError  
+                                                     style={{ fontSize: '20px', color: 'white' }} />
+                                                });
+    });
 
-    alert(`✅ Proforma invoice ${invoiceId} disabled successfully.`);
-    setPopupRow(null);
-  };
+  setPopupRow(null);
+};
 
   const cancelDisable = () => {
     setPopupRow(null); // closes the popup
@@ -232,7 +279,9 @@ useEffect(() => {
   
   return (
     <div className="performa-invoice-status">
-      <h3>Praforma Invoice Management</h3>
+      <h3>Proforma Invoice Management</h3>
+                  <ToastContainer />
+      
       <div>
         <input
           className="search-field-poinvoice-status"
@@ -273,7 +322,7 @@ useEffect(() => {
       </div>
       {disabledInvoiceInfo && (
   <div className="disabled-invoice-card">
-    <h4> 👍 Invoice Disabled</h4>
+    <h4> 👍Proforma Invoice Disabled</h4>
     <p>
       Proforma <span>#{disabledInvoiceInfo.invoiceNumber}</span> for customer <span>{disabledInvoiceInfo.customerName}</span> has been disabled.
    <p></p> Choose a customer from the list above to continue managing porforma invoices.</p>
@@ -366,7 +415,7 @@ useEffect(() => {
                                   <FaExclamationTriangle />
                                 </div>
                                 <p>
-                                  Are you sure you want to disable{" "}
+                                  Are you sure you want to disable porforma invoice {" "}
                                   <strong>{rowId}</strong>?
                                 </p>
                                 <div className="popup-actions">
