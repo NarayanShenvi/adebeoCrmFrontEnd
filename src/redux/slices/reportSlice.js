@@ -10,6 +10,7 @@ export const fetchActivityReport = createAsyncThunk(
       // Create the query parameters object, ensuring that companyName is excluded if it's an empty string
       const params = {
         startDate,
+        reportType,
         endDate,  
         user,
         page,
