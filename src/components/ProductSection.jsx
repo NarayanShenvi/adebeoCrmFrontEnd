@@ -300,7 +300,8 @@ const handleSearchChange = async (e) => {
         params: { productName: term },
       });
       responseData = (response.data.data || [])
-    .filter((p) => !p.comboCode && p.type === "product")
+    .filter((p) =>   !p.comboCode && (p.type === "product" || p.type === "service")
+)
     .filter((p) =>
       p.productName?.toLowerCase().startsWith(term.toLowerCase())
     ); // ✅ only products starting with search term
@@ -590,7 +591,6 @@ useEffect(() => {
     </div>
   )}
 </div>
-
 
       {/* Show search input and dropdown if in Edit mode */}
       {mode === 'edit' && (

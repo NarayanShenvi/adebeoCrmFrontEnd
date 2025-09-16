@@ -913,6 +913,23 @@ useEffect(() => {
     }
   }
 }, [proformaType]);
+useEffect(() => {
+  const handleResize = () => {
+    invoiceLines.forEach((line, idx) => {
+      const el = triggerRefs.current[idx];
+      if (el && line.dropdownOpen) {
+        const r = el.getBoundingClientRect();
+        setPortalPos({
+          top: r.bottom + window.scrollY,
+          left: r.left + window.scrollX,
+        });
+      }
+    });
+  };
+
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, [invoiceLines]);
 
   return (
 <div ref={wrapperRef} className="POinvoice-slider show">

@@ -725,6 +725,22 @@ useEffect(() => {
   document.addEventListener("mousedown", handleClick);
   return () => document.removeEventListener("mousedown", handleClick);
 }, [onClose]);
+useEffect(() => {
+  const handleResize = () => {
+    quoteLines.forEach((line, idx) => {
+      const el = triggerRefs.current[idx];
+      if (el && line.dropdownOpen) {
+        const r = el.getBoundingClientRect();
+        setPortalPos({
+          top: r.bottom + window.scrollY,
+          left: r.left + window.scrollX,
+        });
+      }
+    });
+  };
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, [quoteLines]);
 
   return (
 

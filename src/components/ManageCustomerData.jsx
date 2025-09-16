@@ -430,7 +430,7 @@ useEffect(() => {
                         <td>{item.address}</td>
                         <td>{item.mobileNumber}</td>
                         <td>{item.primaryEmail}</td>
-<td>{item.insertBy}</td>
+<td>{item.assigned_to || item.insertBy}</td>
                         <td>
                           <select
                             value={rowAssignment[rowId] || ""}

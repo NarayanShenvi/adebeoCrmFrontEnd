@@ -420,7 +420,8 @@ toast.error("Please select a customer and enter a comment!!!.");  }
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [modalState.showQuoteSlider, dispatch]);
-  
+  const selectedCustomer = funnelData.find(c => c._id === selectedTaskCustomerId);
+
   
   if (loading) return <div className='loading'>Loading funnel data...</div>;//changes made.. classnames were added
   if (error) return <div className='error'>Error: {error}</div>;//changes made
@@ -612,8 +613,11 @@ toast.error("Please select a customer and enter a comment!!!.");  }
       {/* Left Side: Calendar & Day Tasks */}
       <div className="task-popup-left">
 <div >
-        <h3>Task Reminder for Customer: </h3><br></br>
-        <p> </p></div>
+        <h3>Task Reminder For:</h3>
+  {selectedCustomer && (
+    <p className="task-customer-name">
+    {selectedCustomer.companyName}
+    </p>)}</div>
         <div className="calendar-wrapper">
   <Calendar
     className="professional-pastel-calendar"

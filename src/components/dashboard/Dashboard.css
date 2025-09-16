@@ -1058,7 +1058,6 @@ font-family: "Shippori Mincho B1", "Times New Roman", serif;
   text-overflow: clip;       /* no ellipsis, just clip */
 }
 
-
 .single-product-trigger:hover {
   background-color: rgba(52, 164, 245, 0.31);
 }
