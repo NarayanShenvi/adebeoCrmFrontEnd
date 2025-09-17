@@ -301,7 +301,8 @@ onClick={() => {
 )}
 
 
-      {/* Pagination controls */}
+      {/* Pagination controls */}      {/* Pagination controls */}
+
       {/* Show Pagination only if there are payments */}
       {totalPages > 1 && editablePayments.length > 0 && (
           <div className="pagination-controls">
