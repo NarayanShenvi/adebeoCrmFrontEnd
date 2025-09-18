@@ -283,7 +283,7 @@ onClick={() => {
       toast.info(`Regeneration only allowed for cancelled invoices. ${payment.invoice_number} is not cancelled!!`);
     } else {
       toast.info(`Re-generating Invoice ${payment.invoice_number}...`);
-       dispatch(recreateInvoiceAsync({ invoice_id: payment.invoice_id, old_invoice_id: payment.invoice_id }));} }}
+       dispatch(recreateInvoiceAsync(payment.invoice_id?._id || payment.invoice_id));} }}
   title={
     payment.canRegenerate
       ? "Re-generate Invoice"
@@ -301,8 +301,7 @@ onClick={() => {
 )}
 
 
-      {/* Pagination controls */}      {/* Pagination controls */}
-
+      {/* Pagination controls */}
       {/* Show Pagination only if there are payments */}
       {totalPages > 1 && editablePayments.length > 0 && (
           <div className="pagination-controls">
