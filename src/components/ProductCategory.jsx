@@ -69,17 +69,23 @@ const CategorySection = () => {
     setSearchTerm('');
   };
 
-  const handleSearchChange = async (e) => {
+  const handleSearchChange = async (e, includeDisabled = true) => {
     const term = e.target.value;
     setSearchTerm(term); // keep search term separate
-
+  
     if (term.length >= 3) {
       try {
         setSearchLoading(true);
         setSearchError('');
-        const response = await axios.get(`${API}/getAllCategories`, {
-          params: { name: term }
-        });
+  
+        // Build params with optional includeDisabled
+        const params = { name: term };
+        if (includeDisabled) {
+          params.includeDisabled = true;
+        }
+  
+        const response = await axios.get(`${API}/getAllCategories`, { params });
+  
         const data = response?.data?.data ?? response?.data ?? [];
         setSearchResults(Array.isArray(data) ? data : []);
       } catch (error) {
@@ -94,6 +100,32 @@ const CategorySection = () => {
       setSearchError('');
     }
   };
+  
+  // const handleSearchChange = async (e) => {
+  //   const term = e.target.value;
+  //   setSearchTerm(term); // keep search term separate
+
+  //   if (term.length >= 3) {
+  //     try {
+  //       setSearchLoading(true);
+  //       setSearchError('');
+  //       const response = await axios.get(`${API}/getAllCategories`, {
+  //         params: { name: term }
+  //       });
+  //       const data = response?.data?.data ?? response?.data ?? [];
+  //       setSearchResults(Array.isArray(data) ? data : []);
+  //     } catch (error) {
+  //       console.error('Error fetching search results:', error);
+  //       setSearchError('Unable to fetch categories.');
+  //       setSearchResults([]);
+  //     } finally {
+  //       setSearchLoading(false);
+  //     }
+  //   } else {
+  //     setSearchResults([]);
+  //     setSearchError('');
+  //   }
+  // };
 
   // Helper to generate a UNIQUE option value per row
   // Guarantees <select> change event will fire for every distinct row

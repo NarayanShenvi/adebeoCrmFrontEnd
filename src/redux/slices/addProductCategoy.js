@@ -130,15 +130,30 @@ export const addProductCategoryAsync = createAsyncThunk(
 // Async thunk to fetch all categories (with name search)
 export const fetchCategoriesAsync = createAsyncThunk(
   'productCategory/fetchCategories',
-  async (searchTerm = '', thunkAPI) => {
+  async ({ searchTerm = '', includeDisabled = false } = {}, thunkAPI) => {
     try {
       const token = localStorage.getItem('Access_Token');
-      const url = searchTerm
-        ? `${API}/getAllCategories?name=${encodeURIComponent(searchTerm)}`
-        : `${API}/getAllCategories`;
+
+      // Build base URL with optional search param
+      let url = `${API}/getAllCategories`;
+      const params = new URLSearchParams();
+
+      if (searchTerm) {
+        params.append('name', searchTerm);
+      }
+
+      if (includeDisabled) {
+        params.append('includeDisabled', 'true');
+      }
+
+      if ([...params].length) {
+        url += `?${params.toString()}`;
+      }
+
       const response = await axios.get(url, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
+
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -147,6 +162,26 @@ export const fetchCategoriesAsync = createAsyncThunk(
     }
   }
 );
+// export const fetchCategoriesAsync = createAsyncThunk(
+//   'productCategory/fetchCategories',
+//   async (searchTerm = '', thunkAPI) => {
+//     try {
+//       const token = localStorage.getItem('Access_Token');
+//       const url = searchTerm
+//         ? `${API}/getAllCategories?name=${encodeURIComponent(searchTerm)}`
+//         : `${API}/getAllCategories`;
+//       const response = await axios.get(url, {
+//         headers: token ? { Authorization: `Bearer ${token}` } : {},
+//       });
+//       return response.data;
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(
+//         error.response?.data?.message || "Failed to fetch categories"
+//       );
+//     }
+//   }
+// );
+
 
 // Async thunk to update a product category
 export const updateProductCategoryAsync = createAsyncThunk(
