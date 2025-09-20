@@ -265,8 +265,14 @@ const handleSearchChange = (e) => {
                                         });
 
     // ✅ Update Assigned By locally (so UI reflects immediately)
-    const updatedFunnel = funnelData.map((item) =>
-      item._id === row._id ? { ...item, insertBy: assignedTo } : item
+    const updatedFunnel = funnelData.map((item) =>      
+      item._id === row._id
+      ? { 
+           ...item, 
+           insertBy: assignedTo,
+           assigned_to: assignedTo,
+           isEnabled: status === "enable" // keep local status also
+         } : item
     );
     dispatch({ type: "funnel/setFunnelData", payload: updatedFunnel });
 

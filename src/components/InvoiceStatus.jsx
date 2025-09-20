@@ -404,6 +404,7 @@ const InvoiceStatus = () => {
                 <th>Sub Total</th>
                 <th>Total Amount</th>
                 <th>Amount Due</th>
+                <th>Status</th>
                 <th>Disable</th>
               </tr>
             </thead>
@@ -439,6 +440,7 @@ const InvoiceStatus = () => {
                       <>
                         <td rowSpan={items.length}>{invoice.total_amount}</td>
                         <td rowSpan={items.length}>{invoice.amount_due}</td>
+                        <td rowSpan={items.length}>{invoice.payment_status}</td>
                         <td rowSpan={items.length}>
                           <button
                             className={`toggle-btn ${invoice.isEnabled ? "disable" : "enable"}`}
