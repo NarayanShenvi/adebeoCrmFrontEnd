@@ -308,9 +308,14 @@ const handleSearchChange = async (e) => {
     } else {
       // Combo product search
       const token = localStorage.getItem("Access_Token");
+      const includeDisabled = true; // Set to true if you want to include disabled combos
       const response = await axios.get(`${API}/getComboProducts`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
-        params: { name: term },
+        // params: { name: term },
+        params: {
+          name: term,
+          ...(includeDisabled ? { includeDisabled: true } : {})
+        }
       });
       responseData = (response.data.data || [])
     .filter((p) => !!p.comboCode)
@@ -405,6 +410,7 @@ const handleSubmit = async (e) => {
   salesCode: formData.salesCode,
   salesCost: String(formData.salesCost || 0),   // send as string
   maxDiscount: String(formData.maxDiscount || 0),
+  prodisEnabled: formData.prodisEnabled ?? false,
   products: comboProducts.map(p => ({
     productCode: p.name,
     productId: p.productId,
@@ -449,6 +455,7 @@ const handleSubmit = async (e) => {
         salesCode: formData.salesCode,
         salesCost: parseFloat(formData.salesCost) || 0,
         maxDiscount: parseFloat(formData.maxDiscount) || 0,
+        prodisEnabled: formData.prodisEnabled ?? false,
         products: comboProducts.map(p => ({
           productCode: p.name,
           productId: p.productId,

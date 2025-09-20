@@ -46,15 +46,36 @@ export const processCustomerPaymentAsync = createAsyncThunk(
 
 export const recreateInvoiceAsync = createAsyncThunk(
   'customerPayment/recreateInvoice',
-  async (invoice_id) => {
+  async (invoice_id, thunkAPI) => {
     const token = localStorage.getItem('Access_Token');
     if (!token) throw new Error("No access token found. Please log in.");
+
+    // Step 1: Call backend to regenerate invoice
     const response = await axios.post(`${API}/recreate_invoice/${invoice_id}`, {}, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+
+    const newInvoice = response.data;
+
+    // Step 2: Dispatch a full refetch of customer payments
+    await thunkAPI.dispatch(fetchCustomerPaymentsAsync({ page: 1, per_page: 10 }));
+
+    // Step 3: Return new invoice for use in reducer if needed
+    return newInvoice;
   }
 );
+
+// export const recreateInvoiceAsync = createAsyncThunk(
+//   'customerPayment/recreateInvoice',
+//   async (invoice_id) => {
+//     const token = localStorage.getItem('Access_Token');
+//     if (!token) throw new Error("No access token found. Please log in.");
+//     const response = await axios.post(`${API}/recreate_invoice/${invoice_id}`, {}, {
+//       headers: { Authorization: `Bearer ${token}` },
+//     });
+//     return response.data;
+//   }
+// );
 
 export const disableInvoiceAsync = createAsyncThunk(
   "customerPayment/disableInvoice",
@@ -131,29 +152,51 @@ const customerPaymentSlice = createSlice({
         state.loading = false;
         state.error = action.error?.message || "An error occurred while fetching payments.";
       })
+
       .addCase(fetchCustomerPaymentsAsync.fulfilled, (state, action) => {
         state.loading = false;
         const { payments, totalCount, totalPages, currentPage } = action.payload;
+      
         state.payments = payments || [];
         state.totalCount = totalCount || 0;
         state.totalPages = totalPages || 1;
         state.currentPage = currentPage || 1;
-
+      
         // --- MERGE any client-side cancelled entries that backend omitted ---
-        // If backend didn't return a cancelled invoice, re-insert the localCancelled copy
         Object.keys(state.localCancelled).forEach(invNum => {
           const local = state.localCancelled[invNum];
           const exists = state.payments.some(p => p.invoice_number === invNum);
+      
           if (!exists && local) {
-            state.payments.unshift(local);
-          } else if (exists && local) {
-            // ensure server version reflects cancelled status too
-            state.payments = state.payments.map(p =>
-              p.invoice_number === invNum ? { ...p, ...local } : p
-            );
+            state.payments.unshift(local); // Add if missing
           }
+          // 🔁 REMOVE else-if to avoid overwriting backend's updated invoice
         });
       });
+      
+      // .addCase(fetchCustomerPaymentsAsync.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   const { payments, totalCount, totalPages, currentPage } = action.payload;
+      //   state.payments = payments || [];
+      //   state.totalCount = totalCount || 0;
+      //   state.totalPages = totalPages || 1;
+      //   state.currentPage = currentPage || 1;
+
+      //   // --- MERGE any client-side cancelled entries that backend omitted ---
+      //   // If backend didn't return a cancelled invoice, re-insert the localCancelled copy
+      //   Object.keys(state.localCancelled).forEach(invNum => {
+      //     const local = state.localCancelled[invNum];
+      //     const exists = state.payments.some(p => p.invoice_number === invNum);
+      //     if (!exists && local) {
+      //       state.payments.unshift(local);
+      //     } else if (exists && local) {
+      //       // ensure server version reflects cancelled status too
+      //       state.payments = state.payments.map(p =>
+      //         p.invoice_number === invNum ? { ...p, ...local } : p
+      //       );
+      //     }
+      //   });
+      // });
 
     // process payment
     builder
@@ -190,28 +233,40 @@ const customerPaymentSlice = createSlice({
       });
 
     // recreate
-    builder
-      .addCase(recreateInvoiceAsync.pending, (state) => { state.loading = true; })
-      .addCase(recreateInvoiceAsync.fulfilled, (state, action) => {
-  state.loading = false;
-  const newInvoice = action.payload; // the newly created invoice from backend
-  const oldInvoiceId = newInvoice.old_invoice_id; // backend should return this, else pass it from frontend
+//     builder
+//       .addCase(recreateInvoiceAsync.pending, (state) => { state.loading = true; })
+//       .addCase(recreateInvoiceAsync.fulfilled, (state, action) => {
+//   state.loading = false;
+//   const newInvoice = action.payload; // the newly created invoice from backend
+//   const oldInvoiceId = newInvoice.old_invoice_id; // backend should return this, else pass it from frontend
 
-  // Step 1: Add new invoice to the list (insert at front)
-  state.payments.unshift(newInvoice);
+//   // Step 1: Add new invoice to the list (insert at front)
+//   state.payments.unshift(newInvoice);
 
-  // Step 2: Find old invoice and mark it as 'Regenerated' and disable regeneration
-  const oldIndex = state.payments.findIndex(p => p.invoice_id === oldInvoiceId);
-  if (oldIndex >= 0) {
-    state.payments[oldIndex].payment_status = "Regenerated";
-    state.payments[oldIndex].canRegenerate = false;
-  }
+//   // Step 2: Find old invoice and mark it as 'Regenerated' and disable regeneration
+//   const oldIndex = state.payments.findIndex(p => p.invoice_id === oldInvoiceId);
+//   if (oldIndex >= 0) {
+//     state.payments[oldIndex].payment_status = "Regenerated";
+//     state.payments[oldIndex].canRegenerate = false;
+//   }
 
-  // Step 3: Remove from localCancelled if present
-  if (oldInvoiceId && state.localCancelled[oldInvoiceId]) {
-    delete state.localCancelled[oldInvoiceId];
-  }
-});
+//   // Step 3: Remove from localCancelled if present
+//   if (oldInvoiceId && state.localCancelled[oldInvoiceId]) {
+//     delete state.localCancelled[oldInvoiceId];
+//   }
+// });
+
+builder
+  .addCase(recreateInvoiceAsync.pending, (state) => {
+    state.loading = true;
+  })
+  .addCase(recreateInvoiceAsync.fulfilled, (state) => {
+    state.loading = false;
+    // No need to manually modify state — the full list has already been refetched
+  })
+  .addCase(recreateInvoiceAsync.rejected, (state) => {
+    state.loading = false;
+  });
 
 
     // disable (when called from payments slice)
