@@ -176,20 +176,26 @@ export const addComboProductAsync = (payload) => async (dispatch) => {
 
 
 // Fetch combo products (optionally by name)
-export const fetchComboProductsAsync = (name = '') => async (dispatch) => {
+export const fetchComboProductsAsync = (name = '', includeDisabled = false) => async (dispatch) => {
   dispatch(setLoading(true));
   try {
     const token = localStorage.getItem('Access_Token');
+
+    const params = {};
+    if (name) params.name = name;
+    if (includeDisabled) params.includeDisabled = true;
+
     const response = await axios.get(`${API}/getComboProducts`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
-      params: name ? { name } : {},
+      params,
     });
 
     if (response && response.data) {
       const combos = response.data.data || [];
       dispatch(setComboProducts(combos));
-      return combos; // allow component to use results
+      return combos;
     }
+
     return [];
   } catch (error) {
     dispatch(setError('Failed to fetch combo products.'));
@@ -198,6 +204,28 @@ export const fetchComboProductsAsync = (name = '') => async (dispatch) => {
     dispatch(setLoading(false));
   }
 };
+// export const fetchComboProductsAsync = (name = '') => async (dispatch) => {
+//   dispatch(setLoading(true));
+//   try {
+//     const token = localStorage.getItem('Access_Token');
+//     const response = await axios.get(`${API}/getComboProducts`, {
+//       headers: token ? { Authorization: `Bearer ${token}` } : {},
+//       params: name ? { name } : {},
+//     });
+
+//     if (response && response.data) {
+//       const combos = response.data.data || [];
+//       dispatch(setComboProducts(combos));
+//       return combos; // allow component to use results
+//     }
+//     return [];
+//   } catch (error) {
+//     dispatch(setError('Failed to fetch combo products.'));
+//     return [];
+//   } finally {
+//     dispatch(setLoading(false));
+//   }
+// };
 
 
 // Async Thunk to update a combo product (PUT)

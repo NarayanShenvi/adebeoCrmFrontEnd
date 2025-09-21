@@ -272,7 +272,7 @@ onClick={() => {
 </td>
 
 
-  {/* Regenerate Invoice */}
+  {/* Regenerate Invoice  */}
   <td>
     <button
   className={`regen-btn ${payment.canRegenerate ? "" : "is-disabled"}`}
