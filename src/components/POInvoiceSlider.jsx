@@ -1452,8 +1452,10 @@ useEffect(() => {
         {/* Available PO's Section (Empty Placeholder for now) */}
         <div className="proforma-created-section">
   <h4>Previous Proformas</h4>
-  
-  {currentPerformas && currentPerformas.length > 0 ? (
+{loading ? (
+    <p className="loading-po">Loading proformas...</p>   // ✅ show loader while fetching
+  ) : currentPerformas && currentPerformas.length > 0 ? (
+    <>
     <table className="po-table">
       <thead>
         <tr>
@@ -1484,11 +1486,8 @@ useEffect(() => {
         ))}
       </tbody>
     </table>
-  ) : (
-    <p className="no-po">No Proformas Available</p>
-  )}
 
-  {/* Pagination Controls */}
+    {/* Pagination Controls */}
   {currentPerformas && currentPerformas.length > 0 && (
   <div className="pagination-controls">
             <button
@@ -1506,6 +1505,11 @@ useEffect(() => {
             </button>
           </div>
           )}
+  </>
+  ) : (
+    <p className="no-po">No Proformas Available</p>   // ✅ only show after loading
+  )}
+
 </div>
 </div>
 </div>

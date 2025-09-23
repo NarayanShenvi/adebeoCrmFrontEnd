@@ -146,22 +146,37 @@ useEffect(() => {
       {editablePayments.map((payment, index) => (
        <tr
   key={payment.invoice_number}
-  className={payment.payment_status === "Cancelled" ? "cancelled-row" : ""}
+ className={
+    payment.payment_status === "Cancelled"
+      ? "cancelled-row"
+      : payment.payment_status === "Regenerated"
+      ? "regenerated-row"
+      : ""}
 >
 
  <td>
-<button 
-  className={`cxpay ${payment.payment_status === "Cancelled" ? "is-disabled" : ""}`}
-onClick={() => {
+<button
+  className={`cxpay ${
+    payment.payment_status === "Cancelled" || payment.payment_status === "Regenerated"
+      ? "is-disabled"
+      : ""
+  }`}
+  onClick={() => {
     if (payment.payment_status === "Cancelled") {
-      toast.info("This invoice is cancelled. PDF cannot be generated.");
+      toast.info(`This invoice  ${payment.invoice_number} is cancelled. PDF cannot be generated.`);
+    } else if (payment.payment_status === "Regenerated") {
+      toast.info(`This invoice ${payment.invoice_number} is regenerated. Please generate PDF from there`);
     } else {
       toast.info(`PDF for Invoice ${payment.invoice_number} is generated..`);
       handleGeneratePDF(payment.invoice_number);
     }
   }}
-  disabled={payment.payment_status === "Cancelled"}
-  title={payment.payment_status === "Cancelled" ? "Disabled" : "Generate PDF"}
+  disabled={payment.payment_status === "Cancelled" || payment.payment_status === "Regenerated"}
+  title={
+    payment.payment_status === "Cancelled" || payment.payment_status === "Regenerated"
+      ? "Disabled"
+      : "Generate PDF"
+  }
 >
   <FaFilePdf />
 </button>
@@ -206,7 +221,7 @@ onClick={() => {
 
  {/* Action Submit */}
 <td>
-  {payment.payment_status === "Pending" ? (
+  {payment.payment_status === "Pending" || payment.payment_status === "Inprog" ? (
     <FaCheckCircle
       title={
         payment.amount_due === 0
@@ -215,29 +230,49 @@ onClick={() => {
       }
       className={`submit-icon ${payment.amount_due === 0 ? "is-disabled" : ""}`}
       onClick={() => {
-    if (payment.amount_due === 0) {
-      toast.info(`Payment for ${payment.invoice_number}is  already completed. No submission required.`);
-    } else {
-      toast.info(`Submitting payment for Invoice ${payment.invoice_number}...`);
-      handleSubmit(index, payment);
-    }
-  }}
+        if (payment.amount_due === 0) {
+          toast.info(
+            `Payment for ${payment.invoice_number} is already completed. No submission required.`
+          );
+        } else {
+          toast.info(
+            `Submitting payment for Invoice ${payment.invoice_number}...`
+          );
+          handleSubmit(index, payment);
+        }
+      }}
     />
   ) : payment.payment_status === "Cancelled" ? (
     <FaCheckCircle
       title="Submission disabled — invoice cancelled"
       className="submit-icon is-disabled"
-            onClick={() => toast.info(`For ${payment.invoice_number}, Submission disabled. Invoice is cancelled.`)}
-
+      onClick={() =>
+        toast.info(
+          `For ${payment.invoice_number}, Submission disabled. Invoice is cancelled.`
+        )
+      }
+    />
+  ) : payment.payment_status === "Regenerated" ? (
+    <FaCheckCircle
+      title="Submission disabled — invoice regenerated"
+      className="submit-icon is-disabled"
+      onClick={() =>
+        toast.info(
+          `For ${payment.invoice_number}, invoice is already regenerated. Try submission from there.`
+        )
+      }
     />
   ) : (
-    <CiFileOff
+    <FaCheckCircle
       className="nopdf"
-      title="Submission disabled — not pending"
-            onClick={() => toast.info(`Payment for ${payment.invoice_number}is  already completed. No submission required.`)}
+      title="Submission disabled"
+      onClick={() =>
+        toast.info(`Payment for ${payment.invoice_number} is Disabled.`)
+      }
     />
   )}
 </td>
+
 
 {/* Download PDF */}
 <td>
@@ -245,31 +280,67 @@ onClick={() => {
     <FaFileDownload
       className="rowdown is-disabled"
       title="Download disabled — invoice cancelled"
-      onClick={() => toast.info(`For ${payment.invoice_number}, Download disabled. Invoice is cancelled.`)}
+      onClick={() =>
+        toast.info(
+          `For ${payment.invoice_number}, Download disabled. Invoice is cancelled.`
+        )
+      }
+    />
+  ) : payment.payment_status === "Regenerated" ? (
+    <FaFileDownload
+      className="rowdown is-disabled"
+      title="Download disabled — invoice regenerated"
+      onClick={() =>
+        toast.info(
+          `For ${payment.invoice_number}, Download disabled. Invoice already regenerated. Please download from there.`
+        )
+      }
     />
   ) : payment.pdf_link ? (
     <a
       href={`${payment.base_url}${payment.pdf_link}`}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={() => toast.info(`Downloading PDF for Invoice ${payment.invoice_number}`)}
+      onClick={() =>
+        toast.info(
+          `Downloading PDF for Invoice ${payment.invoice_number}`
+        )
+      }
     >
       <FaFileDownload className="rowdown" title="Download PDF" />
     </a>
   ) : (
-    <CiFileOff className="nopdf" title="No PDF Available" 
-        onClick={() => toast.info(`No PDF available for ${payment.invoice_number} invoice.`)}
-/>
+    <CiFileOff
+      className="nopdf"
+      title="No PDF Available"
+      onClick={() =>
+        toast.info(
+          `No PDF available for ${payment.invoice_number} invoice.`
+        )
+      }
+    />
   )}
 </td>
 
 
+
   <td>
   <RiInformation2Fill
-    title={payment.payment_status === "Cancelled" ? "Disabled" : "Payment Information"}
-    className={`action-icon-payment ${payment.payment_status === "Cancelled" ? "is-disabled" : ""}`}
+    title={
+      payment.payment_status === "Cancelled"
+        ? "Disabled"
+        : payment.payment_status === "Regenerated"
+        ? "Disabled"
+        : "Payment Information"
+    }
+    className={`action-icon-payment ${
+      payment.payment_status === "Cancelled" || payment.payment_status === "Regenerated"
+        ? "is-disabled"
+        : ""
+    }`}
   />
 </td>
+
 
 
   {/* Regenerate Invoice  */}

@@ -975,14 +975,12 @@ useEffect(() => {
   title="Delete Quote"
 />
 
-{index === quoteLines.length - 1 && (
   <MdAddBox
   className='add-quote'
     size={20} 
     onClick={handleAddProductRow} 
     title="Add Quote"
 />
-)}
 
             </div>
           ))}
@@ -1023,9 +1021,11 @@ useEffect(() => {
         {/* Quote Display Section (Created Quotes as Table) */}
         <div className="quote-created-section">
           <h4>Previous Quotes</h4>
-          {quotes.length === 0 ? (
-            <p className='no-quote'>No Quotes Available</p>
-          ) : (
+           {loading ? (
+    <p className="loading-quote">Loading quotes...</p>   // ✅ Show loader first
+  ) : quotes.length === 0 ? (
+    <p className="no-quote">No Quotes Available</p>  // ✅ Only show when finished & empty
+  ) : (
             <table className="quote-table">
               <thead>
                 <tr>
@@ -1062,7 +1062,7 @@ useEffect(() => {
           )}
                       
            {/* Pagination controls */}
-           {quotes.length > 0 && (
+           {!loading && quotes.length > 0 && (
           <div className="pagination-controls">
             <button
               onClick={() => handlePageChange(currentPageState - 1)}

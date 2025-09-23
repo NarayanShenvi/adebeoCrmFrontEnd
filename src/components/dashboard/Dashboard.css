@@ -1302,7 +1302,15 @@ font-family: "Shippori Mincho B1", "Times New Roman", serif;
   text-align:center;
  margin-top: 10%;
 }
-
+.quote-created-section .loading-quote
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #db6c03;
+  text-align:center;
+ margin-top: 10%;
+}
 
 .quote-table {
   width: 100%;
@@ -2091,6 +2099,15 @@ input.form-control-ref:focus {
   text-align:center;
  margin-top: 10%;
 }
+.proforma-created-section .loading-po
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #db6c03;
+  text-align:center;
+ margin-top: 10%;
+}
 
 .po-table {
   width: 100%;
@@ -2517,6 +2534,7 @@ a:hover {
   max-width: 1200px; /* Adjust as needed */
   table-layout: fixed; /* Prevents columns from resizing */
   overflow: hidden;
+  margin-top: 10%;
 }
 
 .invoice-table thead
@@ -2602,6 +2620,46 @@ a:hover {
   transition: background-color 0.3s ease-in-out;
 }
 
+.invoice-table-wrapper {
+  text-align: center; /* ensures everything inside is centered */
+  width: 100%;
+}
+
+.pagination-controls-inv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.pagination-controls-inv button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls-inv button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls-inv button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls-inv span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
 
 /* Responsive Styles */
 /* 🔍 For Large Tablets and Small Desktops (1024px and below) */
@@ -4822,6 +4880,22 @@ select option {
   background-color: #f1f1f1; 
   cursor: default;          /* no pointer change */
 }
+.payments-table tr.regenerated-row,
+.payments-table tr.regenerated-row td {
+  color: rgba(129, 131, 131, 1) !important; /* dull font color for text cells */
+  background-color: #669b9e56; 
+}
+/* Disabled look for inputs + textarea in cancelled row */
+.payments-table tr.regenerated-row input:disabled,
+.payments-table tr.regenerated-row textarea:disabled {
+  background-color: rgba(224, 224, 224, 0.45) !important;   
+  cursor: default;  /* normal arrow cursor */
+}
+/* When hovering over a cancelled row */
+.payments-table tr.regenerated-row:hover {
+  background-color: #f1f1f1; 
+  cursor: default;          /* no pointer change */
+}
 .cxpay{
   background: none;
   border: none;
@@ -5480,6 +5554,28 @@ select option {
   text-align:center;
   margin-top: 5%;
   word-spacing: 2px;
+}
+
+.no-activity-message-short {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #e02020ff;
+  text-align:center;
+  margin-top: 5%;
+  word-spacing: 2px;
+}
+
+.company-alert {
+  color: #d9534f; /* red */
+  font-weight: bold;
+  animation: blink 1s infinite;
+  margin-top: 5px;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
 }
 
 /* Responsive Styles */

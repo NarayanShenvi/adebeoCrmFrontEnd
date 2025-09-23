@@ -6,6 +6,8 @@ import { Form } from 'react-bootstrap';
 import { Row, Col } from 'react-bootstrap';
 import { LuFileCheck2 } from "react-icons/lu";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 
 const ReportSection = () => {
   const dispatch = useDispatch();
@@ -41,24 +43,36 @@ const ReportSection = () => {
 
   // Prevent future dates
   const handleStartDateChange = (e) => {
-    const selectedDate = e.target.value;
+  const selectedDate = e.target.value.split("T")[0]; // remove time if any
     if (selectedDate > today) {
-      alert("You cannot select a future date!");
+      toast.warn("You cannot select a future date!");
       e.target.value = startDate;
       return;
     }
     setStartDate(selectedDate);
+      setEndDate(''); // reset end date whenever start date changes
+
   };
 
-  const handleEndDateChange = (e) => {
-    const selectedDate = e.target.value;
-    if (selectedDate > today) {
-      alert("You cannot select a future date!");
-      e.target.value = endDate;
-      return;
-    }
-    setEndDate(selectedDate);
-  };
+const handleEndDateChange = (e) => {
+  if (!startDate) {
+    toast.warn("Please select Start Date first!");
+    e.target.value = ''; // reset end date
+    return;
+  }
+  const selectedDate = e.target.value;
+  if (selectedDate > today) {
+    toast.warn("You cannot select a future date!");
+    e.target.value = endDate;
+    return;
+  }
+  if (selectedDate < startDate) {
+    toast.warn("End Date cannot be before Start Date!");
+    e.target.value = endDate;
+    return;
+  }
+  setEndDate(selectedDate);
+};
 
   // Fetch report
   const fetchReportData = (pageNum = 1) => {
@@ -98,42 +112,43 @@ const filteredActivities = activities.filter(act => {
   return act.company_name?.toLowerCase().includes(companyName.toLowerCase());
 });
 
-
-
   return (
     <div className='report-section'>
       <h3>Activity Report</h3>
-
+<ToastContainer />
       {/* Filter Form */}
       <Form onSubmit={handleSubmit} className='filter-form'>
-        <Row className="g-3 align-items-center">
-          <Col xs="auto">
-            <Form.Label className="required-label">Start Date:</Form.Label>
-          </Col>
-          <Col>
-            <Form.Control
-              type="date"
-              value={startDate}
-              onChange={handleStartDateChange}
-              required
-              className="dates"
-              max={today}
-            />
-          </Col>
-          <Col xs="auto" className='datess'>
-            <Form.Label className="required-label">End Date:</Form.Label>
-          </Col>
-          <Col>
-            <Form.Control
-              type="date"
-              value={endDate}
-              onChange={handleEndDateChange}
-              required
-              className="dates"
-              max={today}
-            />
-          </Col>
-        </Row>
+        {/* Start & End Date */}
+<Row className="g-3 align-items-center">
+  <Col xs="auto">
+    <Form.Label className="required-label">Start Date:</Form.Label>
+  </Col>
+  <Col>
+    <Form.Control
+      type="date"
+      value={startDate}
+      onChange={handleStartDateChange}
+      required
+      className="dates"
+      max={today} // can't select future
+    />
+  </Col>
+  <Col xs="auto" className='datess'>
+    <Form.Label className="required-label">End Date:</Form.Label>
+  </Col>
+  <Col>
+    <Form.Control
+      type="date"
+      value={endDate}
+      onChange={handleEndDateChange}
+      required
+      className="dates"
+      max={today} // can't select future
+      min={startDate || ''} // can't select before start date
+    />
+  </Col>
+</Row>
+
 
         <Row className="g-4">
           <Col md={3}>
@@ -207,51 +222,59 @@ const filteredActivities = activities.filter(act => {
       )}
 
       {/* Report Table */}
-      <div className="report-table">
-        {filteredActivities.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Company Name</th>
-                <th>Activity Type</th>
-                <th>Details</th>
-                <th>Timestamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredActivities.map((activity, index) => (
-                <tr key={index}>
-                  <td>{activity.insertBy}</td>
-                  <td>{activity.company_name}</td>
-                  <td>{activity.activity_type}</td>
-                  <td>
-                    {activity.details.split(",").map((item, idx) => (
-                      <span key={idx}>{item}<br /></span>
-                    ))}
-                  </td>
-                  <td>{new Date(activity.insertDate).toLocaleString()}</td>
-                </tr>
+     
+<div className="report-table">
+  {reportType === 'detailed' && companyName ? (
+    <p className="no-activity-message-short">
+      Cannot generate a Detailed report with Company name filter. Please select 'Short' Report Type.
+    </p>
+  ) : filteredActivities.length > 0 ? (
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Company Name</th>
+          <th>Activity Type</th>
+          <th>Details</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredActivities.map((activity, index) => (
+          <tr key={index}>
+            <td>{activity.insertBy}</td>
+            <td>{activity.company_name}</td>
+            <td>{activity.activity_type}</td>
+            <td>
+              {activity.details.split(",").map((item, idx) => (
+                <span key={idx}>{item}<br /></span>
               ))}
-            </tbody>
-          </table>
-        ) : (
-          reportGenerated && !loading && <p className="no-activity-message">NO ACTIVITIES FOUND...</p>
-        )}
+            </td>
+            <td>{new Date(activity.insertDate).toLocaleString()}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    reportGenerated && !loading && (
+      <p className="no-activity-message">NO ACTIVITIES FOUND...</p>
+    )
+  )}
 
-        {/* Pagination */}
-        {filteredActivities.length > 0 && (
-          <div className="pagination-controls">
-            <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
-              <FaChevronLeft /> 
-            </button>
-            <span className='page-quote'>{page} of {totalPages}</span>
-            <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>
-              <FaChevronRight />
-            </button>
-          </div>
-        )}
-      </div>
+  {/* Pagination */}
+  {reportType !== 'detailed' && filteredActivities.length > 0 && (
+    <div className="pagination-controls">
+      <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
+        <FaChevronLeft /> 
+      </button>
+      <span className='page-quote'>{page} of {totalPages}</span>
+      <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>
+        <FaChevronRight />
+      </button>
+    </div>
+  )}
+</div>
+
     </div>
   );
 };
