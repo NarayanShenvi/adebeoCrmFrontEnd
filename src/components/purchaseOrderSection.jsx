@@ -12,6 +12,21 @@ import { ToastContainer } from "react-toastify";
 const CreatePurchaseOrder = () => {
   const dispatch = useDispatch();
 
+  // dummy button
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleClick = () => {
+    if (submitted) {
+      alert("PO already generated!");
+      return;
+    }
+
+    // simulate PO generation
+    alert("PO generated successfully!");
+    setSubmitted(true); // disable for next time
+  };
+
+  //dummy button
   const { proformas = [], recentOrders = [], status, currentPage = 1, totalPages = 0, totalOrders = 0, isProformasFetched, orderStatus } = useSelector((state) => state.purchaseOrder || {});
 
   const [selectedProforma, setSelectedProforma] = useState('');
@@ -21,6 +36,9 @@ const CreatePurchaseOrder = () => {
   const [loading, setLoading] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [error, setError] = useState('');
+
+  // ✅ Added state
+  const [isPOGenerated, setIsPOGenerated] = useState(false);
 
   // Fetch proformas and recent orders
   useEffect(() => {
@@ -34,6 +52,8 @@ const CreatePurchaseOrder = () => {
   // Handle Proforma Selection
   const handleProformaSelect = useCallback((proformaId) => {
     setSelectedProforma(proformaId);
+        setIsPOGenerated(false); // ✅ reset when new proforma selected
+
     const selected = proformas.find(proforma => proforma.proforma_id === proformaId);
     if (selected) {
       setItems(selected.items || []);
@@ -55,60 +75,58 @@ const CreatePurchaseOrder = () => {
   }, [discounts]);
 
   // Handle Purchase Order Generation
-  const handleGeneratePurchaseOrder = async () => {
-    if (!selectedProforma) {
+const handleGeneratePurchaseOrder = async () => {
+  if (!selectedProforma) {
     toast.error("Please select a Proforma!");
-      return;
-    }
+    return;
+  }
 
-    setLoading(true);
-    // Ensure that if no value is selected for mode or type, we use the default
-    const itemsWithDiscount = items.map((item, index) => {
-      const mode = selectedModes[index] || 'regular';  // Fallback to 'regular' if not selected
-      const businessType = selectedTypes[index] || 'new';  // Fallback to 'new' if not selected
-      const purchaseCost = parseFloat(item.purchase_cost);  // Ensure it's a number
-      const quantity = parseFloat(item.quantity); // Ensure quantity is also a number
+  if (loading) return; // 🚫 prevent multiple clicks while processing
 
-      const discountAmount = Array.isArray(discounts[index]) ? discounts[index][0] : discounts[index];
-      //const discountAmount = discounts[index];
-      const totalBeforeTax = (purchaseCost - discountAmount) * quantity;
-      const taxAmount = Math.ceil(totalBeforeTax * 0.18); // 18% tax
+  setLoading(true);
 
-      return {
-        ...item,
-        discount: discounts[index],
-        mode: mode,
-        business_type: businessType,
-        tax_amount:taxAmount
-      };
-    });
-    
-    try {
-      // Dispatch createPurchaseOrder action to handle order creation via Redux
+  const itemsWithDiscount = items.map((item, index) => {
+    const mode = selectedModes[index] || 'regular';
+    const businessType = selectedTypes[index] || 'new';
+    const purchaseCost = parseFloat(item.purchase_cost);
+    const quantity = parseFloat(item.quantity);
+    const discountAmount = discounts[index] || 0;
+
+    const totalBeforeTax = (purchaseCost - discountAmount) * quantity;
+    const taxAmount = Math.ceil(totalBeforeTax * 0.18);
+
+    return {
+      ...item,
+      discount: discountAmount,
+      mode,
+      business_type: businessType,
+      tax_amount: taxAmount
+    };
+  });
+
+  try {
+    // dispatch and wait for result
     const result = await dispatch(
       createPurchaseOrder({ proforma_id: selectedProforma, itemsWithDiscount })
     ).unwrap();
-    
-          // ✅ Success toast (backend message or default)
-    if (result?.message) {
-      toast.success(result.message);
-    } else {
-      toast.success("Purchase Order Created Successfully!");
-    }
 
+    // ✅ Trigger toast immediately
+    toast.success(result?.message || "Purchase Order Created Successfully!");
+        setIsPOGenerated(true); // ✅ lock after creation
+
+    // refresh list
     dispatch(fetchPurchaseOrders({ page: currentPage, rows_per_page: rowsPerPage }));
     dispatch(fetchProformas());
+
   } catch (error) {
-    // ✅ Error toast (backend error or default)
-    const errMsg =
-      error?.message ||
-      error?.error ||
-      "Failed to create Purchase Order!! Please try again.";
-    toast.error(errMsg);
+    toast.error(
+      error?.message || error?.error || "Failed to create Purchase Order!! Please try again."
+    );
   } finally {
     setLoading(false);
   }
 };
+
 
   // Handle Page Change for Recent Orders
   const handleRecentOrdersPageChange = (page) => {
@@ -160,7 +178,7 @@ const CreatePurchaseOrder = () => {
     updatedTypes[index] = value;
     setSelectedTypes(updatedTypes);
   };
-  
+   
 
   return (
     <div className="purchase-order-container">
@@ -270,7 +288,7 @@ const CreatePurchaseOrder = () => {
         
       )}
 {selectedProforma && items.length > 0 && (
-  <button onClick={handleGeneratePurchaseOrder} disabled={loading}   className="submit-button-p-order">
+  <button onClick={handleGeneratePurchaseOrder} disabled={loading || isPOGenerated}   className="submit-button-p-order">
 
 {loading ? (
                       <>
@@ -278,12 +296,20 @@ const CreatePurchaseOrder = () => {
                       </>
                     )  : (
                       <>
-                        <FaFilePdf  size={24} title='Save & Generate PDF' className='New-p-order'/>
+                        <FaFilePdf  size={24} title={isPOGenerated ? 'PO already generated' : 'Save & Generate PDF'} className='New-p-order'/>
                       </>
                     )}
   </button>
-)}
-
+)}  
+{/* dummy button */}
+<button
+      onClick={handleClick}
+      disabled={submitted}
+      className="dummy-po-btn"
+    >
+      {submitted ? "PO Generated" : "Generate Dummy PO"}
+    </button>
+    {/* dummy button */}
       {/* Pagination for Recent Orders */}
      
 

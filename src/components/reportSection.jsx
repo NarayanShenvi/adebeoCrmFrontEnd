@@ -262,17 +262,19 @@ const filteredActivities = activities.filter(act => {
   )}
 
   {/* Pagination */}
-  {reportType !== 'detailed' && filteredActivities.length > 0 && (
-    <div className="pagination-controls">
-      <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
-        <FaChevronLeft /> 
-      </button>
-      <span className='page-quote'>{page} of {totalPages}</span>
-      <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>
-        <FaChevronRight />
-      </button>
-    </div>
-  )}
+{/* Pagination */}
+{filteredActivities.length > 0 && totalPages > 1 && (
+  <div className="pagination-controls">
+    <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
+      <FaChevronLeft /> 
+    </button>
+    <span className='page-quote'>{page} of {totalPages}</span>
+    <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>
+      <FaChevronRight />
+    </button>
+  </div>
+)}
+
 </div>
 
     </div>
