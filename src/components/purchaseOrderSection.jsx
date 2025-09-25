@@ -12,21 +12,7 @@ import { ToastContainer } from "react-toastify";
 const CreatePurchaseOrder = () => {
   const dispatch = useDispatch();
 
-  // dummy button
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleClick = () => {
-    if (submitted) {
-      alert("PO already generated!");
-      return;
-    }
-
-    // simulate PO generation
-    alert("PO generated successfully!");
-    setSubmitted(true); // disable for next time
-  };
-
-  //dummy button
+  
   const { proformas = [], recentOrders = [], status, currentPage = 1, totalPages = 0, totalOrders = 0, isProformasFetched, orderStatus } = useSelector((state) => state.purchaseOrder || {});
 
   const [selectedProforma, setSelectedProforma] = useState('');
@@ -301,15 +287,7 @@ const handleGeneratePurchaseOrder = async () => {
                     )}
   </button>
 )}  
-{/* dummy button */}
-<button
-      onClick={handleClick}
-      disabled={submitted}
-      className="dummy-po-btn"
-    >
-      {submitted ? "PO Generated" : "Generate Dummy PO"}
-    </button>
-    {/* dummy button */}
+
       {/* Pagination for Recent Orders */}
      
 
