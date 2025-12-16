@@ -949,7 +949,7 @@ useEffect(() => {
     </>
   )}
 </button>
-{isEditMode && (
+{/* {isEditMode && (
     <span className="icon-container-customer">
         <FaEye 
             onClick={() => handleShowComments(customer?._id)} 
@@ -962,13 +962,13 @@ useEffect(() => {
             className="action-icon-customer"
         />
     </span>
-)}
+)} */}
       </Form>
       
 
    {/* Show Comments Modal */}
   {/* changes made from Show Comments Modal */}
-   {modalState.showComments && !modalState.addComment && (
+   {/* {modalState.showComments && !modalState.addComment && (
      <div className="comments-modal-container-customer" ref={commentsRef}>
        <div className="comments-modal-customer" >
          <h4>Customer Comments</h4>
@@ -992,9 +992,9 @@ useEffect(() => {
        </div>
      </div>
    )}
-   
+    */}
    {/* Add Comment Modal */}
-   {modalState.addComment && !modalState.showComments && (
+   {/* {modalState.addComment && !modalState.showComments && (
      <div className="comment-edit-modal-container-customer"  ref={addCommentRef}>
        <div className="comment-edit-modal-customer">
          <h4>Add Comment</h4>
@@ -1011,7 +1011,7 @@ useEffect(() => {
          <p className="alert-box-customer">Comment saved successfully! ✅</p>
        </div>
      </div>
-   )}
+   )} */}
    {/* to here Add Comment Modal -- bugs free */}
 
 

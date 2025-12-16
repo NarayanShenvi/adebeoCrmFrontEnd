@@ -65,6 +65,11 @@ const [hasFetched, setHasFetched] = useState(false);
   };
 
   // ------------------- 🔎 DEBOUNCED SEARCH LOGIC START ----------------------
+  function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+
   const debouncedSearch = useCallback(
     debounce(async (term) => {
       if (!term.trim()) {
@@ -76,7 +81,8 @@ const [hasFetched, setHasFetched] = useState(false);
       setSearchLoading(true);
 
       try {
-        const result = await dispatch(fetchPOInvoicesByCustomer(term)).unwrap();
+const safeTerm = escapeRegex(term);
+const result = await dispatch(fetchPOInvoicesByCustomer(safeTerm)).unwrap();
 
         const invoices = Array.isArray(result)
           ? result
@@ -84,18 +90,19 @@ const [hasFetched, setHasFetched] = useState(false);
           ? result.invoices
           : [];
 
-        const names = Array.from(
-          new Set(
-            invoices
-              .map(
-                (inv) =>
-                  inv.customerName || inv.customer_name || inv.customer || ""
-              )
-              .filter((name) =>
-                name.toLowerCase().startsWith(term.toLowerCase())
-              )
-          )
-        );
+
+const names = Array.from(
+  new Set(
+    invoices
+      .map((inv) =>
+        inv.customerName || inv.customer_name || inv.customer || ""
+      )
+      .filter((name) =>
+        name?.toLowerCase().includes(safeTerm)
+      )
+  )
+);
+
 
         if (names.length === 0) {
           setSearchResults([]);
@@ -148,9 +155,9 @@ const [hasFetched, setHasFetched] = useState(false);
 
     if (cust) {
       try {
-        const result = await dispatch(
-          fetchPOInvoicesByCustomer(cust.companyName)
-        ).unwrap();
+        const safeName = escapeRegex(cust.companyName);
+const result = await dispatch(fetchPOInvoicesByCustomer(safeName)).unwrap();
+
 
         const raw = Array.isArray(result)
           ? result
@@ -163,7 +170,7 @@ const [hasFetched, setHasFetched] = useState(false);
         const filtered = normalized.filter((inv) =>
           (inv.customerName || "")
             .toLowerCase()
-            .startsWith(cust.companyName.toLowerCase())
+            .includes(cust.companyName.toLowerCase())
         );
 
         setTableData(filtered);
@@ -523,7 +530,7 @@ useEffect(() => {
             marginTop: "10%",
           }}
         >
-          No Proforma Invoices Available{" "}
+          No Proforma Invoices Available for {" "}
           {selectedCustomer.companyName}.
         </p>
       )}

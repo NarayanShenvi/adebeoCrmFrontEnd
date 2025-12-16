@@ -178,9 +178,14 @@ html, body {
   
 }
 /* Search Bar */
+.search-wrapper {
+  position: relative;
+  width: 450px; /* set fixed width for the search field */
+  margin: 20px auto; /* centers the wrapper horizontally */
+}
+
 .search_company {
-  width: 450px; /* fixed width */
-  min-width: 450px; /* prevent shrinking */
+  width: 100%; /* take full width of wrapper */
   height: 30px;
   background: rgba(170, 207, 234, 0.87);
   border: 1px solid #8bcfcf;
@@ -189,16 +194,38 @@ html, body {
   padding-left: 10px;
   font-size: 13px;
   font-weight: bold;
-  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
   caret-color: rgb(7, 94, 121);
   color: rgb(7, 94, 121);
-  margin: 5px auto; /* keeps it centered */
+  box-sizing: border-box; /* ensures padding doesn't expand width */
   display: block;
 }
 
 .search_company:focus {
   border-color: #6ac7e0;
   box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+
+.animated-placeholder {
+  position: absolute;
+  left: 20px; /* match padding-left of input */
+  top: 45%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: bold;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121);
+  color: rgb(7, 94, 121);
+  pointer-events: none;
+  transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+  opacity: 0.8;
+  white-space: nowrap; /* prevent wrapping */
+}
+
+/* Slide-up animation */
+.animated-placeholder.slide-up {
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 /* Table Styling */
@@ -4805,7 +4832,7 @@ select option {
 
 .payments-table th:nth-child(6),
 .payments-table td:nth-child(6) {
-  width: 76px; /* Fixed width */
+  width: 82px; /* Fixed width */
 }
 .payments-table th:nth-child(7),
 .payments-table td:nth-child(7) {
@@ -4822,11 +4849,15 @@ select option {
 }
 .payments-table th:nth-child(11),
 .payments-table td:nth-child(11) {
-  width: 48px; /* Fixed width */
+  width: 46px; /* Fixed width */
 }
 .payments-table th:nth-child(12),
 .payments-table td:nth-child(12) {
-  width: 48px; /* Fixed width */
+  width: 5%; /* Fixed width */
+}
+.payments-table th:nth-child(13),
+.payments-table td:nth-child(13) {
+  width: 46px; /* Fixed width */
 }
 .payments-table th:last-child,
 .payments-table td:last-child {

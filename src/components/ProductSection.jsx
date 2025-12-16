@@ -303,7 +303,7 @@ const handleSearchChange = async (e) => {
     .filter((p) =>   !p.comboCode && (p.type === "product" || p.type === "service")
 )
     .filter((p) =>
-      p.productName?.toLowerCase().startsWith(term.toLowerCase())
+      p.productName?.toLowerCase().includes(term.toLowerCase())
     ); // ✅ only products starting with search term
     } else {
       // Combo product search
@@ -320,7 +320,7 @@ const handleSearchChange = async (e) => {
       responseData = (response.data.data || [])
     .filter((p) => !!p.comboCode)
     .filter((p) =>
-      p.comboDisplayName?.toLowerCase().startsWith(term.toLowerCase())
+      p.comboDisplayName?.toLowerCase().includes(term.toLowerCase())
     ); // ✅ only combos that start with term
     }
 
