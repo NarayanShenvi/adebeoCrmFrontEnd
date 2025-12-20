@@ -205,32 +205,32 @@ const SalesReport = () => {
     }
   };
 
-  // --- Load all customers initially ---
-// --- Load all customers initially ---
-useEffect(() => {
-  // Fetch all customers once on mount
-  const fetchAllCustomers = async () => {
-    try {
-      setLocalSearchLoading(true); // show spinner while loading
-      await dispatch(fetchCustomerAsync("")); // empty string fetches all
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLocalSearchLoading(false);
-    }
-  };
+//   // --- Load all customers initially ---
+// // --- Load all customers initially ---
+// useEffect(() => {
+//   // Fetch all customers once on mount
+//   const fetchAllCustomers = async () => {
+//     try {
+//       setLocalSearchLoading(true); // show spinner while loading
+//       await dispatch(fetchCustomerAsync("")); // empty string fetches all
+//     } catch (err) {
+//       console.error(err);
+//     } finally {
+//       setLocalSearchLoading(false);
+//     }
+//   };
 
-  fetchAllCustomers();
-}, [dispatch]);
+//   fetchAllCustomers();
+// }, [dispatch]);
 
-// --- Prepare options ---
-const customerOptions = customers.map(c => ({
-  value: c._id,
-  label: c.companyName || c.company_name || c.company
-}));
+// // --- Prepare options ---
+// const customerOptions = customers.map(c => ({
+//   value: c._id,
+//   label: c.companyName || c.company_name || c.company
+// }));
 
 
-  // -----------------------
+// -----------------------
 // Product search (single products only) — USING REDUX ONLY
 // -----------------------
 
@@ -359,7 +359,7 @@ useEffect(() => {
 
         <Row className="g-4 mt-3">
           {/* Customer search */}
-          {/* <Col md={4}>
+          {<Col md={4}>
             <Form.Group className="form-group">
               <Form.Label>Customer (search)</Form.Label>
               <input
@@ -395,8 +395,8 @@ useEffect(() => {
                 ) : null}
               </div>
             </Form.Group>
-          </Col> */}
-          <Col md={4}>
+          </Col> }
+          {/* <Col md={4}>
   <Form.Group className="form-group">
     <Form.Label>Customer</Form.Label>
   <Select
@@ -438,7 +438,7 @@ useEffect(() => {
 />
 
   </Form.Group>
-</Col>
+</Col> */}
 
 
          {/* Product search (single products only) */}
