@@ -4,14 +4,32 @@
   import { Form, Row, Col } from "react-bootstrap";
   import { LuFileCheck2 } from "react-icons/lu";
   import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-  import { ToastContainer, toast } from "react-toastify";
-  import "react-toastify/dist/ReactToastify.css";
 
   import { fetchSalesReport, resetSalesReport } from "../redux/slices/reportSlice";
   import { fetchUsers } from "../redux/slices/userSlice";
   import { fetchCustomerAsync, clearCustomers } from "../redux/slices/customerSlice"; // adjust path/names if different
   import { setProductToEdit, updateProductAsync, fetchProductsAsync, addProductAsync } from '../redux/slices/productSlice';
   import Select from "react-select";
+  import { toast } from "react-toastify";
+  import "react-toastify/dist/ReactToastify.css";
+  import { ToastContainer } from "react-toastify"; 
+  import { BiSolidMessageRoundedError } from "react-icons/bi";
+  import { IoIosWarning } from "react-icons/io";
+  import { BiSolidCommentCheck } from "react-icons/bi";
+  import {
+  ResponsiveContainer,
+  LineChart,
+  BarChart,
+  ComposedChart,   
+  Line,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
+
 
   const SalesReport = () => {
     const dispatch = useDispatch();
@@ -48,7 +66,6 @@
   const {
     salesReports = [],
     salesLoading,
-    salesError,
     salesTotalPages = 1,
   } = useSelector((state) => state.report);
 
@@ -86,7 +103,24 @@
     const handleStartDateChange = (e) => {
       const selected = e.target.value;
       if (selected > today) {
-        toast.warn("You cannot select a future date!");
+        toast.warn("You cannot select a future Date!!", {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
         return;
       }
       setStartDate(selected);
@@ -100,16 +134,67 @@
 
     const handleEndDateChange = (e) => {
       if (!startDate) {
-        toast.warn("Please select Start Date first!");
+        toast.warn("Please select Start Date first!", {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
         return;
       }
       const selected = e.target.value;
       if (selected > today) {
-        toast.warn("You cannot select a future date!");
+        toast.warn("You cannot select a future Date!!", {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
         return;
       }
       if (selected < startDate) {
-        toast.warn("End Date cannot be before Start Date!");
+        toast.warn("End Date cannot be before Start Date!", {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
         return;
       }
       setEndDate(selected);
@@ -119,7 +204,24 @@
     // --- Fetch report ---
     const fetchReportData = (pageNum = 1) => {
     if (!startDate || !endDate) {
-      toast.warn("Please select Start Date and End Date");
+      toast.warn("Please select Start Date and End Date", {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
       return;
     }
 
@@ -143,7 +245,24 @@
     e.preventDefault();
 
     if (!startDate || !endDate) {
-      toast.warn("Please select Start Date and End Date");
+      toast.warn("Please select Start Date and End Date", {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
       return;
     }
 
@@ -233,7 +352,24 @@
 
     // ⛔ No dates → warn & CLEAR selection
     if (!startDate || !endDate) {
-      toast.warn("Please select Start Date and End Date before applying customer filter.");
+      toast.warn("Please select Start Date and End Date before applying Customer filter.", {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
 
       setSelectedCustomerId("");
       setSelectedCustomerObj(null);
@@ -311,7 +447,24 @@
 
     // ⛔ No dates → warn & CLEAR selection
     if (!startDate || !endDate) {
-      toast.warn("Please select Start Date and End Date before applying product filter.");
+      toast.warn("Please select Start Date and End Date before applying Product filter.", {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
 
       setSelectedSearchValue("");
       setSelectedProductId("");
@@ -491,6 +644,125 @@ const formattedTotalAmount = useMemo(() => {
   });
 }, [totalAmountBilled]);
 
+const { salesError } = useSelector((state) => state.report);
+
+useEffect(() => {
+  if (!salesError) return;
+
+  // 🌐 Network error
+  if (
+    salesError === "Failed to fetch sales report" || "Rejected" ||
+    salesError.toLowerCase().includes("network")
+  ) {
+    toast.error("Rejected!! Network error. Please check your internet connection.", {
+                                                autoClose: 4000,
+                                                toastClassName: "toast-warn-zfix",
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: true,
+                                                progress: undefined,
+                                                theme: "colored", // "light", "dark", or "colored"
+                                                style: { background: "rgba(252, 61, 61, 0.88)", color: "white", 
+                                                  fontSize: "14px",       // ✅ Change font size
+                                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                  fontWeight: "bold",    // ✅ Make text bold
+                                                 },
+                                                 icon: <BiSolidMessageRoundedError  
+                                                 style={{ fontSize: '20px', color: 'white' }} />
+                                            });
+  }
+  // ❌ Auth / backend / validation error
+  else {
+toast.error(salesError, {
+  autoClose: 4000,
+  toastClassName: "toast-warn-zfix",
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: "colored",
+  style: {
+    background: "rgba(252, 61, 61, 0.88)",
+    color: "white",
+    fontSize: "14px",
+    fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+    fontWeight: "bold",
+  },
+  icon: (
+    <BiSolidMessageRoundedError
+      style={{ fontSize: "20px", color: "white" }}
+    />
+  ),
+});  }
+}, [salesError]);
+
+
+const salesLineChartData = useMemo(() => {
+  const map = {};
+
+  filteredSalesReports.forEach((row) => {
+    const date = row["Invoice Date"];
+    const amount = Number(
+      String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
+    );
+
+    if (!date) return;
+
+    if (!map[date]) {
+      map[date] = { date, amount: 0 };
+    }
+
+    map[date].amount += isNaN(amount) ? 0 : amount;
+  });
+
+  return Object.values(map);
+}, [filteredSalesReports]);
+
+const salesBarChartData = useMemo(() => {
+  const map = {};
+
+  filteredSalesReports.forEach((row) => {
+    const customer = row["Customer Name"] || "Unknown";
+    const amount = Number(
+      String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
+    );
+
+    if (!map[customer]) {
+      map[customer] = { customer, amount: 0 };
+    }
+
+    map[customer].amount += isNaN(amount) ? 0 : amount;
+  });
+
+  return Object.values(map);
+}, [filteredSalesReports]);
+
+const productCombinedChartData = useMemo(() => {
+  const map = {};
+
+  filteredSalesReports.forEach((row) => {
+    const product = row["Description"] || "Unknown";
+    const qty = Number(row["Qty"] || 0);
+    const amount = Number(
+      String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
+    );
+
+    if (!map[product]) {
+      map[product] = {
+        product,
+        quantity: 0,
+        amount: 0,
+      };
+    }
+
+    map[product].quantity += isNaN(qty) ? 0 : qty;
+    map[product].amount += isNaN(amount) ? 0 : amount;
+  });
+
+  return Object.values(map);
+}, [filteredSalesReports]);
 
     return (
       <div className="SalesReport-section">
@@ -561,6 +833,13 @@ const formattedTotalAmount = useMemo(() => {
     {useReportFilters ? (
       // ✅ DROPDOWN FROM GENERATED REPORT DATA
       <Select
+      className="SalesReport-select"
+      classNamePrefix="SalesReport"
+      menuPortalTarget={document.body}
+  menuPosition="fixed"
+  styles={{
+    menuPortal: base => ({ ...base, zIndex: 9999 })
+  }}
         options={reportCustomerOptions}
         value={
           selectedCustomerId
@@ -582,7 +861,7 @@ const formattedTotalAmount = useMemo(() => {
         <input
           type="text"
           className="search-field-customer-name form-control"
-          placeholder="Search by Company name"
+          placeholder="Search by Company Name"
           value={searchQuery}
           onChange={handleSearchChange}
         />
@@ -671,6 +950,13 @@ const formattedTotalAmount = useMemo(() => {
     {useReportFilters ? (
       // ✅ PRODUCT DROPDOWN FROM REPORT DATA
       <Select
+        className="SalesReport-select"
+        classNamePrefix="SalesReport"
+        menuPortalTarget={document.body}
+  menuPosition="fixed"
+  styles={{
+    menuPortal: base => ({ ...base, zIndex: 9999 })
+  }}
         options={reportProductOptions}
         value={
           selectedProductId
@@ -746,6 +1032,11 @@ const formattedTotalAmount = useMemo(() => {
     <Select
   className="SalesReport-select"
   classNamePrefix="SalesReport"
+  menuPortalTarget={document.body}
+  menuPosition="fixed"
+  styles={{
+    menuPortal: base => ({ ...base, zIndex: 9999 })
+  }}
   options={useReportFilters ? reportUserOptions : userOptions}
   value={selectedUser ? { value: selectedUser, label: selectedUser } : null}
   onChange={(selected) => {
@@ -753,9 +1044,26 @@ const formattedTotalAmount = useMemo(() => {
       setSelectedUser("");
       return;
     }
-
+ 
     if (!useReportFilters && (!startDate || !endDate)) {
-      toast.warn("Please select Start Date and End Date before applying user filter.");
+      toast.warn("Please select Start Date and End Date before applying User filter.", {
+                                                    position: "top-right",
+                                                    toastClassName: "toast-warn-zfix",
+                                                    autoClose: 4000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: true,
+                                                    progress: undefined,
+                                                    theme: "colored", // "light", "dark", or "colored"
+                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                      fontSize: "14px",       // ✅ Change font size
+                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                      fontWeight: "bold",    // ✅ Make text bold
+                                                     },
+                                                     icon: <IoIosWarning  
+                                                     style={{ fontSize: '25px', color: 'white' }} />
+                                                });
       return;
     }
 
@@ -766,7 +1074,7 @@ const formattedTotalAmount = useMemo(() => {
   placeholder={
     useReportFilters
       ? "Select user from report"
-      : "Select or search user"
+      : "Search or select User"
   }
 />
   </Form.Group>
@@ -777,7 +1085,7 @@ const formattedTotalAmount = useMemo(() => {
             <Col md={1}>
               <Form.Group className="form-group">
                 <Form.Label className="invisible">&nbsp;</Form.Label>
-                <button type="submit" className="report-button" title="Generate Report">
+                <button type="submit" className="report-button-sales" title="Generate Sales Report">
                   <LuFileCheck2 className="filecheck" />
                 </button>
               </Form.Group>
@@ -789,24 +1097,24 @@ const formattedTotalAmount = useMemo(() => {
 
         {/* Loading & Error */}
       {salesLoading && (
-    <div className="loading-container-report">
-      <div className="loading-spinner-report"></div>
-      <p className="loading-message-report">Loading sales report...</p>
+    <div className="loading-container-report-sales">
+      <div className="loading-spinner-report-sales"></div>
+      <p className="loading-message-report-sales">Loading sales report...</p>
     </div>
   )}
 
-  {salesError && (
-    <div className="error-container-report">
-      <p className="error-message-report">{salesError}</p>
-    </div>
-  )}
+  {salesError && salesError !== "Rejected" && (
+  <div className="error-container-report-sales">
+    <p className="error-message-report-sales">{salesError}</p>
+  </div>
+)}
 
-        {/* Report Table */}
-      <div className="report-table">
+{/* Report Table */}
+      <div className="SalesReport-table">
     {filteredSalesReports.length > 0 ? (
-      <table className="table table-striped">
+      <table>
         <thead>
-          <tr>
+          <tr> 
             {/* {!hideCustomerColumn && <th>Customer Name</th>}
             {!hideProductColumn && <th>Product Name</th>} */}
             <th>Customer Name</th>
@@ -836,7 +1144,11 @@ const formattedTotalAmount = useMemo(() => {
 
               <td>{row["Invoice #"] || "-"}</td>
               <td>{row["Invoice Date"] || "-"}</td>
-              <td>{row["Amount Billed (INR)"] || "-"}</td>
+<td>
+  {row["Amount Billed (INR)"]
+    ? `₹ ${row["Amount Billed (INR)"]}`
+    : "-"}
+</td>
             </tr>
           ))}
         </tbody>
@@ -844,13 +1156,129 @@ const formattedTotalAmount = useMemo(() => {
     ) : (
       reportGenerated &&
       !salesLoading && (
-        <p className="no-activity-message">NO SALES FOUND...</p>
+        <p className="no-sales-message">NO SALES FOUND...</p>
       )
     )}
+    
+{/* ================== CHARTS ================== */}
+{filteredSalesReports.length > 0 && (
+  <div className="sales-report-charts mt-5">
+    
+    {/* Line Chart */}
+    <h5 className="text-center mb-3">Sales Trend (Date-wise)</h5>
+    <ResponsiveContainer width="100%" height={320}>
+      <LineChart data={salesLineChartData}>
+        <CartesianGrid strokeDasharray="3 3" />
+<XAxis
+  dataKey="date"
+  interval={0}              // ✅ show ALL dates
+  angle={-45}               // ✅ rotate labels
+  textAnchor="end"
+  height={70}
+/>
+        <YAxis />
+        <Tooltip formatter={(value) => `₹ ${value}`} />
+        <Line
+          type="monotone"
+          dataKey="amount"
+          stroke="#0a8181"
+          strokeWidth={3}
+          dot={{ r: 4 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+
+    {/* Bar Chart */}
+    <h5 className="text-center mt-5 mb-3">Customer-wise Sales</h5>
+    <ResponsiveContainer width="100%" height={320}>
+      <BarChart data={salesBarChartData}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="customer" />
+        <YAxis />
+        <Tooltip formatter={(value) => `₹ ${value}`} />
+        <Bar
+          dataKey="amount"
+          fill="#3498db"
+          radius={[6, 6, 0, 0]}
+        />
+      </BarChart>
+    </ResponsiveContainer>
+    
+    <h5 className="text-center mt-5 mb-3">
+  Product-wise Quantity & Amount
+</h5>
+
+<div style={{ width: "100%", overflowX: "auto" }}>
+  <div style={{ width: `${productCombinedChartData.length * 140}px` }}>
+    <ResponsiveContainer width="100%" height={480}>
+      <ComposedChart data={productCombinedChartData}>
+        <CartesianGrid strokeDasharray="3 3" />
+
+        <XAxis
+          dataKey="product"
+          interval={0}
+          angle={-30}
+          textAnchor="end"
+          height={90}
+        />
+
+        {/* Left Y-Axis → Quantity */}
+        <YAxis
+          yAxisId="left"
+          label={{ value: "Qty", angle: -90, position: "insideLeft" }}
+        />
+
+        {/* Right Y-Axis → Amount */}
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          label={{
+            value: "Amount (₹)",
+            angle: 90,
+            position: "insideRight",
+          }}
+        />
+
+        <Tooltip
+          formatter={(value, name) => {
+            if (name === "Amount") {
+              return [`₹ ${value}`, "Amount"];
+            }
+            return [value, "Quantity"];
+          }}
+        />
+
+        <Legend />
+
+        {/* Quantity as Bar */}
+        <Bar
+          yAxisId="left"
+          dataKey="quantity"
+          fill="#27ae60"
+          name="Quantity"
+          radius={[6, 6, 0, 0]}
+        />
+
+        {/* Amount as Line */}
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="amount"
+          stroke="#e74c3c"
+          strokeWidth={3}
+          name="Amount"
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
+  </div>
+)}
 
     {/* Pagination */}
     {filteredSalesReports.length > 0 && salesTotalPages > 1 && (
-      <div className="pagination-controls">
+      <div className="pagination-controls-salesreport">
         <button
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 1}
@@ -858,7 +1286,7 @@ const formattedTotalAmount = useMemo(() => {
           <FaChevronLeft />
         </button>
 
-        <span className="page-quote">
+        <span className="page-salesreport">
           {page} of {salesTotalPages}
         </span>
 
