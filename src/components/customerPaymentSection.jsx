@@ -8,6 +8,7 @@ import { generateInvoicePdfAsync } from '../redux/slices/customerPaymentSlice';
 import { FaFileDownload, FaFilePdf } from 'react-icons/fa'; // added
 import { CiFileOff } from "react-icons/ci"; // added
 import { FaDownload } from "react-icons/fa6";// added
+import { FaFileInvoiceDollar } from "react-icons/fa6";
 import { recreateInvoiceAsync } from '../redux/slices/customerPaymentSlice';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -138,6 +139,7 @@ useEffect(() => {
         <th>Action</th>
         <th><FaDownload className='header-down'/>
         </th>
+        <th>TDS Gen</th>
         <th>Info</th> {/* New Info column */}
         <th>Reg-inv</th>
       </tr>
@@ -151,32 +153,43 @@ useEffect(() => {
       ? "cancelled-row"
       : payment.payment_status === "Regenerated"
       ? "regenerated-row"
+      : payment.payment_status === "Disabled"
+      ? "cancelled-row"
       : ""}
 >
 
  <td>
 <button
   className={`cxpay ${
-    payment.payment_status === "Cancelled" || payment.payment_status === "Regenerated"
-      ? "is-disabled"
-      : ""
+   payment.payment_status === "Cancelled" ||
+  payment.payment_status === "Regenerated" ||
+  payment.payment_status === "Disabled"
+    ? "is-disabled"
+    : ""
   }`}
   onClick={() => {
     if (payment.payment_status === "Cancelled") {
       toast.info(`This invoice  ${payment.invoice_number} is cancelled. PDF cannot be generated.`);
     } else if (payment.payment_status === "Regenerated") {
       toast.info(`This invoice ${payment.invoice_number} is regenerated. Please generate PDF from there`);
-    } else {
+    } else if (payment.payment_status === "Disabled") {
+    toast.info(`This invoice ${payment.invoice_number} is disabled. PDF generation is not allowed.`);
+  } else {
       toast.info(`PDF for Invoice ${payment.invoice_number} is generated..`);
       handleGeneratePDF(payment.invoice_number);
     }
   }}
-  disabled={payment.payment_status === "Cancelled" || payment.payment_status === "Regenerated"}
-  title={
-    payment.payment_status === "Cancelled" || payment.payment_status === "Regenerated"
-      ? "Disabled"
-      : "Generate PDF"
-  }
+  disabled={payment.payment_status === "Cancelled" || payment.payment_status === "Regenerated" ||
+  payment.payment_status === "Disabled"}
+ title={
+  payment.payment_status === "Cancelled"
+    ? "Cancelled – PDF cannot be generated"
+    : payment.payment_status === "Regenerated"
+    ? "Regenerated – Generate PDF from new invoice"
+    : payment.payment_status === "Disabled"
+    ? "Disabled – PDF generation not allowed"
+    : "Generate PDF"
+}
 >
   <FaFilePdf />
 </button>
@@ -185,8 +198,8 @@ useEffect(() => {
   </td>
   <td>{payment.invoice_number}</td>
   <td>{payment.customer_name}</td>
-  <td>{payment.total_amount}</td>
-  <td>{payment.amount_due}</td>
+  <td>₹&nbsp;{payment.total_amount}</td>
+  <td>₹&nbsp;{payment.amount_due}</td>
   <td>{new Date(payment.invoice_date).toLocaleDateString()}</td>
   <td>{payment.payment_status}</td>
 
@@ -264,7 +277,7 @@ useEffect(() => {
     />
   ) : (
     <FaCheckCircle
-      className="nopdf"
+      className="submit-icon is-disabled"
       title="Submission disabled"
       onClick={() =>
         toast.info(`Payment for ${payment.invoice_number} is Disabled.`)
@@ -296,7 +309,17 @@ useEffect(() => {
         )
       }
     />
-  ) : payment.pdf_link ? (
+  ) : payment.payment_status === "Disabled" ? (
+    <FaFileDownload
+      title="Download disabled — invoice disabled"
+      className="rowdown is-disabled"
+      onClick={() =>
+        toast.info(
+          `For ${payment.invoice_number}, submission disabled. Invoice is disabled.`
+        )
+      }
+    />
+  ): payment.pdf_link ? (
     <a
       href={`${payment.base_url}${payment.pdf_link}`}
       target="_blank"
@@ -323,18 +346,42 @@ useEffect(() => {
 </td>
 
 
+<td>
+  <FaFileInvoiceDollar 
+    title={
+      payment.payment_status === "Cancelled"
+        ? "TDS Generation Disabled — invoice cancelled"
+        : payment.payment_status === "Regenerated"
+        ? "TDS Generation Disabled — invoice regenerated"
+        : payment.payment_status === "Disabled"
+        ? "TDS Generation Disabled — invoice disabled"
+        : "Generate TDS"
+    }
+    className={`action-icon-payment ${
+      payment.payment_status === "Cancelled" ||
+      payment.payment_status === "Regenerated" ||
+      payment.payment_status === "Disabled"
+        ? "is-disabled"
+        : ""
+    }`}
+  />
+</td>
 
   <td>
   <RiInformation2Fill
     title={
       payment.payment_status === "Cancelled"
-        ? "Disabled"
+        ? "Disabled — invoice cancelled"
         : payment.payment_status === "Regenerated"
-        ? "Disabled"
+        ? "Disabled — invoice regenerated"
+        : payment.payment_status === "Disabled"
+        ? "Disabled — invoice disabled"
         : "Payment Information"
     }
     className={`action-icon-payment ${
-      payment.payment_status === "Cancelled" || payment.payment_status === "Regenerated"
+      payment.payment_status === "Cancelled" ||
+      payment.payment_status === "Regenerated" ||
+      payment.payment_status === "Disabled"
         ? "is-disabled"
         : ""
     }`}

@@ -59,6 +59,10 @@ const InvoiceStatus = () => {
   };
 
   // ------------------- 🔎 DEBOUNCED SEARCH LOGIC START ----------------------
+  function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
   const debouncedSearch = useCallback(
     debounce(async (term) => {
       if (!term.trim()) {
@@ -70,7 +74,8 @@ const InvoiceStatus = () => {
       setSearchLoading(true);
 
       try {
-        const result = await dispatch(fetchInvoicesByCustomer(term)).unwrap();
+const safeTerm = escapeRegex(term);
+const result = await dispatch(fetchInvoicesByCustomer(safeTerm)).unwrap();
 
         const invoices = Array.isArray(result)
           ? result
@@ -83,7 +88,7 @@ const InvoiceStatus = () => {
             invoices
               .map((inv) => inv.customer_name || inv.customer || "")
               .filter((name) =>
-                name.toLowerCase().startsWith(term.toLowerCase())
+                name.toLowerCase().includes(term.toLowerCase())
               )
           )
         );
@@ -146,9 +151,9 @@ const InvoiceStatus = () => {
 
     if (cust) {
       try {
-        const result = await dispatch(
-          fetchInvoicesByCustomer(cust.customer_name)
-        ).unwrap();
+        const safeName = escapeRegex(cust.customer_name);
+const result = await dispatch(fetchInvoicesByCustomer(safeName)).unwrap();
+
 
         const raw = Array.isArray(result)
           ? result
@@ -161,7 +166,7 @@ const InvoiceStatus = () => {
         const filtered = normalized.filter((inv) =>
           (inv.customerName || "")
             .toLowerCase()
-            .startsWith(cust.customer_name.toLowerCase())
+            .includes(cust.customer_name.toLowerCase())
         );
 
         setTableData(filtered);

@@ -178,9 +178,14 @@ html, body {
   
 }
 /* Search Bar */
+.search-wrapper {
+  position: relative;
+  width: 450px; /* set fixed width for the search field */
+  margin: 20px auto; /* centers the wrapper horizontally */
+}
+
 .search_company {
-  width: 450px; /* fixed width */
-  min-width: 450px; /* prevent shrinking */
+  width: 100%; /* take full width of wrapper */
   height: 30px;
   background: rgba(170, 207, 234, 0.87);
   border: 1px solid #8bcfcf;
@@ -189,16 +194,38 @@ html, body {
   padding-left: 10px;
   font-size: 13px;
   font-weight: bold;
-  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
   caret-color: rgb(7, 94, 121);
   color: rgb(7, 94, 121);
-  margin: 5px auto; /* keeps it centered */
+  box-sizing: border-box; /* ensures padding doesn't expand width */
   display: block;
 }
 
 .search_company:focus {
   border-color: #6ac7e0;
   box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+
+.animated-placeholder {
+  position: absolute;
+  left: 20px; /* match padding-left of input */
+  top: 45%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: bold;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121);
+  color: rgb(7, 94, 121);
+  pointer-events: none;
+  transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+  opacity: 0.8;
+  white-space: nowrap; /* prevent wrapping */
+}
+
+/* Slide-up animation */
+.animated-placeholder.slide-up {
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 /* Table Styling */
@@ -4805,7 +4832,7 @@ select option {
 
 .payments-table th:nth-child(6),
 .payments-table td:nth-child(6) {
-  width: 76px; /* Fixed width */
+  width: 82px; /* Fixed width */
 }
 .payments-table th:nth-child(7),
 .payments-table td:nth-child(7) {
@@ -4822,11 +4849,15 @@ select option {
 }
 .payments-table th:nth-child(11),
 .payments-table td:nth-child(11) {
-  width: 48px; /* Fixed width */
+  width: 46px; /* Fixed width */
 }
 .payments-table th:nth-child(12),
 .payments-table td:nth-child(12) {
-  width: 48px; /* Fixed width */
+  width: 5%; /* Fixed width */
+}
+.payments-table th:nth-child(13),
+.payments-table td:nth-child(13) {
+  width: 46px; /* Fixed width */
 }
 .payments-table th:last-child,
 .payments-table td:last-child {
@@ -8841,7 +8872,7 @@ select option {
 }
 
 
-/* Submenu1------------>Transfer Customer Data Section */
+/* Submenu2------------>Transfer Customer Data Section */
 /* Container */
 .manage-customer-data {
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
@@ -9356,4 +9387,771 @@ select option {
 .toast-warn-zfix {
   z-index: 999999 !important;   /* keep toast above menus/buttons */
   pointer-events: auto !important; /* let hover actually pause */
+}
+
+/*Admin----Report Section*/
+
+/* Submenu1------------>SalesReport Section */
+.SalesReport-section {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  flex-grow: 1;
+  padding: 20px;
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
+  background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
+  margin-left: 250px;
+}
+
+/* Heading */
+.SalesReport-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+}
+
+.filter-form-sales
+{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 900px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+.SalesReport-section .form-group {
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  margin-top: -15px;
+}
+
+.SalesReport-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.required-label::after {
+  content: " *"; 
+  color: rgb(223, 3, 3);    
+  font-weight: 800;
+}
+
+.filter-form-sales .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-sales .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-sales .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.filter-form-sales .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-sales .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-sales .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+.dates{
+  max-width: 240px;
+}
+.datess{
+  max-width: 240px;
+  margin-left: 295px;
+}
+
+/* Custom Checkbox Container */
+.custom-checkbox-sales {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  margin-top: 30px;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox-sales input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #069696; /* Default border color */
+  border-radius: 1px;
+  background-color: white; /* Default background */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-right: 10px;
+}
+
+/* Checkbox Checked State */
+.custom-checkbox-sales input[type="checkbox"]:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+/* Checkbox Checkmark */
+.custom-checkbox-sales input[type="checkbox"]::after {
+  content: "";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Show Checkmark When Checked */
+.custom-checkbox-sales input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkbox Hover Effect */
+.custom-checkbox-sales input[type="checkbox"]:hover {
+  border-color: #06b4b4; /* Darker blue */
+}
+
+/* Checkbox Label */
+.custom-checkbox-sales label {
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Change Label Color on Checked */
+.custom-checkbox-sales input[type="checkbox"]:checked + label {
+  color: #28a745;
+  font-size: 14px;
+}
+
+/* ===== DISABLED CHECKBOX ===== */
+.custom-checkbox-sales input[type="checkbox"]:disabled {
+  background-color: #f2f2f2;
+  border-color: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== TOTAL AMOUNT CONTAINER ===== */
+.total-amount-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 6px 14px;
+  border-radius: 2px;
+  margin-top: 26px;
+  background: linear-gradient(
+    135deg,
+    rgba(39, 142, 170, 0.27),
+    rgba(46, 107, 125, 0.11)
+  );
+
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+   
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* animation */
+  animation: totalFadeSlide 0.45s ease-out forwards;
+}
+
+/* Amount value */
+.total-amount-text strong {
+  font-size: 16px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #2e7d32;
+  letter-spacing: 0.3px;
+}
+
+/* Hover effect */
+.total-amount-text:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
+  transition: all 0.25s ease;
+}
+
+/* ===== ENTRY ANIMATION ===== */
+@keyframes totalFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* WHEN TOTAL IS NOT PRESENT & WHEN IT IS PRESENT */
+/* Make row flexible */
+.sales-filter-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Default behavior (when total exists) */
+.sales-filter-row > .col-md-3 {
+  transition: all 0.3s ease;
+}
+
+/* 🔹 CENTER FIRST 3 COLS WHEN TOTAL IS NOT PRESENT */
+.sales-filter-row:not(:has(.total-amount-text)) {
+  justify-content: center;
+}
+
+/* WHEN TOTAL IS NOT PRESENT → 3 columns only */
+.sales-filter-row:not(:has(.total-amount-text)) {
+  justify-content: center;
+  column-gap: 32px;   /* 👈 space between the 3 columns */
+}
+
+/* Slightly wider columns so they don't squeeze */
+.sales-filter-row:not(:has(.total-amount-text)) > .col-md-3 {
+  width: 275px;       /* adjust: 240–280px */
+  margin-bottom: -20px;
+}
+
+/* Serch Filelds--customer */
+.SalesReport-section .search-field-customer-name {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.search-field1-customer-name .NoCustomerNameFound
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-customer-name .CustomerNameLoading 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-customer-name .TypeMoreCustData 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+
+.search-field1-customer-name select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 254px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 1%;
+  display: block;
+} 
+.search-field1-customer-name select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-customer-name option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+/* Serch Filelds--product */
+.SalesReport-section .search-field-product-name {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.search-field1-product-name .NoProductNameFound
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name .ProductNameLoading 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name .TypeMoreProd 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+
+.search-field1-product-name select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 254px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 1%;
+  display: block;
+} 
+.search-field1-product-name select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-product-name option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+/* Serch Filelds--user */
+.SalesReport__control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0px 8px;
+  min-height: 32px;          /* ✅ correct */
+  height: auto;              /* ✅ allow hover area */
+  background-color: rgba(134, 195, 238, 0.31) !important;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-weight: 800;
+  pointer-events: auto;
+  color: #555555;
+}
+
+.SalesReport__control--is-focused {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+}
+
+/* Hover when NOT focused */
+.SalesReport__control:not(.SalesReport__control--is-focused):hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+  border-color: #6ac7e0;
+}
+
+/* Hover even when focused */
+.SalesReport__control--is-focused:hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+}
+
+/* Loading and Error Container */
+.loading-container-report-sales {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-left: 35%;
+}
+
+.loading-spinner-report-sales {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #028618;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1.5s linear infinite; /* Slightly slower spin */
+  margin-left: 10%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.loading-message-report-sales {
+  font-size: 18px;
+  font-weight: bold;
+  color: #028618;
+  margin-top: 15px;
+  text-align: center;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.error-container-report-sales {
+  display: flex;
+  align-items: center;       /* vertical center text */
+  justify-content: center;   /* horizontal center text */
+
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 36%;
+
+  color: #f51009;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+
+  border-radius: 5px;
+  padding-top: 10px;
+  padding-bottom: -3px;
+  width: 100%;
+  max-width: 28%;
+  min-height: 60px;
+
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+
+.error-container-report-sales {
+  animation: fadeSlide 0.3s ease-in-out;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.report-button-sales {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+  text-align: center;
+  color: #05555f;
+  width: 20px;
+  margin-left: 65%;
+}
+
+.filecheck
+{
+  font-size: 25px !important;
+}
+
+.report-button-sales:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.report-button-sales:hover:not(:disabled) {
+  transform: scale(1.3); 
+  color: #0e7204;
+}
+
+/* Sales Report Table */
+.SalesReport-table {
+  margin-top: 50px !important;
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  max-width: calc(100% - 250px); /* leaves 60px gap on the right */
+  min-width: calc(100% - 290px); /* leaves 200px gap */
+  margin: 0 auto;
+  cursor: default !important;
+}
+
+.SalesReport-table th, .SalesReport-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold; 
+  cursor: default !important;
+}
+
+.SalesReport-table th {
+  color: rgb(255, 255, 255);
+  color: aliceblue;
+  text-align: left;
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:12px;
+  padding-bottom:12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #069696;
+  border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
+}
+
+.SalesReport-table td {
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  color: #161616da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  background-color: rgba(170, 207, 234, 0.87);
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.SalesReport-table th:nth-child(1),
+.SalesReport-table td:nth-child(1) {
+  width: 23%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+.SalesReport-table th:nth-child(2),
+.SalesReport-table td:nth-child(2) {
+  width: 8%; /* Fixed width */
+}
+
+.SalesReport-table th:nth-child(3),
+.SalesReport-table td:nth-child(3) {
+  width: 23%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+.SalesReport-table th:nth-child(4),
+.SalesReport-table td:nth-child(4) {
+  width: 4%; /* Fixed width */
+}
+
+.SalesReport-table th:nth-child(5),
+.SalesReport-table td:nth-child(5) {
+  width:8%; /* Fixed width */
+}
+
+.SalesReport-table th:nth-child(6),
+.SalesReport-table td:nth-child(6) {
+  width:7%; /* Fixed width */
+}
+
+.SalesReport-table th:last-child,
+.SalesReport-table td:last-child {
+  width: 10%; /* Adjust as needed */
+}
+
+.SalesReport-table tbody tr:hover {
+  background-color: #05afc5; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+/* No Sales */
+.no-sales-message {
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 20px;
+  text-align: center;
+  margin-top: 5%;
+  word-spacing: 2px;
+
+  background: linear-gradient(
+    90deg,
+    #d86902ff,
+    #f5b274ff,
+    #d86902ff
+  );
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+
+/* Pagination Controls */
+.pagination-controls-salesreport {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  margin-left: 121px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.pagination-controls-salesreport button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls-salesreport button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls-salesreport button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls-salesreport span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
 }

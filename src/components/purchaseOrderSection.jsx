@@ -328,13 +328,19 @@ const handleGeneratePurchaseOrder = async () => {
             </thead>
             <tbody>
   {recentOrders.map((order) => {
-    const isCancelled = order.status === "Cancelled";
+    const isCancelled = order.status === "Cancelled" || order.status === "Disabled";
 
     return (
       <tr
         key={order._id}
         className={isCancelled ? "cancelled-row-po" : ""}
-        title={isCancelled ? "This PO is cancelled with the invoice" : ""}
+       title={
+          order.status === "Cancelled"
+            ? "This PO is cancelled with the invoice"
+            : order.status === "Disabled"
+            ? "This PO is disabled"
+            : ""
+        }  
       >
         <td>{order.po_number}</td>
         <td>{order.customer_name}</td>

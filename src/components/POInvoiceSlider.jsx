@@ -1423,7 +1423,7 @@ useEffect(() => {
             <label className="label">Tax (18%):</label>
            <span className="amount">
       ₹&nbsp;{(((total || 0) - (overallDiscount || 0)) * 0.18).toFixed(2)}
-    </span>
+    </span> 
           </div>
            </div>
           <div className="po-quote-final-total">           

@@ -25,13 +25,15 @@ import { ToastContainer } from "react-toastify";
 const FunnelSection = () => {
   const dispatch = useDispatch();
   const [selectedCustomerId, setSelectedCustomerId] = useState(null); // Track selected customer changes made
- 
+
+
 //tableref part removed
 const [taskTime, setTaskTime] = useState("12:00");
 const resetTaskInputs = () => {
   setNewTask('');
   setTaskTime('12:00');
 };
+
 const [showTaskPopup, setShowTaskPopup] = useState(false);
 const [selectedTaskCustomerId, setSelectedTaskCustomerId] = useState(null);
 const [selectedDate, setSelectedDate] = useState(new Date());
@@ -212,6 +214,26 @@ const sliderRef = useRef(null); // Create a ref for the slider
   const modalState = useSelector((state) => state.funnel.modalState);
   const totalPages = useSelector((state) => state.funnel.totalPages);
   
+  const placeholders = ["Search by Customer Name...", "Search by Customer Address...", "Search by Customer Area..."];
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [focused, setFocused] = useState(false);
+  const [animate, setAnimate] = useState(false);
+
+  // Rotate placeholders
+  useEffect(() => {
+    if (focused || searchTerm) return; // pause when typing/focused
+
+    const interval = setInterval(() => {
+      setAnimate(true); // start slide up animation
+      setTimeout(() => {
+        setAnimate(false);
+        setCurrentIndex((prev) => (prev + 1) % placeholders.length);
+      }, 400); // match animation duration
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [focused, searchTerm]);
+  
   //const [totalPages, setTotalPages] = useState(1);
  
   // Calculate page boundaries based on rows per page
@@ -264,11 +286,30 @@ const sliderRef = useRef(null); // Create a ref for the slider
   }, [searchTerm]);
 
   // Fetch funnel data when searchTerm changes
-  useEffect(() => {
-    if (debouncedSearchTerm.trim() !== '') {
-      dispatch(loadFunneldata(1, rowsPerPage, debouncedSearchTerm));
-    }
-  }, [debouncedSearchTerm, dispatch, rowsPerPage]);
+  // useEffect(() => {
+  //   if (debouncedSearchTerm.trim() !== '') {
+  //     dispatch(loadFunneldata(1, rowsPerPage, debouncedSearchTerm));
+  //   }
+  // }, [debouncedSearchTerm, dispatch, rowsPerPage]);
+  const [filteredData, setFilteredData] = useState([]);
+
+  const [masterData, setMasterData] = useState([]);
+useEffect(() => {
+  setMasterData(funnelData);
+  setFilteredData(funnelData);
+}, [funnelData]);
+useEffect(() => {
+  const lower = debouncedSearchTerm.toLowerCase();
+
+  const filtered = masterData.filter((cust) =>
+    (cust.companyName?.toLowerCase() || "").includes(lower) ||
+    (cust.address?.toLowerCase() || "").includes(lower) ||
+    (cust.area?.toLowerCase() || "").includes(lower)
+  );
+
+  setFilteredData(filtered);
+}, [debouncedSearchTerm, masterData]);
+
 
   // Fetch customer comments only if they haven't been fetched already
   const fetchCommentsIfNeeded = (customerId) => {
@@ -402,7 +443,6 @@ toast.error("Please select a customer and enter a comment!!!.");  }
     }));
   };
   
-  
 
   // Close slider when clicking outside
   useEffect(() => {
@@ -432,15 +472,28 @@ toast.error("Please select a customer and enter a comment!!!.");  }
 
       <h3>My Funnel</h3>
       <br></br>
-      <input
-          type="text"
-          placeholder="Search by Customer Name"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className='search_company'/>  
+
+<div className="search-wrapper">
+  <input
+    type="text"
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    onFocus={() => setFocused(true)}
+    onBlur={() => setFocused(false)}
+    className="search_company"
+  />
+
+  {!searchTerm && !focused && (
+    <span className={`animated-placeholder ${animate ? "slide-up" : ""}`}>
+      {placeholders[currentIndex]}
+    </span>
+  )}
+</div>
+
+
           {/* changes made--searchbar classname */}
 
-      {funnelData && funnelData.length > 0 ? (
+      {filteredData && filteredData.length > 0 ? (
         
      <div className='right-pannel'>
      <table className="funnel-table" >
@@ -458,7 +511,7 @@ toast.error("Please select a customer and enter a comment!!!.");  }
          </tr>
        </thead>
        <tbody>
-       {currentRows.map((item) => (
+       {filteredData.map((item) => (
             <tr
             key={item._id}
             onClick={() => setSelectedCustomerId(item._id)}
@@ -529,9 +582,9 @@ toast.error("Please select a customer and enter a comment!!!.");  }
       color: "#069696",
       padding: "20px",
       width: "100%",
-      marginTop: "49%",
+      marginTop: "40%",
       fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
-    }}>No data available</p> 
+    }}>No matching results found for the current search. 🔍 <br /> Clear the search and try again.</p> 
         
       )}
 
