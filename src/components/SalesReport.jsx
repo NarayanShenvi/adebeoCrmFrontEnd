@@ -59,7 +59,7 @@
 
     // Pagination & report
     const [page, setPage] = useState(1);
-    const perPage = 10;
+    const perPage = 300;
     const [reportGenerated, setReportGenerated] = useState(false);
 
     // Redux slices
