@@ -179,9 +179,12 @@ html, body {
 }
 /* Search Bar */
 .search-wrapper {
-  position: relative;
-  width: 450px; /* set fixed width for the search field */
-  margin: 20px auto; /* centers the wrapper horizontally */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* pushes content to right */
+  width: 100%;
+  margin-left: -8%;
+  margin-top: 4%;
 }
 
 .search_company {
@@ -199,6 +202,7 @@ html, body {
   color: rgb(7, 94, 121);
   box-sizing: border-box; /* ensures padding doesn't expand width */
   display: block;
+  max-width: 410px;
 }
 
 .search_company:focus {
@@ -206,26 +210,63 @@ html, body {
   box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
 }
 
-.animated-placeholder {
-  position: absolute;
-  left: 20px; /* match padding-left of input */
-  top: 45%;
-  transform: translateY(-50%);
-  font-size: 13px;
-  font-weight: bold;
-  font-family: "Shippori Mincho B1", "Times New Roman", serif;
-  caret-color: rgb(7, 94, 121);
-  color: rgb(7, 94, 121);
-  pointer-events: none;
-  transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
-  opacity: 0.8;
-  white-space: nowrap; /* prevent wrapping */
+/* Container for radio buttons */
+.search-radio-group {
+  display: flex;
+  gap: 20px;
+  margin-top: 13px;
 }
 
-/* Slide-up animation */
-.animated-placeholder.slide-up {
-  transform: translateY(-100%);
-  opacity: 0;
+/* Hide the default radio button */
+.search-radio-group input[type="radio"] {
+  display: none;
+}
+
+/* Label styling */
+.search-radio-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding-left: 30px;
+  font-size: 14px;
+  color: #242323da;
+  user-select: none;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 700;
+}
+
+/* Custom radio button */
+.search-radio-group label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid #069696;
+  border-radius: 50%;
+  background-color: #fff;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* Inner dot for checked state */
+.search-radio-group input[type="radio"]:checked + label::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #069696;
+}
+
+/* Hover effect */
+.search-radio-group label:hover::before {
+  border-color: #069631;
 }
 
 /* Table Styling */
@@ -9431,6 +9472,7 @@ select option {
   flex-grow: 1;
   box-sizing: border-box;
   margin: 0 auto;
+    font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
 
 .SalesReport-section .form-group {
@@ -9440,6 +9482,7 @@ select option {
   pointer-events: auto;
   position: relative;
   margin-top: -15px;
+    font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
 
 .SalesReport-section label {
@@ -10041,26 +10084,25 @@ select option {
 
 .SalesReport-table th:nth-child(1),
 .SalesReport-table td:nth-child(1) {
-  width: 23%; /* Fixed width */
+  width: 20%; /* Fixed width */
   white-space: pre-line; 
   word-wrap: break-word; 
 }
 
 .SalesReport-table th:nth-child(2),
 .SalesReport-table td:nth-child(2) {
-  width: 8%; /* Fixed width */
-}
+  width: 20%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; }
 
 .SalesReport-table th:nth-child(3),
 .SalesReport-table td:nth-child(3) {
-  width: 23%; /* Fixed width */
-  white-space: pre-line; 
-  word-wrap: break-word; 
+  width: 4%; /* Fixed width */ 
 }
 
 .SalesReport-table th:nth-child(4),
 .SalesReport-table td:nth-child(4) {
-  width: 4%; /* Fixed width */
+  width: 8%; /* Fixed width */
 }
 
 .SalesReport-table th:nth-child(5),
@@ -10073,9 +10115,19 @@ select option {
   width:7%; /* Fixed width */
 }
 
+.SalesReport-table th:nth-child(7),
+.SalesReport-table td:nth-child(7) {
+  width:8%; /* Fixed width */
+}
+
+.SalesReport-table th:nth-child(8),
+.SalesReport-table td:nth-child(8) {
+  width:10%; /* Fixed width */
+}
+
 .SalesReport-table th:last-child,
 .SalesReport-table td:last-child {
-  width: 10%; /* Adjust as needed */
+  width: 8%; /* Adjust as needed */
 }
 
 .SalesReport-table tbody tr:hover {
@@ -10086,7 +10138,7 @@ select option {
 
 /* No Sales */
 .no-sales-message {
-  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
   font-weight: 900;
   font-size: 20px;
   text-align: center;
@@ -10114,6 +10166,98 @@ select option {
 }
 
 
+/* CHARTS */
+/* Line--CHARTS */
+.sales-line-chart {
+  width: 100%;
+  height: 45vh;
+  max-height: 600px;
+
+  background: #249da11e;
+  border-radius: 12px;
+
+  padding: 24px 20px 55px 20px;
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Heading look */
+.sales-line-chart h5 {
+  font-weight: 600;
+  color: #0a3d62;
+  text-align: center;
+  font-size: 17px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 30px !important;
+}
+
+/* Bar--CHARTS */
+/* Heading look */
+.sales-bar-chart-head {
+  font-weight: 600;
+  color: #0a3d62;
+  text-align: left;
+  font-size: 17px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 30px !important;
+}
+
+/* Pie--CHARTS */
+/* Heading look */
+.sales-pie-chart-head {
+  font-weight: 600;
+  color: #0a3d62;
+  text-align: left;
+  font-size: 17px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: -25px !important;
+}
+
+
+/* Collapsible Toggle Button */
+.charts-collapsible .btn {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 900;  
+  font-size: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #069696;
+  margin-top: 60px !important;
+    margin-bottom: 20px !important;
+}
+
+.charts-collapsible .btn:hover {
+  background-color: #069696;
+  color: white;
+  border-color: #069696;
+}
+
+/* Arrow rotation animation */
+.charts-collapsible .btn .arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.charts-collapsible .btn.open .arrow {
+  transform: rotate(120deg);
+}
+
+/* Smooth fade-in for charts */
+#charts-collapse {
+  transition: all 0.5s ease;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+#charts-collapse.show {
+  opacity: 1;
+  height: auto;
+}
+
 /* Pagination Controls */
 .pagination-controls-salesreport {
   flex-grow: 1;
@@ -10123,9 +10267,10 @@ select option {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: -5px;
   gap: 10px;
   white-space: nowrap;
+  margin-bottom: -40px;
 }
 
 .pagination-controls-salesreport button {
@@ -10148,6 +10293,2827 @@ select option {
 }
 
 .pagination-controls-salesreport span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* ================== RESPONSIVE ================== */
+/* ---------- 1024px Screens ---------- */
+@media (max-width: 1024px) {
+
+  .SalesReport-section {
+    margin-left: 200px;
+    padding: 15px;
+  }
+
+  .filter-form-sales {
+    max-width: 900px;
+    min-width: auto;
+  }
+
+  .sales-filter-row {
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+
+  .dates,
+  .datess {
+    max-width: 220px;
+    margin-left: 0;
+  }
+
+  .total-amount-text {
+    margin-top: 15px;
+    font-size: 13px;
+  }
+}
+
+/* ---------- 768px Screens (Tablets) ---------- */
+@media (max-width: 768px) {
+
+  .SalesReport-section {
+    margin-left: 0;
+    width: 100%;
+    padding: 12px;
+  }
+
+  .filter-form-sales {
+    width: 100%;
+    max-width: 650px;
+    min-width: auto;
+  }
+
+  .sales-filter-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .sales-filter-row > .col-md-3 {
+    width: 100% !important;
+  }
+
+  .dates,
+  .datess {
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .search-field1-customer-name select,
+  .search-field1-product-name select {
+    max-width: 100%;
+  }
+
+  .total-amount-text {
+    width: fit-content;
+    margin-top: 10px;
+  }
+}
+
+/* ---------- 480px Screens (Mobile) ---------- */
+@media (max-width: 480px) {
+
+  .SalesReport-section h3 {
+    font-size: 16px;
+  }
+
+  .filter-form-sales {
+    padding: 10px;
+    width: 100%;
+  }
+
+  .SalesReport-section label {
+    font-size: 11px;
+  }
+
+  .filter-form-sales .form-control,
+  .filter-form-sales .form-select {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .custom-checkbox-sales {
+    margin-top: 10px;
+  }
+
+  .custom-checkbox-sales label {
+    font-size: 12px;
+  }
+
+  .total-amount-text {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .total-amount-text strong {
+    font-size: 14px;
+  }
+
+  .search-field1-customer-name select,
+  .search-field1-product-name select {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Submenu2------------>PurchaseReport Section */
+.PurchaseReport-section {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  flex-grow: 1;
+  padding: 20px;
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
+  background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
+  margin-left: 250px;
+}
+
+/* Heading */
+.PurchaseReport-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+}
+
+.filter-form-purchase
+{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 900px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+    font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.PurchaseReport-section .form-group {
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  margin-top: -15px;
+    font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.PurchaseReport-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.required-label::after {
+  content: " *"; 
+  color: rgb(223, 3, 3);    
+  font-weight: 800;
+}
+
+.filter-form-purchase .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-purchase .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-purchase .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.filter-form-purchase .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-purchase .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-purchase .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+.dates{
+  max-width: 240px;
+}
+.datess{
+  max-width: 240px;
+  margin-left: 295px;
+}
+
+/* Custom Checkbox Container */
+.custom-checkbox-purchase {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  margin-top: 30px;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox-purchase input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #069696; /* Default border color */
+  border-radius: 1px;
+  background-color: white; /* Default background */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-right: 10px;
+}
+
+/* Checkbox Checked State */
+.custom-checkbox-purchase input[type="checkbox"]:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+/* Checkbox Checkmark */
+.custom-checkbox-purchase input[type="checkbox"]::after {
+  content: "";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Show Checkmark When Checked */
+.custom-checkbox-purchase input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkbox Hover Effect */
+.custom-checkbox-purchase input[type="checkbox"]:hover {
+  border-color: #06b4b4; /* Darker blue */
+}
+
+/* Checkbox Label */
+.custom-checkbox-purchase label {
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Change Label Color on Checked */
+.custom-checkbox-purchase input[type="checkbox"]:checked + label {
+  color: #28a745;
+  font-size: 14px;
+}
+
+/* ===== DISABLED CHECKBOX ===== */
+.custom-checkbox-purchase input[type="checkbox"]:disabled {
+  background-color: #f2f2f2;
+  border-color: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== TOTAL AMOUNT CONTAINER ===== */
+.total-amount-text-purchase {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 6px 14px;
+  border-radius: 2px;
+  margin-top: 26px;
+  background: linear-gradient(
+    135deg,
+    rgba(39, 142, 170, 0.27),
+    rgba(46, 107, 125, 0.11)
+  );
+
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+   
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* animation */
+  animation: totalFadeSlide 0.45s ease-out forwards;
+}
+
+/* Amount value */
+.total-amount-text-purchase strong {
+  font-size: 16px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #2e7d32;
+  letter-spacing: 0.3px;
+}
+
+/* Hover effect */
+.total-amount-text-purchase:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
+  transition: all 0.25s ease;
+}
+
+/* ===== ENTRY ANIMATION ===== */
+@keyframes totalFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* WHEN TOTAL IS NOT PRESENT & WHEN IT IS PRESENT */
+/* Make row flexible */
+.purchase-filter-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Default behavior (when total exists) */
+.purchase-filter-row > .col-md-3 {
+  transition: all 0.3s ease;
+}
+
+/* 🔹 CENTER FIRST 3 COLS WHEN TOTAL IS NOT PRESENT */
+.purchase-filter-row:not(:has(.total-amount-text-purchase)) {
+  justify-content: center;
+}
+
+/* WHEN TOTAL IS NOT PRESENT → 3 columns only */
+.purchase-filter-row:not(:has(.total-amount-text-purchase)) {
+  justify-content: center;
+  column-gap: 32px;   /* 👈 space between the 3 columns */
+}
+
+/* Slightly wider columns so they don't squeeze */
+.purchase-filter-row:not(:has(.total-amount-text-purchase)) > .col-md-3 {
+  width: 275px;       /* adjust: 240–280px */
+  margin-bottom: -20px;
+}
+
+/* Serch Filelds--product */
+.PurchaseReport-section .search-field-product-name-purchase {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.search-field1-product-name-purchase .NoProductNameFoundPurchase
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name-purchase .ProductNameLoadingPurchase 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name-purchase .TypeMoreProdPurchase 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+
+.search-field1-product-name-purchase select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 254px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 1%;
+  display: block;
+} 
+.search-field1-product-name-purchase select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-product-name-purchase option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+/* Serch Filelds--user */
+.PurchaseReport__control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0px 8px;
+  min-height: 32px;          /* ✅ correct */
+  height: auto;              /* ✅ allow hover area */
+  background-color: rgba(134, 195, 238, 0.31) !important;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-weight: 800;
+  pointer-events: auto;
+  color: #555555;
+}
+
+.PurchaseReport__control--is-focused {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+}
+
+/* Hover when NOT focused */
+.PurchaseReport__control:not(.PurchaseReport__control--is-focused):hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+  border-color: #6ac7e0;
+}
+
+/* Hover even when focused */
+.PurchaseReport__control--is-focused:hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+}
+
+/* Loading and Error Container */
+.loading-container-report-purchase {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-left: 35%;
+}
+
+.loading-spinner-report-purchase {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #028618;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1.5s linear infinite; /* Slightly slower spin */
+  margin-left: 10%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.loading-message-report-purchase {
+  font-size: 18px;
+  font-weight: bold;
+  color: #028618;
+  margin-top: 15px;
+  text-align: center;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.error-container-report-purchase {
+  display: flex;
+  align-items: center;       /* vertical center text */
+  justify-content: center;   /* horizontal center text */
+
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 36%;
+
+  color: #f51009;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+
+  border-radius: 5px;
+  padding-top: 10px;
+  padding-bottom: -3px;
+  width: 100%;
+  max-width: 28%;
+  min-height: 60px;
+
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+
+.error-container-report-purchase {
+  animation: fadeSlide 0.3s ease-in-out;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.report-button-purchase {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+  text-align: center;
+  color: #05555f;
+  width: 20px;
+  margin-left: 65%;
+}
+
+.filecheck
+{
+  font-size: 25px !important;
+}
+
+.report-button-purchase:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.report-button-purchase:hover:not(:disabled) {
+  transform: scale(1.3); 
+  color: #0e7204;
+}
+
+/* Purchase Report Table */
+.PurchaseReport-table {
+  margin-top: 50px !important;
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  max-width: calc(100% - 250px); /* leaves 60px gap on the right */
+  min-width: calc(100% - 290px); /* leaves 200px gap */
+  margin: 0 auto;
+  cursor: default !important;
+}
+
+.PurchaseReport-table th, .PurchaseReport-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold; 
+  cursor: default !important;
+}
+
+.PurchaseReport-table th {
+  color: rgb(255, 255, 255);
+  color: aliceblue;
+  text-align: left;
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:12px;
+  padding-bottom:12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #069696;
+  border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
+}
+
+.PurchaseReport-table td {
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  color: #161616da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  background-color: rgba(170, 207, 234, 0.87);
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.PurchaseReport-table th:nth-child(1),
+.PurchaseReport-table td:nth-child(1) {
+  width: 16%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+.PurchaseReport-table th:nth-child(2),
+.PurchaseReport-table td:nth-child(2) {
+  width: 16%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; }
+
+.PurchaseReport-table th:nth-child(3),
+.PurchaseReport-table td:nth-child(3) {
+  width: 4%; /* Fixed width */ 
+}
+
+.PurchaseReport-table th:nth-child(4),
+.PurchaseReport-table td:nth-child(4) {
+  width: 10%; /* Fixed width */
+}
+
+.PurchaseReport-table th:nth-child(5),
+.PurchaseReport-table td:nth-child(5) {
+  width:10%; /* Fixed width */
+}
+
+.PurchaseReport-table th:nth-child(6),
+.PurchaseReport-table td:nth-child(6) {
+  width:8%; /* Fixed width */
+}
+
+.PurchaseReport-table th:nth-child(7),
+.PurchaseReport-table td:nth-child(7) {
+  width:8%; /* Fixed width */
+}
+
+.PurchaseReport-table th:nth-child(8),
+.PurchaseReport-table td:nth-child(8) {
+  width:7%; /* Fixed width */
+}
+
+.PurchaseReport-table th:nth-child(9),
+.PurchaseReport-table td:nth-child(9) {
+  width:8%; /* Fixed width */
+}
+
+.PurchaseReport-table th:last-child,
+.PurchaseReport-table td:last-child {
+  width: 12%; /* Adjust as needed */
+}
+
+.PurchaseReport-table tbody tr:hover {
+  background-color: #05afc5; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+/* No Purchase */
+.no-purchase-message {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 900;
+  font-size: 20px;
+  text-align: center;
+  margin-top: 5%;
+  word-spacing: 2px;
+
+  background: linear-gradient(
+    90deg,
+    #d86902ff,
+    #f5b274ff,
+    #d86902ff
+  );
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+
+/* CHARTS */
+/* Line--CHARTS */
+.purchase-line-chart {
+  width: 100%;
+  height: 45vh;
+  max-height: 600px;
+
+  background: #249da11e;
+  border-radius: 12px;
+
+  padding: 24px 20px 55px 20px;
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Heading look */
+.purchase-line-chart h5 {
+  font-weight: 600;
+  color: #0a3d62;
+  text-align: center;
+  font-size: 17px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 30px !important;
+}
+
+/* Bar--CHARTS */
+/* Heading look */
+.purchase-bar-chart-head {
+  font-weight: 600;
+  color: #0a3d62;
+  text-align: left;
+  font-size: 17px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 30px !important;
+}
+
+/* Pie--CHARTS */
+/* Heading look */
+.purchase-pie-chart-head {
+  font-weight: 600;
+  color: #0a3d62;
+  text-align: left;
+  font-size: 17px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: -25px !important;
+}
+
+
+/* Collapsible Toggle Button */
+.charts-collapsible-purchasereport .btn {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 900;  
+  font-size: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #069696;
+  margin-top: 60px !important;
+    margin-bottom: 20px !important;
+}
+
+.charts-collapsible-purchasereport .btn:hover {
+  background-color: #069696;
+  color: white;
+  border-color: #069696;
+}
+
+/* Arrow rotation animation */
+.charts-collapsible-purchasereport .btn .arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.charts-collapsible-purchasereport .btn.open .arrow {
+  transform: rotate(120deg);
+}
+
+/* Smooth fade-in for charts */
+#charts-collapse {
+  transition: all 0.5s ease;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+#charts-collapse.show {
+  opacity: 1;
+  height: auto;
+}
+
+/* Pagination Controls */
+.pagination-controls-purchasereport {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  margin-left: 121px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -5px;
+  gap: 10px;
+  white-space: nowrap;
+  margin-bottom: -40px;
+}
+
+.pagination-controls-purchasereport button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls-purchasereport button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls-purchasereport button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls-purchasereport span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* ================== RESPONSIVE ================== */
+/* ---------- 1024px Screens ---------- */
+@media (max-width: 1024px) {
+
+  .PurchaseReport-section {
+    margin-left: 200px;
+    padding: 15px;
+  }
+
+  .filter-form-purchase {
+    max-width: 100%;
+    min-width: auto;
+  }
+
+  .purchase-filter-row {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .purchase-filter-row > .col-md-3 {
+    width: 240px;
+    margin-bottom: 10px;
+  }
+
+  .PurchaseReport-table {
+    max-width: calc(100% - 200px);
+    min-width: calc(100% - 200px);
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .pagination-controls-purchasereport {
+    margin-left: 80px;
+  }
+}
+
+/* ---------- 768px Screens (Tablets) ---------- */
+@media (max-width: 768px) {
+
+  .PurchaseReport-section {
+    margin-left: 0;
+    padding: 10px;
+  }
+
+  .filter-form-purchase {
+    padding: 15px;
+    min-width: auto;
+  }
+
+  .purchase-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .purchase-filter-row > .col-md-3 {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .dates,
+  .datess {
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .total-amount-text-purchase {
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .PurchaseReport-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .pagination-controls-purchasereport {
+    margin-left: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .loading-container-report-purchase,
+  .error-container-report-purchase {
+    margin-left: 0;
+    max-width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ---------- 480px Screens (Mobile) ---------- */
+@media (max-width: 480px) {
+
+  .PurchaseReport-section h3 {
+    font-size: 16px;
+  }
+
+  .filter-form-purchase {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .PurchaseReport-section label {
+    font-size: 11px;
+  }
+
+  .PurchaseReport__control {
+    font-size: 11px;
+    min-height: 30px;
+  }
+
+  .total-amount-text-purchase {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .total-amount-text-purchase strong {
+    font-size: 14px;
+  }
+
+  .report-button-purchase {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .filecheck {
+    font-size: 22px !important;
+  }
+
+  .PurchaseReport-table th,
+  .PurchaseReport-table td {
+    font-size: 11px;
+    padding: 6px;
+  }
+
+  .pagination-controls-purchasereport span {
+    font-size: 12px;
+  }
+
+  .purchase-line-chart {
+    height: 35vh;
+    padding: 15px;
+  }
+}
+
+
+/* Submenu3------------>BusinessReport Section */
+.BusinessReport-section {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  flex-grow: 1;
+  padding: 20px;
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
+  background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
+  margin-left: 250px;
+}
+
+/* Heading */
+.BusinessReport-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+}
+
+.filter-form-business
+{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 900px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+    font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.BusinessReport-section .form-group {
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  margin-top: -15px;
+    font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.BusinessReport-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.required-label::after {
+  content: " *"; 
+  color: rgb(223, 3, 3);    
+  font-weight: 800;
+}
+
+.filter-form-business .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-business .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-business .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.filter-form-business .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-business .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-business .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+.dates{
+  max-width: 240px;
+}
+.datess{
+  max-width: 240px;
+  margin-left: 295px;
+}
+
+/* Custom Checkbox Container */
+.custom-checkbox-business {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  margin-top: 30px;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox-business input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #069696; /* Default border color */
+  border-radius: 1px;
+  background-color: white; /* Default background */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-right: 10px;
+}
+
+/* Checkbox Checked State */
+.custom-checkbox-business input[type="checkbox"]:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+/* Checkbox Checkmark */
+.custom-checkbox-business input[type="checkbox"]::after {
+  content: "";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Show Checkmark When Checked */
+.custom-checkbox-business input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkbox Hover Effect */
+.custom-checkbox-business input[type="checkbox"]:hover {
+  border-color: #06b4b4; /* Darker blue */
+}
+
+/* Checkbox Label */
+.custom-checkbox-business label {
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Change Label Color on Checked */
+.custom-checkbox-business input[type="checkbox"]:checked + label {
+  color: #28a745;
+  font-size: 14px;
+}
+
+/* ===== DISABLED CHECKBOX ===== */
+.custom-checkbox-business input[type="checkbox"]:disabled {
+  background-color: #f2f2f2;
+  border-color: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== TOTAL AMOUNT CONTAINER ===== */
+.total-amount-text-business {
+  display: flex;
+  align-items: center;
+
+  padding: 6px 14px;
+  border-radius: 2px;
+  margin-top: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(39, 142, 170, 0.27),
+    rgba(46, 107, 125, 0.11)
+  );
+
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+   
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* animation */
+  animation: totalFadeSlide 0.45s ease-out forwards;
+}
+
+/* Amount value */
+.total-amount-text-business strong {
+  font-size: 16px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #2e7d32;
+  letter-spacing: 0.3px;
+}
+
+/* Hover effect */
+.total-amount-text-business:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
+  transition: all 0.25s ease;
+}
+
+.wrap-amount {
+  max-width: 180px;          /* adjust based on layout */
+  word-break: break-word;    /* break long numbers */
+  overflow-wrap: anywhere;   /* allow wrapping anywhere */
+  white-space: normal;       /* allow multi-line */
+}
+
+/* ===== ENTRY ANIMATION ===== */
+@keyframes totalFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* WHEN TOTAL IS NOT PRESENT & WHEN IT IS PRESENT */
+/* Make row flexible */
+.business-filter-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Default behavior (when total exists) */
+.business-filter-row > .col-md-3 {
+  transition: all 0.3s ease;
+}
+
+/* 🔹 CENTER FIRST 3 COLS WHEN TOTAL IS NOT PRESENT */
+.business-filter-row:not(:has(.total-amount-text-business)) {
+  justify-content: center;
+}
+
+/* WHEN TOTAL IS NOT PRESENT → 3 columns only */
+.business-filter-row:not(:has(.total-amount-text-business)) {
+  justify-content: center;
+  column-gap: 32px;   /* 👈 space between the 3 columns */
+}
+
+/* Slightly wider columns so they don't squeeze */
+.business-filter-row:not(:has(.total-amount-text-business)) > .col-md-3 {
+  width: 275px;       /* adjust: 240–280px */
+  margin-bottom: -20px;
+}
+
+/* Serch Filelds--product */
+.BusinessReport-section .search-field-product-name-business {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.search-field1-product-name-business .NoProductNameFoundBusiness
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name-business .ProductNameLoadingBusiness 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name-business .TypeMoreProdBusiness
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+
+.search-field1-product-name-business select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 254px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 1%;
+  display: block;
+} 
+.search-field1-product-name-business select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-product-name-business option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+/* Serch Filelds--user */
+.BusinessReport__control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0px 8px;
+  min-height: 32px;          /* ✅ correct */
+  height: auto;              /* ✅ allow hover area */
+  background-color: rgba(134, 195, 238, 0.31) !important;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-weight: 800;
+  pointer-events: auto;
+  color: #555555;
+}
+
+.BusinessReport__control--is-focused {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+}
+
+/* Hover when NOT focused */
+.BusinessReport__control:not(.BusinessReport__control--is-focused):hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+  border-color: #6ac7e0;
+}
+
+/* Hover even when focused */
+.BusinessReport__control--is-focused:hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+}
+
+/* Loading and Error Container */
+.loading-container-report-business {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-left: 35%;
+}
+
+.loading-spinner-report-business {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #028618;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1.5s linear infinite; /* Slightly slower spin */
+  margin-left: 10%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.loading-message-report-business {
+  font-size: 18px;
+  font-weight: bold;
+  color: #028618;
+  margin-top: 15px;
+  text-align: center;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.error-container-report-business {
+  display: flex;
+  align-items: center;       /* vertical center text */
+  justify-content: center;   /* horizontal center text */
+
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 36%;
+
+  color: #f51009;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+
+  border-radius: 5px;
+  padding-top: 10px;
+  padding-bottom: -3px;
+  width: 100%;
+  max-width: 28%;
+  min-height: 60px;
+
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+
+.error-container-report-business {
+  animation: fadeSlide 0.3s ease-in-out;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.report-button-business {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+  text-align: center;
+  color: #05555f;
+  width: 20px;
+  margin-left: 65%;
+}
+
+.filecheck
+{
+  font-size: 25px !important;
+}
+
+.report-button-business:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.report-button-business:hover:not(:disabled) {
+  transform: scale(1.3); 
+  color: #0e7204;
+}
+
+/* Business Report Table */
+.BusinessReport-table {
+  margin-top: 50px !important;
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  max-width: calc(100% - 250px); /* leaves 60px gap on the right */
+  min-width: calc(100% - 290px); /* leaves 200px gap */
+  margin: 0 auto;
+  cursor: default !important;
+}
+
+.BusinessReport-table th, .BusinessReport-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold; 
+  cursor: default !important;
+}
+
+.BusinessReport-table th {
+  color: rgb(255, 255, 255);
+  color: aliceblue;
+  text-align: left;
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:12px;
+  padding-bottom:12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #069696;
+  border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
+}
+
+.BusinessReport-table td {
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  color: #161616da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  background-color: rgba(170, 207, 234, 0.87);
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.BusinessReport-table th:nth-child(1),
+.BusinessReport-table td:nth-child(1) {
+  width: 17%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+.BusinessReport-table th:nth-child(2),
+.BusinessReport-table td:nth-child(2) {
+  width: 17%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; }
+
+.BusinessReport-table th:nth-child(3),
+.BusinessReport-table td:nth-child(3) {
+  width: 8%; /* Fixed width */ 
+}
+
+.BusinessReport-table th:nth-child(4),
+.BusinessReport-table td:nth-child(4) {
+  width: 7%; /* Fixed width */
+}
+
+.BusinessReport-table th:nth-child(5),
+.BusinessReport-table td:nth-child(5) {
+  width: 8%; /* Fixed width */
+}
+
+.BusinessReport-table th:nth-child(6),
+.BusinessReport-table td:nth-child(6) {
+  width: 8%; /* Fixed width */
+}
+
+.BusinessReport-table th:nth-child(7),
+.BusinessReport-table td:nth-child(7) {
+  width: 8%; /* Fixed width */
+}
+
+.BusinessReport-table th:nth-child(8),
+.BusinessReport-table td:nth-child(8) {
+  width:9%; /* Fixed width */
+}
+
+.BusinessReport-table th:nth-child(9),
+.BusinessReport-table td:nth-child(9) {
+  width:9%; /* Fixed width */
+}
+
+.BusinessReport-table th:nth-child(10),
+.BusinessReport-table td:nth-child(10) {
+  width:9%; /* Fixed width */
+}
+
+.BusinessReport-table th:last-child,
+.BusinessReport-table td:last-child {
+  width: 7%; /* Adjust as needed */
+}
+
+.BusinessReport-table tbody tr:hover {
+  background-color: #05afc5; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+/* No Business */
+.no-business-message {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 900;
+  font-size: 20px;
+  text-align: center;
+  margin-top: 5%;
+  word-spacing: 2px;
+
+  background: linear-gradient(
+    90deg,
+    #d86902ff,
+    #f5b274ff,
+    #d86902ff
+  );
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+
+/* CHARTS */
+/* Line--CHARTS */
+.business-line-chart {
+  width: 100%;
+  height: 45vh;
+  max-height: 600px;
+
+  background: #249da11e;
+  border-radius: 12px;
+
+  padding: 24px 20px 55px 20px;
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Heading look */
+.business-line-chart h5 {
+  font-weight: 600;
+  color: #0a3d62;
+  text-align: center;
+  font-size: 17px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 30px !important;
+}
+
+/* Bar--CHARTS */
+/* Heading look */
+.business-bar-chart-head {
+  font-weight: 600;
+  color: #0a3d62;
+  text-align: left;
+  font-size: 17px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: 30px !important;
+}
+
+/* Pie--CHARTS */
+/* Heading look */
+.business-pie-chart-head {
+  font-weight: 600;
+  color: #0a3d62;
+  text-align: left;
+  font-size: 17px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: -25px !important;
+}
+
+
+/* Collapsible Toggle Button */
+.charts-collapsible-businessreport .btn {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 900;  
+  font-size: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #069696;
+  margin-top: 60px !important;
+    margin-bottom: 20px !important;
+}
+
+.charts-collapsible-businessreport .btn:hover {
+  background-color: #069696;
+  color: white;
+  border-color: #069696;
+}
+
+/* Arrow rotation animation */
+.charts-collapsible-businessreport .btn .arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.charts-collapsible-businessreport .btn.open .arrow {
+  transform: rotate(120deg);
+}
+
+/* Smooth fade-in for charts */
+#charts-collapse {
+  transition: all 0.5s ease;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+#charts-collapse.show {
+  opacity: 1;
+  height: auto;
+}
+
+/* Pagination Controls */
+.pagination-controls-businessreport {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  margin-left: 121px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -5px;
+  gap: 10px;
+  white-space: nowrap;
+  margin-bottom: -40px;
+}
+
+.pagination-controls-businessreport button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls-businessreport button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls-businessreport button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls-businessreport span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* ================== RESPONSIVE ================== */
+/* ---------- 1024px Screens ---------- */
+@media (max-width: 1024px) {
+
+  .BusinessReport-section {
+    margin-left: 200px;
+    padding: 15px;
+  }
+
+  .filter-form-business {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .dates,
+  .datess {
+    max-width: 200px;
+  }
+
+  .BusinessReport-table {
+    max-width: calc(100% - 200px);
+    min-width: calc(100% - 200px);
+  }
+
+  .pagination-controls-businessreport {
+    max-width: calc(100% - 200px);
+    margin-left: 100px;
+  }
+}
+
+/* ---------- 768px Screens (Tablets) ---------- */
+@media (max-width: 768px) {
+
+  .BusinessReport-section {
+    margin-left: 0;
+    padding: 12px;
+  }
+
+  .filter-form-business {
+    min-width: 100%;
+    padding: 15px;
+  }
+
+  .business-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .business-filter-row > .col-md-3 {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .dates,
+  .datess {
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .total-amount-text-business {
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .BusinessReport-table {
+    max-width: 100%;
+    min-width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .pagination-controls-businessreport {
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .loading-container-report-business,
+  .error-container-report-business {
+    margin-left: 0;
+    max-width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ---------- 480px Screens (Mobile) ---------- */
+@media (max-width: 480px) {
+
+  .BusinessReport-section h3 {
+    font-size: 16px;
+  }
+
+  .filter-form-business {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .BusinessReport-section label {
+    font-size: 11px;
+  }
+
+  .filter-form-business .form-control,
+  .filter-form-business .form-select {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .custom-checkbox-business {
+    margin-top: 10px;
+    justify-content: center;
+  }
+
+  .total-amount-text-business {
+    font-size: 12px;
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .total-amount-text-business strong {
+    font-size: 14px;
+  }
+
+  .BusinessReport-table th,
+  .BusinessReport-table td {
+    font-size: 10px;
+    padding: 6px;
+  }
+
+  .BusinessReport-table {
+    overflow-x: auto;
+    display: block;
+  }
+
+  .pagination-controls-businessreport {
+    font-size: 12px;
+    gap: 6px;
+    padding: 10px;
+  }
+
+  .report-button-business {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Submenu4------------>PaymentReport Section */
+.PaymentReport-section {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  flex-grow: 1;
+  padding: 20px;
+  width: 100vw; /* Ensure it spans the full viewport width */
+  max-width: 100%;
+  height: auto;
+  background-color: #feffff;
+  justify-content: center; /* Centers the form */
+  box-sizing: border-box;
+  align-items: center;
+  margin-left: 250px;
+}
+
+/* Heading */
+.PaymentReport-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 20px;
+}
+
+.filter-form-payment
+{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 900px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+    font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.PaymentReport-section .form-group {
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 3px;
+  margin-left: 50px;
+}
+
+.PaymentReport-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.required-label::after {
+  content: " *"; 
+  color: rgb(223, 3, 3);    
+  font-weight: 800;
+}
+
+.filter-form-payment .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-payment .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-payment .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.filter-form-payment .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-payment .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-payment .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+.dates{
+  max-width: 240px;
+}
+.datess{
+  max-width: 240px;
+}
+
+/* Custom Checkbox Container */
+.custom-checkbox-payment {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  margin-top: 30px;
+  margin-left: -13px !important;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox-payment input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #069696; /* Default border color */
+  border-radius: 1px;
+  background-color: white; /* Default background */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Checkbox Checked State */
+.custom-checkbox-payment input[type="checkbox"]:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+/* Checkbox Checkmark */
+.custom-checkbox-payment input[type="checkbox"]::after {
+  content: "";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Show Checkmark When Checked */
+.custom-checkbox-payment input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkbox Hover Effect */
+.custom-checkbox-payment input[type="checkbox"]:hover {
+  border-color: #06b4b4; /* Darker blue */
+}
+
+/* Checkbox Label */
+.custom-checkbox-payment label {
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+  font-size: 14px;
+  margin-top: 5px;
+  margin-right: -120px;
+}
+
+/* Change Label Color on Checked */
+.custom-checkbox-payment input[type="checkbox"]:checked + label {
+  color: #28a745;
+  font-size: 14px;
+}
+
+.PaymentReport__control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0px 8px;
+  min-height: 32px;          /* ✅ correct */
+  height: auto;              /* ✅ allow hover area */
+  background-color: rgba(134, 195, 238, 0.31) !important;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-weight: 800;
+  pointer-events: auto;
+  color: #555555;
+}
+
+.PaymentReport__control--is-focused {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+}
+
+/* Hover when NOT focused */
+.PaymentReport__control:not(.PaymentReport__control--is-focused):hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+  border-color: #6ac7e0;
+}
+
+/* Hover even when focused */
+.PaymentReport__control--is-focused:hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+}
+
+/* ===== DISABLED CHECKBOX ===== */
+.custom-checkbox-payment input[type="checkbox"]:disabled {
+  background-color: #f2f2f2;
+  border-color: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== TOTAL AMOUNT CONTAINER ===== */
+.total-amount-text-payment {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 6px 14px;
+  border-radius: 2px;
+  margin-top: -26px;
+  background: linear-gradient(
+    135deg,
+    rgba(39, 142, 170, 0.27),
+    rgba(46, 107, 125, 0.11)
+  );
+
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+   
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* animation */
+  animation: totalFadeSlide 0.45s ease-out forwards;
+}
+
+/* Amount value */
+.total-amount-text-payment strong {
+  font-size: 16px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #2e7d32;
+  letter-spacing: 0.3px;
+}
+
+/* Hover effect */
+.total-amount-text-payment:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
+  transition: all 0.25s ease;
+}
+
+/* ===== ENTRY ANIMATION ===== */
+@keyframes totalFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* WHEN TOTAL IS NOT PRESENT & WHEN IT IS PRESENT */
+/* Make row flexible */
+.payment-filter-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Default behavior (when total exists) */
+.payment-filter-row > .col-md-3 {
+  transition: all 0.3s ease;
+}
+
+/* 🔹 CENTER FIRST 3 COLS WHEN TOTAL IS NOT PRESENT */
+.payment-filter-row:not(:has(.total-amount-text)) {
+  justify-content: center;
+}
+
+/* WHEN TOTAL IS NOT PRESENT → 3 columns only */
+.payment-filter-row:not(:has(.total-amount-text)) {
+  justify-content: center;
+  column-gap: 32px;   /* 👈 space between the 3 columns */
+}
+
+/* Slightly wider columns so they don't squeeze */
+.payment-filter-row:not(:has(.total-amount-text)) > .col-md-3 {
+  width: 275px;       /* adjust: 240–280px */
+  margin-bottom: -20px;
+}
+
+/* Serch Filelds--customer */
+.PaymentReport-section .search-field-customer-name-payment {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.search-field1-customer-name-payment .NoCustomerNameFoundPayment
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-customer-name-payment .CustomerNameLoadingPayment 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-customer-name-payment .TypeMoreCustDataPayment 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+
+.search-field1-customer-name-payment select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 254px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 1%;
+  display: block;
+} 
+.search-field1-customer-name-payment select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-customer-name-payment option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+/* Loading and Error Container */
+.loading-container-report-payment {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-left: 35%;
+}
+
+.loading-spinner-report-payment {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #028618;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1.5s linear infinite; /* Slightly slower spin */
+  margin-left: 10%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.loading-message-report-payment {
+  font-size: 18px;
+  font-weight: bold;
+  color: #028618;
+  margin-top: 15px;
+  text-align: center;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-container-report-payment {
+  display: flex;
+  align-items: center;       /* vertical center text */
+  justify-content: center;   /* horizontal center text */
+
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 36%;
+
+  color: #f51009;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+
+  border-radius: 5px;
+  padding-top: 10px;
+  padding-bottom: -3px;
+  width: 100%;
+  max-width: 28%;
+  min-height: 60px;
+
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+
+.error-container-report-payment {
+  animation: fadeSlide 0.3s ease-in-out;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.report-button-payment {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+  text-align: center;
+  color: #05555f;
+  width: 20px;
+  margin-left: 55%;
+}
+
+.filecheck
+{
+  font-size: 25px !important;
+}
+
+.report-button-payment:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.report-button-payment:hover:not(:disabled) {
+  transform: scale(1.3); 
+  color: #0e7204;
+}
+
+/* Payment Report Table */
+.PaymentReport-table {
+  margin-top: 50px !important;
+  margin-bottom: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
+  max-width: calc(100% - 250px);
+  min-width: calc(100% - 290px);
+  margin-left: auto;
+  margin-right: auto;
+  cursor: default !important;
+  overflow-x: hidden;
+  margin: 0 auto;
+  cursor: default !important;
+}
+
+.PaymentReport-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  table-layout: fixed; /* ✅ forces wrapping instead of scrolling */
+}
+
+.PaymentReport-table th, .PaymentReport-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold; 
+  cursor: default !important;
+}
+
+.PaymentReport-table th {
+  color: rgb(255, 255, 255);
+  color: aliceblue;
+  text-align: left;
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:8px;
+  padding-bottom:8px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #069696;
+  border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
+}
+
+.PaymentReport-table td {
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  color: #161616da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  background-color: rgba(170, 207, 234, 0.87);
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.PaymentReport-table tbody tr:hover {
+  background-color: #05afc5; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.PaymentReport-table th:nth-child(1),
+.PaymentReport-table td:nth-child(1) {
+  width: 13%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+/* Invoice # */
+.PaymentReport-table th:nth-child(2),
+.PaymentReport-table td:nth-child(2) {
+  width: 9%;
+}
+
+/* Invoice Date */
+.PaymentReport-table th:nth-child(3),
+.PaymentReport-table td:nth-child(3) {
+  width: 7%;
+}
+
+/* 🔥 PAYMENTS COLUMN (BIG SPACE) */
+.PaymentReport-table th:nth-child(4),
+.PaymentReport-table td:nth-child(4) {
+  width: 36%;
+  vertical-align: middle; /* align inner table properly */
+  text-align: center;
+}
+
+/* Total Amount */
+.PaymentReport-table th:nth-child(5),
+.PaymentReport-table td:nth-child(5) {
+  width: 8%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+/* Total Paid */
+.PaymentReport-table th:nth-child(6),
+.PaymentReport-table td:nth-child(6) {
+  width: 8%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+/* Remaining Amount */
+.PaymentReport-table th:nth-child(7),
+.PaymentReport-table td:nth-child(7) {
+  width: 8%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+/* Payment Status */
+.PaymentReport-table th:last-child,
+.PaymentReport-table td:last-child {
+  width: 7%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+/* ============================= */
+/* Inner Payments Table */
+/* ============================= */
+.inner-payment-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; 
+  background:transparent;
+}
+
+/* Inner headers & cells */
+.inner-payment-table th,
+.inner-payment-table td {
+  font-size: 11px;
+  padding: 4px 6px;
+  
+}
+
+.inner-payment-table th {
+  color: rgb(255, 255, 255);
+  color: aliceblue;
+  text-align: left;
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #08adad;
+  border-bottom: 2px dashed rgb(2, 128, 121); /* Adds a subtle separator */
+}
+
+.inner-payment-table td {
+  
+  color: #161616da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  background-color: rgba(170, 224, 234, 0.87);
+  
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px dashed rgb(2, 128, 121);
+}
+
+/* Payment Date */
+.inner-payment-table th:nth-child(1),
+.inner-payment-table td:nth-child(1) {
+  width: 18%;
+}
+
+/* Paid Amount */
+.inner-payment-table th:nth-child(2),
+.inner-payment-table td:nth-child(2) {
+  width: 18%;
+}
+
+/* Payment Status */
+.inner-payment-table th:nth-child(3),
+.inner-payment-table td:nth-child(3) {
+  width: 20%;
+}
+
+/* Comments (MOST SPACE) */
+.inner-payment-table th:nth-child(4),
+.inner-payment-table td:nth-child(4) {
+  width: 40%;
+ white-space: normal !important;      /* allow wrapping */
+  text-align: left;
+  line-height: 1.5;
+}
+
+.PaymentReport-table .status-paid {
+  color: #198754;
+  font-weight: 600;
+}
+
+.PaymentReport-table .status-pending {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* No Payments */
+.no-payment-message {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 900;
+  font-size: 20px;
+  text-align: center;
+  margin-top: 5%;
+  word-spacing: 2px;
+
+  background: linear-gradient(
+    90deg,
+    #d86902ff,
+    #f5b274ff,
+    #d86902ff
+  );
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Pagination Controls */
+.pagination-controls-paymentreport {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  margin-left: 121px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -5px;
+  gap: 10px;
+  white-space: nowrap;
+  margin-bottom: -40px;
+}
+
+.pagination-controls-paymentreport button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls-paymentreport button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls-paymentreport button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls-paymentreport span {
   font-size: 14px;
   font-weight: bold;
   color: #444;
