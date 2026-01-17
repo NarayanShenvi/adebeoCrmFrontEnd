@@ -984,7 +984,7 @@ const productCount = productCombinedChartData?.length || 0;
     {reportGenerated && (
       <div className="total-amount-text">
         <span>Total Amount:</span>
-        <strong>
+        <strong className="wrap-amount">
         {formattedTotalAmount} {/* This already has ₹ symbol & formatting */}
       </strong>
       </div>

@@ -873,7 +873,7 @@ const formatAmountWithRounded = (amount) => {
     {reportGenerated && (
       <div className="total-amount-text-purchase">
         <span>Total Amount:</span>
-        <strong>
+        <strong className="wrap-amount">
         {formattedTotalAmount} {/* This already has ₹ symbol & formatting */}
       </strong>
       </div>
@@ -1111,6 +1111,7 @@ setSelectedUser(selected ? selected.map(s => s.value) : []);
         <thead>
   <tr>
     <th>Vendor Name</th>
+    <th>Customer Name</th>
     <th>Product Name</th>
     <th>Product Qty</th>
     <th>Purchase Price (INR)</th>
@@ -1128,6 +1129,7 @@ setSelectedUser(selected ? selected.map(s => s.value) : []);
           {paginatedPurchaseReports .map((row, idx) => (
             <tr key={idx}>
   <td>{row["Vendor Name"] || "-"}</td>
+  <td>{row["customer name"] || "-"}</td>
   <td>{row["Product"] || "-"}</td>
   <td>{row["Qty"] || "-"}</td>
   <td>

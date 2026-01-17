@@ -8,6 +8,7 @@ import ProductCategory from './ProductCategory';
 import SalesReport from './SalesReport';
 import PurchaseReport from './PurchaseReport';
 import BusinessReport from './BusinessReport';
+import PaymentReport from './PaymentReport';
 import EnquiriesLostReport from './EnquiriesLostReport';
 import EnquiriesWonReport from './EnquiriesWonReport';
 
@@ -27,6 +28,7 @@ const Admin = () => {
       case 'SalesReport': return <SalesReport />;
       case 'PurchaseReport': return <PurchaseReport />;
       case 'BusinessReport': return <BusinessReport />;
+      case 'PaymentReport': return <PaymentReport />;
       case 'EnquiriesLostReport': return <EnquiriesLostReport />;
       case 'EnquiriesWonReport': return <EnquiriesWonReport />;
 
@@ -119,6 +121,12 @@ default: return <div className="default-message-admin">Please select an option f
       onClick={() => setSelected('BusinessReport')}
     >
       Business Report
+    </a>
+    <a
+      className={selected === 'PaymentReport' ? 'active' : ''}
+      onClick={() => setSelected('PaymentReport')}
+    >
+      Payment Report
     </a>
     <a
       className={selected === 'EnquiriesLostReport' ? 'active' : ''}

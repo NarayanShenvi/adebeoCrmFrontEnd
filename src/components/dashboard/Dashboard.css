@@ -228,13 +228,14 @@ html, body {
   align-items: center;
   cursor: pointer;
   position: relative;
-  padding-left: 30px;
+  padding-left: 24px;
   font-size: 14px;
   color: #242323da;
   user-select: none;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   font-weight: 700;
 }
+
 
 /* Custom radio button */
 .search-radio-group label::before {
@@ -9454,7 +9455,8 @@ select option {
   font-size: 20px;
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  margin-top: 20px;
+  margin-top: -35px;
+  margin-bottom: -25px;
 }
 
 .filter-form-sales
@@ -9481,7 +9483,7 @@ select option {
   flex-direction: column;
   pointer-events: auto;
   position: relative;
-  margin-top: -15px;
+  margin-top: -25px;
     font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
 
@@ -10012,7 +10014,7 @@ select option {
 
 /* Sales Report Table */
 .SalesReport-table {
-  margin-top: 50px !important;
+  margin-top: 20px !important;
   width: 100%;
   border-collapse: collapse;
   background: white;
@@ -10442,7 +10444,8 @@ select option {
   font-size: 20px;
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  margin-top: 20px;
+  margin-top: -35px;
+  margin-bottom: -25px;
 }
 
 .filter-form-purchase
@@ -10469,7 +10472,7 @@ select option {
   flex-direction: column;
   pointer-events: auto;
   position: relative;
-  margin-top: -15px;
+  margin-top: -25px;
     font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
 
@@ -10920,7 +10923,7 @@ select option {
 
 /* Purchase Report Table */
 .PurchaseReport-table {
-  margin-top: 50px !important;
+  margin-top: 20px !important;
   width: 100%;
   border-collapse: collapse;
   background: white;
@@ -10992,35 +10995,37 @@ select option {
 
 .PurchaseReport-table th:nth-child(1),
 .PurchaseReport-table td:nth-child(1) {
-  width: 16%; /* Fixed width */
+  width: 12%; /* Fixed width */
   white-space: pre-line; 
   word-wrap: break-word; 
 }
 
 .PurchaseReport-table th:nth-child(2),
 .PurchaseReport-table td:nth-child(2) {
-  width: 16%; /* Fixed width */
+  width: 12%; /* Fixed width */
   white-space: pre-line; 
-  word-wrap: break-word; }
+  word-wrap: break-word; 
+}
 
 .PurchaseReport-table th:nth-child(3),
 .PurchaseReport-table td:nth-child(3) {
-  width: 4%; /* Fixed width */ 
-}
+  width: 12%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; }
 
 .PurchaseReport-table th:nth-child(4),
 .PurchaseReport-table td:nth-child(4) {
-  width: 10%; /* Fixed width */
+  width: 4%; /* Fixed width */ 
 }
 
 .PurchaseReport-table th:nth-child(5),
 .PurchaseReport-table td:nth-child(5) {
-  width:10%; /* Fixed width */
+  width: 10%; /* Fixed width */
 }
 
 .PurchaseReport-table th:nth-child(6),
 .PurchaseReport-table td:nth-child(6) {
-  width:8%; /* Fixed width */
+  width:9%; /* Fixed width */
 }
 
 .PurchaseReport-table th:nth-child(7),
@@ -11030,11 +11035,16 @@ select option {
 
 .PurchaseReport-table th:nth-child(8),
 .PurchaseReport-table td:nth-child(8) {
-  width:7%; /* Fixed width */
+  width:8%; /* Fixed width */
 }
 
 .PurchaseReport-table th:nth-child(9),
 .PurchaseReport-table td:nth-child(9) {
+  width:7%; /* Fixed width */
+}
+
+.PurchaseReport-table th:nth-child(10),
+.PurchaseReport-table td:nth-child(10) {
   width:8%; /* Fixed width */
 }
 
@@ -11385,7 +11395,8 @@ select option {
   font-size: 20px;
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  margin-top: 20px;
+  margin-top: -35px;
+  margin-bottom: -25px;
 }
 
 .filter-form-business
@@ -11412,7 +11423,7 @@ select option {
   flex-direction: column;
   pointer-events: auto;
   position: relative;
-  margin-top: -15px;
+  margin-top: -25px;
     font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
 
@@ -11869,7 +11880,7 @@ select option {
 
 /* Business Report Table */
 .BusinessReport-table {
-  margin-top: 50px !important;
+  margin-top: 20px !important;
   width: 100%;
   border-collapse: collapse;
   background: white;
@@ -12336,7 +12347,8 @@ select option {
   font-size: 20px;
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  margin-top: 20px;
+  margin-top: -35px;
+  margin-bottom: -25px;
 }
 
 .filter-form-payment
@@ -12813,7 +12825,7 @@ select option {
 
 /* Payment Report Table */
 .PaymentReport-table {
-  margin-top: 50px !important;
+  margin-top: 20px !important;
   margin-bottom: 10px;
   padding-left: 30px;
   padding-right: 30px;
@@ -12971,7 +12983,9 @@ select option {
 .inner-payment-table td {
   font-size: 11px;
   padding: 4px 6px;
-  
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .inner-payment-table th {
@@ -12997,17 +13011,20 @@ select option {
 }
 
 .inner-payment-table td {
-  
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
   color: #161616da;
   font-weight: bold;
   text-align: left;
   font-size: 12px;
   text-overflow: unset;  /* Prevent ellipsis (...) */
   background-color: rgba(170, 224, 234, 0.87);
-  
+  overflow: hidden;
   max-width: 150px; /* Adjust to limit width and force line breaks */ 
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
   border-bottom: 1px dashed rgb(2, 128, 121);
@@ -13035,19 +13052,90 @@ select option {
 .inner-payment-table th:nth-child(4),
 .inner-payment-table td:nth-child(4) {
   width: 40%;
- white-space: normal !important;      /* allow wrapping */
+  white-space: normal !important;      /* allow wrapping */
+  word-break: break-word !important;   /* break long words if needed */
   text-align: left;
   line-height: 1.5;
 }
 
-.PaymentReport-table .status-paid {
-  color: #198754;
-  font-weight: 600;
+.status-text {
+  font-weight: 900;
+  
+  background: transparent;
+  white-space: nowrap;
 }
 
-.PaymentReport-table .status-pending {
-  color: #dc3545;
-  font-weight: 600;
+/* GREEN – wide glow spread (fast shrink) */
+.status-green {
+  color: #036928;
+  font-weight: 900;
+  text-shadow:
+    0.3px 0 0 currentColor,
+   -0.3px 0 0 currentColor;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.6),              /* edge sharpener */
+    0 0 4px rgba(34, 197, 94, 0.9),
+    0 0 10px rgba(34, 197, 94, 0.8),
+    0 0 18px rgba(34, 197, 94, 0.6),
+    0 0 28px rgba(34, 197, 94, 0.45);
+  animation: greenGlowWide 0.6s cubic-bezier(0.4, 0, 1, 1) infinite;
+}
+
+/* RED – wide glow spread (static) */
+.status-red {
+  color: #ce3030;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.45),
+    0 0 4px rgba(239, 68, 68, 0.9),
+    0 0 10px rgba(239, 68, 68, 0.8),
+    0 0 18px rgba(239, 68, 68, 0.6),
+    0 0 28px rgba(239, 68, 68, 0.45);
+    animation: redGlowWide 0.6s cubic-bezier(0.4, 0, 1, 1) infinite;
+}
+
+/* FAST shrink → expand → shrink */
+@keyframes greenGlowWide {
+  0% {
+    text-shadow:
+      0 -2px 3px rgba(34, 197, 94, 0.45),
+      0  2px 3px rgba(34, 197, 94, 0.45),
+      0  0  6px rgba(34, 197, 94, 0.3);
+  }
+
+  45% {
+    text-shadow:
+      0 -4px 6px rgba(34, 197, 94, 1),
+      0  4px 6px rgba(34, 197, 94, 1),
+      0  0 14px rgba(34, 197, 94, 0.85),
+      0  0 30px rgba(34, 197, 94, 0.65);
+  }
+
+  100% {
+    text-shadow:
+      0 -2px 3px rgba(34, 197, 94, 0.45),
+      0  2px 3px rgba(34, 197, 94, 0.45),
+      0  0  6px rgba(34, 197, 94, 0.3);
+  }
+}
+
+/* FAST shrink → expand → shrink (RED) */
+@keyframes redGlowWide {
+  0% {
+    text-shadow:
+      0 0 2px rgba(239, 68, 68, 0.45),
+      0 0 6px rgba(239, 68, 68, 0.3);
+  }
+  45% {
+    text-shadow:
+      0 0 8px rgba(239, 68, 68, 1),
+      0 0 18px rgba(239, 68, 68, 0.85),
+      0 0 30px rgba(239, 68, 68, 0.65);
+  }
+  100% {
+    text-shadow:
+      0 0 2px rgba(239, 68, 68, 0.45),
+      0 0 6px rgba(239, 68, 68, 0.3);
+  }
 }
 
 /* No Payments */
@@ -13121,3 +13209,157 @@ select option {
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   text-align: center;
 }
+
+/* ================== RESPONSIVE ================== */
+/* ========================= */
+/* ===== 1024px ===== */
+/* ========================= */
+@media (max-width: 1024px) {
+
+  .PaymentReport-section {
+    margin-left: 200px;
+    padding: 15px;
+  }
+
+  .filter-form-payment {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .PaymentReport-table {
+    max-width: calc(100% - 200px);
+    min-width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .PaymentReport-table th,
+  .PaymentReport-table td {
+    font-size: 11px;
+    padding: 8px;
+  }
+
+  .total-amount-text-payment {
+    font-size: 13px;
+  }
+}
+
+/* ========================= */
+/* ===== 768px (Tablet) ===== */
+/* ========================= */
+@media (max-width: 768px) {
+
+  .PaymentReport-section {
+    margin-left: 0;
+    padding: 12px;
+  }
+
+  .filter-form-payment {
+    min-width: 100%;
+    padding: 12px;
+  }
+
+  .PaymentReport-section .form-group {
+    margin-left: 0;
+  }
+
+  .payment-filter-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 12px;
+  }
+
+  .payment-filter-row > .col-md-3 {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .PaymentReport-table {
+    max-width: 100%;
+    min-width: 100%;
+    overflow-x: auto;
+  }
+
+  .PaymentReport-table table {
+    table-layout: auto;
+  }
+
+  .PaymentReport-table th,
+  .PaymentReport-table td {
+    font-size: 11px;
+    padding: 6px;
+  }
+
+  .inner-payment-table th,
+  .inner-payment-table td {
+    font-size: 10px;
+    padding: 4px;
+  }
+
+  .pagination-controls-paymentreport {
+    margin-left: 0;
+    padding: 10px;
+  }
+}
+
+/* ========================= */
+/* ===== 480px (Mobile) ===== */
+/* ========================= */
+@media (max-width: 480px) {
+
+  .PaymentReport-section h3 {
+    font-size: 16px;
+  }
+
+  .filter-form-payment {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .custom-checkbox-payment {
+    margin-left: 0 !important;
+    justify-content: center;
+  }
+
+  .custom-checkbox-payment label {
+    font-size: 12px;
+    margin-right: 0;
+  }
+
+  .total-amount-text-payment {
+    font-size: 12px;
+    padding: 6px 10px;
+    justify-content: center;
+  }
+
+  .PaymentReport-table {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .PaymentReport-table th,
+  .PaymentReport-table td {
+    font-size: 10px;
+    padding: 5px;
+  }
+
+  .inner-payment-table th,
+  .inner-payment-table td {
+    font-size: 9px;
+  }
+
+  .status-green,
+  .status-red {
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .pagination-controls-paymentreport {
+    font-size: 12px;
+    gap: 6px;
+    margin-bottom: 0;
+  }
+}
+
+
+/* Submenu5------------>Report Section */

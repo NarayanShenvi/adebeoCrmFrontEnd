@@ -100,7 +100,10 @@ useEffect(() => {
       dispatch(processCustomerPaymentAsync(updatedPayment)).then(() => {
         // After payment is processed, update the editablePayments state
         const updatedPayments = [...editablePayments];
-        updatedPayments[index] = updatedPayment;  // Update the specific payment in the state
+updatedPayments[index] = {
+  ...updatedPayment,
+  comment: ""   // ✅ clear textarea after save
+};
         setEditablePayments(updatedPayments);  // Re-render with the updated value
       });
     }
@@ -224,8 +227,7 @@ useEffect(() => {
   <textarea
     value={payment.comment}
     onChange={(e) => handleCommentChange(index, e.target.value)}
-    placeholder="Enter payment details (max 50 words)"
-    maxLength={250}
+    placeholder="Enter payment details"
     rows={3}
     disabled={payment.payment_status !== "Pending"}
   />
