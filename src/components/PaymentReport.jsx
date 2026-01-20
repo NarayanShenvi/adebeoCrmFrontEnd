@@ -330,9 +330,10 @@
     }
 
     // ✅ Dates exist → allow selection
-    setSelectedCustomerId(id);
-    const cust = customers.find((c) => c._id === id) || null;
-    setSelectedCustomerObj(cust);
+   const cust = customers.find((c) => c._id === id);
+
+  setSelectedCustomerId(id ? [id] : []);
+  setSelectedCustomerObj(cust ? [cust] : []);
   };
 
   const filteredPaymentReports = useMemo(() => {

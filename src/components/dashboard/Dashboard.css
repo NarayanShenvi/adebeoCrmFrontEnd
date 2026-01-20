@@ -12691,7 +12691,7 @@ select option {
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   color: rgb(7, 94, 121); /* Change input text color */
   font-weight: 800;
-  margin-bottom: 50px;
+  margin-bottom: -5px;
   width: 100%;
   max-width: 254px;
   height: 100vh;
@@ -12989,8 +12989,7 @@ select option {
 }
 
 .inner-payment-table th {
-  color: rgb(255, 255, 255);
-  color: aliceblue;
+  color: rgb(1, 99, 94);
   text-align: left;
   font-size: 13px;
   white-space: normal; /* Allows multi-line wrapping */
@@ -13006,8 +13005,9 @@ select option {
   position: sticky;
   top: 0;
   z-index: 2;
-  background-color: #08adad;
+  background-color: rgba(170, 207, 234, 0.87);
   border-bottom: 2px dashed rgb(2, 128, 121); /* Adds a subtle separator */
+  border-top: 2px dashed rgb(2, 128, 121);
 }
 
 .inner-payment-table td {
@@ -13020,7 +13020,7 @@ select option {
   text-align: left;
   font-size: 12px;
   text-overflow: unset;  /* Prevent ellipsis (...) */
-  background-color: rgba(170, 224, 234, 0.87);
+  /* background-color: rgba(170, 224, 234, 0.87); */
   overflow: hidden;
   max-width: 150px; /* Adjust to limit width and force line breaks */ 
   padding-left: 10px;
@@ -13028,6 +13028,17 @@ select option {
   padding-top: 5px;
   padding-bottom: 5px;
   border-bottom: 1px dashed rgb(2, 128, 121);
+}
+
+.inner-payment-table tbody tr:hover {
+  background-color: #0e4155; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+}
+.inner-payment-table thead tr:hover {
+  background-color: #0e4155; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
 }
 
 /* Payment Date */

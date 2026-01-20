@@ -383,9 +383,10 @@ import { Collapse, Button } from "react-bootstrap";
     }
 
     // ✅ Dates exist → allow selection
-    setSelectedCustomerId(id);
-    const cust = customers.find((c) => c._id === id) || null;
-    setSelectedCustomerObj(cust);
+     const cust = customers.find((c) => c._id === id);
+
+  setSelectedCustomerId(id ? [id] : []);
+  setSelectedCustomerObj(cust ? [cust] : []);
   };
 
 
@@ -478,9 +479,9 @@ import { Collapse, Button } from "react-bootstrap";
     }
 
     // ✅ Dates exist → allow selection
-    setSelectedSearchValue(value);
-    setSelectedProductId(prod ? prod._id : "");
-    setSelectedProductObj(prod);
+  setSelectedSearchValue(value);
+  setSelectedProductId(prod ? [prod._id] : []);
+  setSelectedProductObj(prod ? [prod] : []);
   };
 
 

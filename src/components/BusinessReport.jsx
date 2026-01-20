@@ -362,12 +362,12 @@ const handlePageChange = (newPage) => {
 
       // ✅ Dates exist → allow selection
       setSelectedSearchValue(value);
-      setSelectedProductId(prod ? prod._id : "");
-      setSelectedProductObj(prod);
+  setSelectedProductId(prod ? [prod._id] : []);
+  setSelectedProductObj(prod ? [prod] : []);
     };
 
 
-    useEffect(() => {
+    useEffect(() => { 
       if (searchTerm.length < 3) {
         setSearchResults([]);
         setSearchLoading(false);

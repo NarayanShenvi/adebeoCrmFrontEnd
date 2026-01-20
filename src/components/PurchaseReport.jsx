@@ -360,8 +360,8 @@ const [selectedBusinessType, setSelectedBusinessType] = useState([]);
 
       // ✅ Dates exist → allow selection
       setSelectedSearchValue(value);
-      setSelectedProductId(prod ? prod._id : "");
-      setSelectedProductObj(prod);
+        setSelectedProductId(prod ? [prod._id] : []);
+        setSelectedProductObj(prod ? [prod] : []);
     };
 
 
@@ -1129,7 +1129,7 @@ setSelectedUser(selected ? selected.map(s => s.value) : []);
           {paginatedPurchaseReports .map((row, idx) => (
             <tr key={idx}>
   <td>{row["Vendor Name"] || "-"}</td>
-  <td>{row["customer name"] || "-"}</td>
+  <td>{row["Customer name"] || "-"}</td>
   <td>{row["Product"] || "-"}</td>
   <td>{row["Qty"] || "-"}</td>
   <td>
