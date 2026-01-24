@@ -1154,14 +1154,14 @@ setSelectedUser(selected ? selected.map(s => s.value) : []);
     return (
       <>
         <div>₹ {amount.formatted}</div>
-        <div>
+        {/* <div>
           <div style={{ fontSize: "12px", color: "#666" }}>
             (Rounded:
           </div>
           <div style={{ fontWeight: 600, fontSize: "12px", color: "#666" }}>
             ₹ {amount.rounded})
           </div>
-        </div>
+        </div> */}
       </>
     );
   })() : "-"}
