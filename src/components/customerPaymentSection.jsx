@@ -89,22 +89,46 @@ useEffect(() => {
 
   // Handle submit button click for processing payment
   const handleSubmit = (index, payment) => {
-    if (payment.payment_status === 'Pending') {
-      const updatedPayment = {
-        ...payment,
-        paid_amount: editablePayments[index].paid_amount, // Updated paid amount
-        comment: editablePayments[index].comment, // Include the comment field
-        payment_status: (payment.amount_due <= editablePayments[index].paid_amount) ? 'Completed' : 'Pending',
-        amount_due: payment.amount_due - editablePayments[index].paid_amount,
-      };
-      dispatch(processCustomerPaymentAsync(updatedPayment)).then(() => {
-        // After payment is processed, update the editablePayments state
-        const updatedPayments = [...editablePayments];
-        updatedPayments[index] = updatedPayment;  // Update the specific payment in the state
-        setEditablePayments(updatedPayments);  // Re-render with the updated value
-      });
-    }
+  const newComment = editablePayments[index]?.comment?.trim();
+  const paidAmount = Number(editablePayments[index]?.paid_amount || 0);
+
+  if (!newComment && paidAmount <= 0) return;
+
+  const combinedComment = newComment
+    ? payment.comment
+      ? `${payment.comment}\n• ${newComment}`
+      : `• ${newComment}`
+    : payment.comment;
+
+  const remaining = payment.amount_due - paidAmount;
+
+  // const updatedPayment = {
+  //   ...payment,
+  //   paid_amount: paidAmount,
+  //   comment: combinedComment,
+  //   amount_due: remaining,
+  //   payment_status: remaining <= 0 ? "Completed" : "Pending",
+  // };
+
+  const updatedPayment = {
+    ...payment,
+    paid_amount: paidAmount,
+    comment: newComment || "",
+    amount_due: remaining,
+    payment_status: remaining <= 0 ? "Completed" : "Pending",
   };
+
+  dispatch(processCustomerPaymentAsync(updatedPayment));
+
+  // ✅ IMPORTANT: reset ONLY input fields
+  const updatedPayments = [...editablePayments];
+  updatedPayments[index] = {
+    paid_amount: "",
+    comment: "",
+  };
+
+  setEditablePayments(updatedPayments);
+};
 
   // Define handlePageChange for pagination
   const handlePageChange = (newPage) => {
@@ -215,20 +239,20 @@ useEffect(() => {
       }
     }}
     min="0"
-    disabled={payment.payment_status !== "Pending"}
+disabled={payment.amount_due <= 0}
   />
 </td>
 
 {/* Comment */}
 <td>
   <textarea
-    value={payment.comment}
-    onChange={(e) => handleCommentChange(index, e.target.value)}
-    placeholder="Enter payment details (max 50 words)"
-    maxLength={250}
-    rows={3}
-    disabled={payment.payment_status !== "Pending"}
-  />
+  value={editablePayments[index]?.comment || ""}
+  onChange={(e) => handleCommentChange(index, e.target.value)}
+  placeholder="Enter payment details"
+  rows={3}
+  disabled={payment.amount_due <= 0}
+/>
+
 </td>
 
 

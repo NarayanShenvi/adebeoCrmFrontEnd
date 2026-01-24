@@ -28,11 +28,14 @@
   CartesianGrid,
   Tooltip,
   Legend,
+  Label,
 } from "recharts";
-
+import { PieChart, Pie, Cell } from "recharts";
+import { Collapse, Button } from "react-bootstrap";
 
   const SalesReport = () => {
     const dispatch = useDispatch();
+      const [chartsOpen, setChartsOpen] = useState(false);
 
     // Dates
     const today = new Date().toISOString().split("T")[0];
@@ -40,11 +43,11 @@
     const [endDate, setEndDate] = useState("");
 
     // Filters
-    const [selectedCustomerId, setSelectedCustomerId] = useState("");
-    const [selectedCustomerObj, setSelectedCustomerObj] = useState(null); // full object if you need
-    const [selectedProductId, setSelectedProductId] = useState("");
-    const [selectedProductObj, setSelectedProductObj] = useState(null);
-    const [selectedUser, setSelectedUser] = useState("");
+    const [selectedCustomerId, setSelectedCustomerId] = useState([]);
+    const [selectedCustomerObj, setSelectedCustomerObj] = useState([]); // full object if you need
+    const [selectedProductId, setSelectedProductId] = useState([]);
+    const [selectedProductObj, setSelectedProductObj] = useState([]);
+    const [selectedUser, setSelectedUser] = useState([]);
 
     // Search UI state - Customers
     const [searchQuery, setSearchQuery] = useState("");
@@ -59,14 +62,12 @@
 
     // Pagination & report
     const [page, setPage] = useState(1);
-    const perPage = 300;
     const [reportGenerated, setReportGenerated] = useState(false);
 
     // Redux slices
   const {
     salesReports = [],
     salesLoading,
-    salesTotalPages = 1,
   } = useSelector((state) => state.report);
 
     const { users = [], loading: usersLoading } = useSelector((state) => state.users);
@@ -80,11 +81,11 @@
 
     const [useReportFilters, setUseReportFilters] = useState(false);
     const [appliedFilters, setAppliedFilters] = useState({
-    customerId: "",
-    customerObj: null,
-    productId: "",
-    productObj: null,
-    user: "",
+    customerId: [],
+    customerObj: [],
+    productId:[],
+    productObj: [],
+    user: [],
   });
 
   
@@ -291,10 +292,12 @@
   
     // Pagination handler
     const handlePageChange = (newPage) => {
-      if (newPage < 1) return;
+      if (newPage < 1 || newPage > frontendTotalPages) return;
       setPage(newPage);
-      fetchReportData(newPage);
     };
+     useEffect(() => {
+      setPage(1);
+    }, [appliedFilters]);
 
     // -----------------------
     // Customer search debounce (uses Redux slice fetchCustomerAsync & clearCustomers)
@@ -380,9 +383,10 @@
     }
 
     // ✅ Dates exist → allow selection
-    setSelectedCustomerId(id);
-    const cust = customers.find((c) => c._id === id) || null;
-    setSelectedCustomerObj(cust);
+     const cust = customers.find((c) => c._id === id);
+
+  setSelectedCustomerId(id ? [id] : []);
+  setSelectedCustomerObj(cust ? [cust] : []);
   };
 
 
@@ -475,9 +479,9 @@
     }
 
     // ✅ Dates exist → allow selection
-    setSelectedSearchValue(value);
-    setSelectedProductId(prod ? prod._id : "");
-    setSelectedProductObj(prod);
+  setSelectedSearchValue(value);
+  setSelectedProductId(prod ? [prod._id] : []);
+  setSelectedProductObj(prod ? [prod] : []);
   };
 
 
@@ -523,45 +527,48 @@
   const filteredSalesReports = useMemo(() => {
     let data = [...salesReports];
 
-    // ✅ CUSTOMER FILTER (APPLIED ONLY)
-    if (appliedFilters.customerId && appliedFilters.customerObj) {
-      const name = (
-        appliedFilters.customerObj.companyName ||
-        appliedFilters.customerObj.company_name ||
-        appliedFilters.customerObj.company ||
-        ""
-      ).toLowerCase();
+    // ✅ CUSTOMER FILTER (multi-select)
+if (appliedFilters.customerObj && appliedFilters.customerObj.length > 0) {
+  const customerNames = appliedFilters.customerObj.map(c =>
+    (c.companyName || c.company_name || c.company || "").toLowerCase()
+  );
 
-      data = data.filter(
-        row =>
-          row["Customer Name"] &&
-          row["Customer Name"].toLowerCase().includes(name)
-      );
-    }
+  data = data.filter(row =>
+    row["Customer Name"] &&
+    customerNames.some(name =>
+      row["Customer Name"].toLowerCase().includes(name)
+    )
+  );
+}
 
-    // ✅ PRODUCT FILTER
-    if (appliedFilters.productId && appliedFilters.productObj) {
-      const productName = appliedFilters.productObj.productName?.toLowerCase();
+// ✅ PRODUCT FILTER (multi-select)
+if (appliedFilters.productObj && appliedFilters.productObj.length > 0) {
+  const productNames = appliedFilters.productObj.map(p =>
+    p.productName.toLowerCase()
+  );
 
-      data = data.filter(
-        row =>
-          row["Description"] &&
-          row["Description"].toLowerCase().includes(productName)
-      );
-    }
+  data = data.filter(row =>
+    row["Description"] &&
+    productNames.some(name =>
+      row["Description"].toLowerCase().includes(name)
+    )
+  );
+}
 
-    // ✅ USER FILTER
-    if (appliedFilters.user) {
-      data = data.filter(
-        row =>
-          row["User"] &&
-          row["User"].toLowerCase() === appliedFilters.user.toLowerCase()
-      );
-    }
+// ✅ USER FILTER (multi-select)
+if (appliedFilters.user && appliedFilters.user.length > 0) {
+  const userNames = appliedFilters.user.map(u => u.toLowerCase());
+  data = data.filter(row =>
+    row["User"] &&
+    userNames.includes(row["User"].toLowerCase())
+  );
+}
 
     return data;
   }, [salesReports, appliedFilters]);
 
+const perPage = 1000; // max rows per page
+const frontendTotalPages = Math.ceil(filteredSalesReports.length / perPage);
 
   const paginatedSalesReports = useMemo(() => {
     const start = (page - 1) * perPage;
@@ -616,33 +623,33 @@
   }, [salesReports]);
 
   useEffect(() => {
-    setSelectedCustomerId("");
-    setSelectedCustomerObj(null);
-    setSelectedProductId("");
-    setSelectedProductObj(null);
-    setSelectedUser("");
+    setSelectedCustomerId([]);
+    setSelectedCustomerObj([]);
+    setSelectedProductId([]);
+    setSelectedProductObj([]);
+    setSelectedUser([]);
     setSearchQuery("");
     setSearchTerm("");
   }, [useReportFilters]);
 
-  const totalAmountBilled = useMemo(() => {
-  if (!salesReports || salesReports.length === 0) return 0;
+//   const totalAmountBilled = useMemo(() => {
+//   if (!salesReports || salesReports.length === 0) return 0;
 
-  return salesReports.reduce((sum, row) => {
-    const amount = Number(
-      String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
-    );
-    return sum + (isNaN(amount) ? 0 : amount);
-  }, 0);
-}, [salesReports]);
+//   return salesReports.reduce((sum, row) => {
+//     const amount = Number(
+//       String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
+//     );
+//     return sum + (isNaN(amount) ? 0 : amount);
+//   }, 0);
+// }, [salesReports]);
 
-const formattedTotalAmount = useMemo(() => {
-  return totalAmountBilled.toLocaleString("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 2,
-  });
-}, [totalAmountBilled]);
+// const formattedTotalAmount = useMemo(() => {
+//   return totalAmountBilled.toLocaleString("en-IN", {
+//     style: "currency",
+//     currency: "INR",
+//     minimumFractionDigits: 2,
+//   });
+// }, [totalAmountBilled]);
 
 const { salesError } = useSelector((state) => state.report);
 
@@ -650,11 +657,14 @@ useEffect(() => {
   if (!salesError) return;
 
   // 🌐 Network error
-  if (
-    salesError === "Failed to fetch sales report" || "Rejected" ||
-    salesError.toLowerCase().includes("network")
-  ) {
-    toast.error("Rejected!! Network error. Please check your internet connection.", {
+ if (
+       salesError  === "Failed to fetch business report" || "Rejected" ||
+       salesError.toLowerCase().includes("network") || salesError.toLowerCase().includes("Token has expired")
+     ) {
+       toast.error(
+       salesError.toLowerCase().includes("Token has expired")
+         ? "Session expired!! Please log in again."
+         : "Rejected!! Network error. Please check your internet connection or Re-login",  {
                                                 autoClose: 4000,
                                                 toastClassName: "toast-warn-zfix",
                                                 hideProgressBar: false,
@@ -764,6 +774,166 @@ const productCombinedChartData = useMemo(() => {
   return Object.values(map);
 }, [filteredSalesReports]);
 
+// Total based on filtered rows (so it updates when filters change)
+const totalAmountBilled = useMemo(() => {
+  if (!filteredSalesReports || filteredSalesReports.length === 0) return 0;
+
+  return filteredSalesReports.reduce((sum, row) => {
+    const amount = Number(
+      String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
+    );
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0);
+}, [filteredSalesReports]);
+const formattedTotalAmount = useMemo(() => {
+  return totalAmountBilled.toLocaleString("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2,
+  });
+}, [totalAmountBilled]);
+
+ // bar chart
+const CustomCustomerTick = ({ x, y, payload }) => {
+  let text = payload.value || "";
+
+  // 1️⃣ Trim name to 50% length
+  const half = Math.ceil(text.length / 2);
+  const trimmed = text.length > 12 ? text.slice(0, half) + "…" : text;
+
+  // 2️⃣ Wrap into 2 lines (every ~10 chars)
+  const words = trimmed.match(/.{1,12}/g) || [trimmed];
+
+  return (
+    <g transform={`translate(${x - 90},${y})`}>
+      {words.map((line, i) => (
+        <text
+          key={i}
+          dy={i * 12}
+          fill="#585757ff"
+          fontSize={12}
+          fontWeight={600}
+          fontFamily="Shippori Mincho B1, Times New Roman, serif"
+        >
+          {line}
+        </text>
+      ))}
+    </g>
+  );
+};
+const rowHeight = 40; // space per bar
+const chartHeight = Math.max(300, salesBarChartData.length * rowHeight);
+
+// Dynamic Pie Size Logic
+const productCount = productCombinedChartData?.length || 0;
+    
+    const sortedProductData = useMemo(() => {
+    return [...productCombinedChartData].sort(
+      (a, b) => b.amount - a.amount
+    );
+  }, [productCombinedChartData]);
+  
+    const COLORS = [
+      "#0a8181",
+      "#f39c12",
+      "#e74c3c",
+      "#9b59b6",
+      "#3498db",
+      "#2ecc71",
+      "#1abc9c",
+      "#8e44ad",
+      "#34495e",
+      "#c0392b",
+    ];
+  
+    const generateColors = (count) =>
+    Array.from({ length: count }, (_, i) => {
+      const hue = (i * 137.508) % 360;
+      return `hsl(${hue}, 60%, 50%)`;
+    });
+  
+  const remainingColors = generateColors(
+    Math.max(0, sortedProductData.length - COLORS.length)
+  );
+  
+  const finalColors = [
+    ...COLORS,
+    ...remainingColors,
+  ]; 
+  
+  const cx = "35%";   // leave room for legend
+  const cy = "50%";   // stable center
+  const MAX_LABEL_PRODUCTS = 6;
+  const showSliceLabels = productCombinedChartData.length <= MAX_LABEL_PRODUCTS;
+  
+  const safeOuterRadius = Math.min(
+    160,
+    Math.max(
+      150,                        // minimum size
+      80 + productCount * 6      // 🔥 grows with product count
+    )
+  );
+  const piechartHeight = Math.max(
+    360,
+    productCount * 28
+  );
+  
+  const TwoColumnPieLegend = ({ payload }) => {
+    if (!payload || payload.length === 0) return null;
+  
+    const mid = Math.ceil(payload.length / 2);
+    const col1 = payload.slice(0, mid);
+    const col2 = payload.slice(mid);
+  
+    const renderItem = (entry, index) => {
+      const name = entry.value || "";
+      const wrapped = name.match(/.{1,26}/g)?.join("\n") || name;
+  
+      return (
+        <div
+          key={index}
+          style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: entry.color,
+                  marginBottom: "10px",
+                  whiteSpace: "pre-line", // ⭐ enables wrapping
+                  fontFamily: "Shippori Mincho B1, Times New Roman, serif",
+                  fontWeight: 600,
+                  fontSize: "13px",
+                }}
+        >
+          <span
+            style={{
+                    width: "30px",      // ⭐ wider box
+                    height: "15px",
+                    borderRadius: "2px",
+                    backgroundColor: entry.color,
+                    marginRight: "9px",
+                  }}
+          />
+          <span>{wrapped}</span>
+        </div>
+      );
+    };
+  
+    return (
+      <div
+        style={{
+          display: "flex",
+          gap: "22px",
+          padding: "8px 10px",
+          maxHeight: "420px",
+          overflowY: "auto",
+        }}
+      >
+        <div>{col1.map(renderItem)}</div>
+        <div>{col2.map(renderItem)}</div>
+      </div>
+    );
+  };
+
+
     return (
       <div className="SalesReport-section">
         <h3>Sales Report</h3>
@@ -815,7 +985,9 @@ const productCombinedChartData = useMemo(() => {
     {reportGenerated && (
       <div className="total-amount-text">
         <span>Total Amount:</span>
-        <strong >{formattedTotalAmount}</strong>
+        <strong className="wrap-amount">
+        {formattedTotalAmount} {/* This already has ₹ symbol & formatting */}
+      </strong>
       </div>
     )}
   </Col>
@@ -833,28 +1005,23 @@ const productCombinedChartData = useMemo(() => {
     {useReportFilters ? (
       // ✅ DROPDOWN FROM GENERATED REPORT DATA
       <Select
-      className="SalesReport-select"
-      classNamePrefix="SalesReport"
-      menuPortalTarget={document.body}
+  className="SalesReport-select"
+  classNamePrefix="SalesReport"
+  menuPortalTarget={document.body}
   menuPosition="fixed"
   styles={{
     menuPortal: base => ({ ...base, zIndex: 9999 })
   }}
-        options={reportCustomerOptions}
-        value={
-          selectedCustomerId
-            ? { value: selectedCustomerId, label: selectedCustomerId }
-            : null
-        }
-        onChange={(selected) => {
-          setSelectedCustomerId(selected?.value || "");
-          setSelectedCustomerObj(
-            selected ? { companyName: selected.value } : null
-          );
-        }}
-        isClearable
-        placeholder="Select customer from report"
-      />
+  options={reportCustomerOptions}
+  value={selectedCustomerObj.map(c => ({ value: c.companyName, label: c.companyName }))}
+  onChange={selected => {
+    setSelectedCustomerObj(selected ? selected.map(s => ({ companyName: s.value })) : []);
+    setSelectedCustomerId(selected ? selected.map(s => s.value) : []);
+  }}
+  isMulti
+  isClearable
+  placeholder="Select customer from report"
+/>
     ) : (
       // 🔴 EXISTING SEARCH UI — UNCHANGED
       <>
@@ -950,28 +1117,24 @@ const productCombinedChartData = useMemo(() => {
     {useReportFilters ? (
       // ✅ PRODUCT DROPDOWN FROM REPORT DATA
       <Select
-        className="SalesReport-select"
-        classNamePrefix="SalesReport"
-        menuPortalTarget={document.body}
+  className="SalesReport-select"
+  classNamePrefix="SalesReport"
+  menuPortalTarget={document.body}
   menuPosition="fixed"
   styles={{
     menuPortal: base => ({ ...base, zIndex: 9999 })
   }}
-        options={reportProductOptions}
-        value={
-          selectedProductId
-            ? { value: selectedProductId, label: selectedProductId }
-            : null
-        }
-        onChange={(selected) => {
-          setSelectedProductId(selected?.value || "");
-          setSelectedProductObj(
-            selected ? { productName: selected.value } : null
-          );
-        }}
-        isClearable
-        placeholder="Select product from report"
-      />
+  options={reportProductOptions}
+  value={selectedProductObj.map(p => ({ value: p.productName, label: p.productName }))}
+  onChange={selected => {
+    setSelectedProductObj(selected ? selected.map(s => ({ productName: s.value })) : []);
+    setSelectedProductId(selected ? selected.map(s => s.value) : []);
+  }}
+  isMulti
+  isClearable
+  placeholder="Select product from report"
+/>
+
     ) : (
       // 🔴 EXISTING PRODUCT SEARCH UI — UNCHANGED
       <>
@@ -1038,45 +1201,44 @@ const productCombinedChartData = useMemo(() => {
     menuPortal: base => ({ ...base, zIndex: 9999 })
   }}
   options={useReportFilters ? reportUserOptions : userOptions}
-  value={selectedUser ? { value: selectedUser, label: selectedUser } : null}
-  onChange={(selected) => {
+  value={selectedUser.map(u => ({ value: u, label: u }))}
+  onChange={selected => {
     if (!selected) {
-      setSelectedUser("");
-      return;
-    }
- 
-    if (!useReportFilters && (!startDate || !endDate)) {
-      toast.warn("Please select Start Date and End Date before applying User filter.", {
-                                                    position: "top-right",
-                                                    toastClassName: "toast-warn-zfix",
-                                                    autoClose: 4000,
-                                                    hideProgressBar: false,
-                                                    closeOnClick: true,
-                                                    pauseOnHover: true,
-                                                    draggable: true,
-                                                    progress: undefined,
-                                                    theme: "colored", // "light", "dark", or "colored"
-                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
-                                                      fontSize: "14px",       // ✅ Change font size
-                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
-                                                      fontWeight: "bold",    // ✅ Make text bold
-                                                     },
-                                                     icon: <IoIosWarning  
-                                                     style={{ fontSize: '25px', color: 'white' }} />
-                                                });
+      setSelectedUser([]);
       return;
     }
 
-    setSelectedUser(selected.value);
+    if (!useReportFilters && (!startDate || !endDate)) {
+      toast.warn("Please select Start Date and End Date before applying User filter.", {
+        position: "top-right",
+        toastClassName: "toast-warn-zfix",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        style: { background: "rgba(187, 184, 9, 1)", color: "white",
+          fontSize: "14px",
+          fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
+          fontWeight: "bold",
+        },
+        icon: <IoIosWarning style={{ fontSize: '25px', color: 'white' }} />
+      });
+      return;
+    }
+
+    setSelectedUser(selected.map(s => s.value));
   }}
+  isMulti
   isClearable
   isSearchable
   placeholder={
-    useReportFilters
-      ? "Select user from report"
-      : "Search or select User"
+    useReportFilters ? "Select user from report" : "Search or select User"
   }
 />
+
   </Form.Group>
 
   </Col>
@@ -1111,45 +1273,47 @@ const productCombinedChartData = useMemo(() => {
 
 {/* Report Table */}
       <div className="SalesReport-table">
-    {filteredSalesReports.length > 0 ? (
+    {paginatedSalesReports.length > 0 ? (
       <table>
         <thead>
-          <tr> 
-            {/* {!hideCustomerColumn && <th>Customer Name</th>}
-            {!hideProductColumn && <th>Product Name</th>} */}
-            <th>Customer Name</th>
-            <th>PO Number</th>
-            <th>Product Name</th>
-            <th>Product  Qty</th>
-            <th>Invoice Number</th>
-            <th>Invoice Date</th>
-            <th>Amount Billed (INR)</th>
-          </tr>
-        </thead>
+  <tr>
+    <th>Customer Name</th>
+    <th>Product Name</th>
+    <th>Product Qty</th>
+    <th>Invoice Number</th>
+    <th>Invoice Date</th>
+    <th>Mode</th>
+    <th>Business Type</th>
+    <th>Amount Billed (INR)</th>
+    <th>PO Number</th>
+  </tr>
+</thead>
+
 
         <tbody>
-          {filteredSalesReports.map((row, idx) => (
+          {paginatedSalesReports.map((row, idx) => (
             <tr key={idx}>
-              {/* {!hideCustomerColumn && (
-                <td>{row["Customer Name"] || "-"}</td>
-              )}
+  <td>{row["Customer Name"] || "-"}</td>
+  <td>{row["Description"] || "-"}</td>
+  <td>{row["Qty"] || "-"}</td>
 
-              {!hideProductColumn && (
-                <td>{row["Description"] || "-"}</td>
-              )} */}
-              <td>{row["Customer Name"] || "-"}</td>
-              <td>{row["PO Number"] || "-"}</td>
-              <td>{row["Description"] || "-"}</td>
-              <td>{row["Qty"] || "-"}</td>
+  <td>{row["Invoice #"] || "-"}</td>
+  <td>{row["Invoice Date"] || "-"}</td>
 
-              <td>{row["Invoice #"] || "-"}</td>
-              <td>{row["Invoice Date"] || "-"}</td>
-<td>
-  {row["Amount Billed (INR)"]
-    ? `₹ ${row["Amount Billed (INR)"]}`
-    : "-"}
-</td>
-            </tr>
+  {/* 👉 NEW COLUMNS */}
+  <td>{row["Mode"] || "-"}</td>
+  <td>{row["Business Type"] || "-"}</td>
+
+  <td>
+    {row["Amount Billed (INR)"]
+      ? `₹ ${row["Amount Billed (INR)"]}`
+      : "-"
+    }
+  </td>
+
+  <td>{row["PO Number"] || "-"}</td>
+</tr>
+
           ))}
         </tbody>
       </table>
@@ -1160,124 +1324,8 @@ const productCombinedChartData = useMemo(() => {
       )
     )}
     
-{/* ================== CHARTS ================== */}
-{filteredSalesReports.length > 0 && (
-  <div className="sales-report-charts mt-5">
-    
-    {/* Line Chart */}
-    <h5 className="text-center mb-3">Sales Trend (Date-wise)</h5>
-    <ResponsiveContainer width="100%" height={320}>
-      <LineChart data={salesLineChartData}>
-        <CartesianGrid strokeDasharray="3 3" />
-<XAxis
-  dataKey="date"
-  interval={0}              // ✅ show ALL dates
-  angle={-45}               // ✅ rotate labels
-  textAnchor="end"
-  height={70}
-/>
-        <YAxis />
-        <Tooltip formatter={(value) => `₹ ${value}`} />
-        <Line
-          type="monotone"
-          dataKey="amount"
-          stroke="#0a8181"
-          strokeWidth={3}
-          dot={{ r: 4 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-
-    {/* Bar Chart */}
-    <h5 className="text-center mt-5 mb-3">Customer-wise Sales</h5>
-    <ResponsiveContainer width="100%" height={320}>
-      <BarChart data={salesBarChartData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="customer" />
-        <YAxis />
-        <Tooltip formatter={(value) => `₹ ${value}`} />
-        <Bar
-          dataKey="amount"
-          fill="#3498db"
-          radius={[6, 6, 0, 0]}
-        />
-      </BarChart>
-    </ResponsiveContainer>
-    
-    <h5 className="text-center mt-5 mb-3">
-  Product-wise Quantity & Amount
-</h5>
-
-<div style={{ width: "100%", overflowX: "auto" }}>
-  <div style={{ width: `${productCombinedChartData.length * 140}px` }}>
-    <ResponsiveContainer width="100%" height={480}>
-      <ComposedChart data={productCombinedChartData}>
-        <CartesianGrid strokeDasharray="3 3" />
-
-        <XAxis
-          dataKey="product"
-          interval={0}
-          angle={-30}
-          textAnchor="end"
-          height={90}
-        />
-
-        {/* Left Y-Axis → Quantity */}
-        <YAxis
-          yAxisId="left"
-          label={{ value: "Qty", angle: -90, position: "insideLeft" }}
-        />
-
-        {/* Right Y-Axis → Amount */}
-        <YAxis
-          yAxisId="right"
-          orientation="right"
-          label={{
-            value: "Amount (₹)",
-            angle: 90,
-            position: "insideRight",
-          }}
-        />
-
-        <Tooltip
-          formatter={(value, name) => {
-            if (name === "Amount") {
-              return [`₹ ${value}`, "Amount"];
-            }
-            return [value, "Quantity"];
-          }}
-        />
-
-        <Legend />
-
-        {/* Quantity as Bar */}
-        <Bar
-          yAxisId="left"
-          dataKey="quantity"
-          fill="#27ae60"
-          name="Quantity"
-          radius={[6, 6, 0, 0]}
-        />
-
-        {/* Amount as Line */}
-        <Line
-          yAxisId="right"
-          type="monotone"
-          dataKey="amount"
-          stroke="#e74c3c"
-          strokeWidth={3}
-          name="Amount"
-        />
-      </ComposedChart>
-    </ResponsiveContainer>
-  </div>
-</div>
-
-  </div>
-)}
-
     {/* Pagination */}
-    {filteredSalesReports.length > 0 && salesTotalPages > 1 && (
+    {filteredSalesReports.length > perPage && frontendTotalPages > 1 && (
       <div className="pagination-controls-salesreport">
         <button
           onClick={() => handlePageChange(page - 1)}
@@ -1287,17 +1335,367 @@ const productCombinedChartData = useMemo(() => {
         </button>
 
         <span className="page-salesreport">
-          {page} of {salesTotalPages}
+          {page} of {frontendTotalPages}
         </span>
 
         <button
           onClick={() => handlePageChange(page + 1)}
-          disabled={page === salesTotalPages}
+          disabled={page === frontendTotalPages}
         >
           <FaChevronRight />
         </button>
       </div>
     )}
+
+    {/* ================== CHARTS ================== */}
+{/* --- Collapsible Charts Section --- */}
+{filteredSalesReports.length > 0 && (
+  <div className="charts-collapsible mt-4">
+    <Button
+      onClick={() => setChartsOpen(!chartsOpen)}
+      aria-controls="charts-collapse"
+      aria-expanded={chartsOpen}
+      variant="outline-primary"
+      className={`mb-3 ${chartsOpen ? "open" : ""}`} // ✅ add class for arrow rotation
+    >
+      <span className="arrow">{chartsOpen ? "▼" : "►"}</span>
+  {chartsOpen ? " Hide Charts & Analysis" : " View Charts & Analysis"}
+</Button>
+
+    <Collapse in={chartsOpen}>
+      <div
+        id="charts-collapse"
+        className={chartsOpen ? "show" : ""}
+      >
+        <div className="sales-report-charts mt-3">
+          {/* --- Line Chart --- */}
+         <div className="sales-line-chart">
+  <h5 className="text-center mb-3">Sales Trend (Date-wise)</h5>
+
+  <ResponsiveContainer width="100%" height="100%">
+    <LineChart data={salesLineChartData}  margin={{ top: 20, right: 20, bottom: 20, left: 40 }}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis
+        dataKey="date"
+        interval={0}
+        angle={-45}
+        textAnchor="end"
+        height={70}
+        axisLine={{ stroke: "#888888ff", strokeWidth: 1 }}
+        tick={{
+    fill: "#585757ff",
+    fontSize: 12,
+    fontWeight: 600,
+    fontFamily: "Shippori Mincho B1, Times New Roman, serif"
+  }}
+    >
+      <Label
+    value="Date ➜"
+    position="insideBottom"
+    offset={-5}
+    style={{ fill: "#0a3d62", fontSize: 13, fontWeight: 600, fontFamily: "Shippori Mincho B1, Times New Roman, serif"
+ }}
+  />
+  </XAxis>
+
+  <YAxis
+  axisLine={{ stroke: "#888888ff", strokeWidth: 1 }}
+   tick={{
+    fill: "#585757ff",
+    fontSize: 12,
+    fontWeight: 600,
+    fontFamily: "Shippori Mincho B1, Times New Roman, serif"
+  }}>
+  <Label
+    value="  Sales Amount (₹) ➜"
+    angle={-90}
+    position="outsideLeft"
+    dx={-40}  
+       style={{ fill: "#0a3d62", fontSize: 12, fontWeight: 600, fontFamily: "Shippori Mincho B1, Times New Roman, serif"
+    }}
+  />
+  </YAxis>
+
+  <Tooltip formatter={(value) => [`₹ ${value}`, "Total Amount"]}  
+    wrapperStyle={{
+    borderRadius: "2px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+  }}
+  contentStyle={{
+    backgroundColor: "#2d7174ff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "3px",
+    padding: "8px 12px", 
+    fontSize: "12px",
+    fontFamily: "Shippori Mincho B1, Times New Roman, serif",
+  }}
+  itemStyle={{ color: "#fff",  fontFamily: "Shippori Mincho B1, Times New Roman, serif", fontWeight: 600
+ }}
+  labelStyle={{
+    color: "#fff",
+    fontWeight: 600,
+        fontFamily: "Shippori Mincho B1, Times New Roman, serif"
+  }}
+  cursor={{ stroke: "#0a8181", strokeWidth: 2, fill: "rgba(10,129,129,0.1)" }}/>
+    
+      <Line
+        type="monotone"
+        dataKey="amount"
+        stroke="#0a8181"
+        strokeWidth={3}
+        dot={{ r: 4 }}
+        style={{ cursor: "pointer" }}
+      />
+    </LineChart>
+  </ResponsiveContainer>
+</div>
+<br></br>
+<br></br>
+<br></br>
+
+          {/* --- Bar Chart --- */}
+           <div className="sales-bar-chart">
+  <h5 className="sales-bar-chart-head">Customer-wise Sales:</h5>
+
+  <ResponsiveContainer width="100%" height={chartHeight}>
+    <BarChart
+      data={salesBarChartData}
+      layout="vertical"
+      wrapperStyle={{ overflow: "visible" }} 
+      margin={{ top: 20, right: 30, bottom: 20, left: 10 }}
+    >
+      <CartesianGrid strokeDasharray="3 3" />
+
+      {/* Y Axis → Customer Names */}
+      <YAxis
+  dataKey="customer"
+  type="category"
+  width={180}      // 👈 This is the correct prop
+  axisLine={{ stroke: "#888888ff", strokeWidth: 1 }}
+  tick={<CustomCustomerTick />}
+><Label
+    value="Customers ➜"
+    angle={-90}
+    position="outsideLeft"
+    dx={-40}  
+       style={{ fill: "#0a3d62", fontSize: 13, fontWeight: 600, fontFamily: "Shippori Mincho B1, Times New Roman, serif"
+    }}
+  />
+  </YAxis>
+
+      {/* X Axis → Amount */}
+      <XAxis
+        type="number"
+        axisLine={{ stroke: "#888888ff", strokeWidth: 1 }}
+        tick={{
+          fill: "#585757ff",
+          fontSize: 13,
+          fontWeight: 600,
+          fontFamily: "Shippori Mincho B1, Times New Roman, serif",
+        }}
+      >
+        <Label
+          value=" Sales Amount (₹) ➜"
+          position="insideBottom"
+          offset={-20}
+          style={{
+            fill: "#0a3d62",
+            fontSize: 13,
+            fontWeight: 600,
+            fontFamily: "Shippori Mincho B1, Times New Roman, serif",
+          }}
+        />
+      </XAxis>
+
+      {/* Tooltip same look as line chart */}
+      <Tooltip
+      labelFormatter={(label) => {
+    const wrapped = label.match(/.{1,55}/g)?.join("\n") || label;
+    return wrapped;
+  }}
+        formatter={(value) => [`₹ ${value}`, "Total Sales"]}
+        wrapperStyle={{
+          borderRadius: "2px",
+          boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+        }}
+        contentStyle={{
+              whiteSpace: "pre-line",
+          backgroundColor: "#f7fbfcfd",
+          color: "#1b5d61ff",
+          border: "none",
+          borderRadius: "3px",
+          padding: "8px 12px",
+          fontSize: "13px",
+          fontWeight: 600,
+          fontFamily: "Shippori Mincho B1, Times New Roman, serif",
+        }}
+        itemStyle={{
+          color: "#1b5d61ff",
+          fontFamily: "Shippori Mincho B1, Times New Roman, serif",
+          fontWeight: 600,
+        }}
+        labelStyle={{
+              whiteSpace: "pre-line",
+          color: "#1b5d61ff",
+          fontWeight: 600,
+          fontFamily: "Shippori Mincho B1, Times New Roman, serif",
+        }}
+        cursor={{ fill: "rgba(10,129,129,0.15)" }}
+      />
+
+      {/* Bars */}
+      <Bar
+        dataKey="amount"
+        fill="#0a8181"
+        radius={[0, 4, 4, 0]}
+        barSize={20}
+        style={{ cursor: "pointer" }}
+      />
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+<br></br><br></br>
+<br></br><br></br>
+
+          {/* --- Pie Chart --- */}
+
+<h5 className="sales-pie-chart-head">
+  Product-wise Sales Percentage:
+</h5>
+
+<ResponsiveContainer width="100%" height={piechartHeight}>
+  <PieChart margin={{ top: 20, right: 180, bottom: 20, left: 20 }}>
+    <Pie
+      data={productCombinedChartData}
+      dataKey="amount"
+      nameKey="product"
+      cx="45%"
+      cy="50%"
+      outerRadius={safeOuterRadius}
+      label={showSliceLabels
+        ? ({ cx, cy, midAngle, outerRadius, payload, percent }) => {
+            const RAD = Math.PI / 180;
+            const radius = outerRadius + 18;
+            const x = cx + radius * Math.cos(-midAngle * RAD);
+            const y = cy + radius * Math.sin(-midAngle * RAD);
+
+            const name = payload.product || "";
+            const short =
+              name.length > 22 ? name.slice(0, 22) + "…" : name;
+
+            return (
+              <text
+                x={x}
+                y={y}
+                textAnchor={x > cx ? "start" : "end"}
+                dominantBaseline="central"
+                fill="#585757ff"
+                fontSize={12}
+                fontWeight={600}
+                fontFamily="Shippori Mincho B1, Times New Roman, serif"
+              >
+                {short}
+                <tspan
+                  dx={4}
+                  fill="#026464ff"
+                  fontSize={14}
+                  fontWeight={700}
+                >
+                  ({(percent * 100).toFixed(1)}%)
+                </tspan>
+              </text>
+            );
+          }
+        : false}
+    >
+      {sortedProductData.map((entry, index) => (
+        <Cell key={index} fill={finalColors[index]} />
+      ))}
+    </Pie>
+
+    {/* Tooltip */}
+    <Tooltip
+      content={({ active, payload }) => {
+        if (!active || !payload?.length) return null;
+
+        const { product, amount } = payload[0]?.payload || {};
+
+        const total = productCombinedChartData.reduce(
+          (sum, i) => sum + i.amount,
+          0
+        );
+
+        const percentage = total
+          ? ((amount / total) * 100).toFixed(1)
+          : 0;
+
+        const wrapped =
+          product?.match(/.{1,30}/g)?.join("\n") || product;
+
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-line",
+              backgroundColor: "#1b5d61ff",
+              color: "#f7fbfcfd",
+              borderRadius: "3px",
+              padding: "8px 12px",
+              fontFamily:
+                "Shippori Mincho B1, Times New Roman, serif",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+              fontSize: "13px",
+              fontWeight: 600,
+              border: "none",
+            }}
+          >
+            {/* Product Name */}
+            <div
+              style={{
+                marginBottom: "6px",
+                fontWeight: 600,
+              }}
+            >
+              {wrapped}
+            </div>
+
+            {/* Sales + % */}
+            <div>
+              Total Sales:&nbsp;&nbsp;
+              <strong>₹ {amount}</strong>{" "}
+              <span
+                style={{
+                  fontSize: "16px",
+                  fontWeight: 900,
+                  color: "#fffffffd",
+                }}
+              >
+                ({percentage}%)
+              </span>
+            </div>
+          </div>
+        );
+      }}
+    />
+
+    {/* Legend */}
+    <Legend
+      layout="vertical"
+      align="right"
+      verticalAlign="middle"
+      wrapperStyle={{
+        right: -7,
+      }}
+      content={<TwoColumnPieLegend />}
+    />
+  </PieChart>
+</ResponsiveContainer>
+
+        </div>
+      </div>
+    </Collapse>
+  </div>
+)}
   </div>
 
       </div>

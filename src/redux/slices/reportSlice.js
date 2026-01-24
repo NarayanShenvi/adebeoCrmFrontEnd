@@ -85,7 +85,108 @@
     }
   );
 
+// ------------------------------
+// PURCHASE REPORT
+// ------------------------------
+export const fetchPurchaseReport = createAsyncThunk(
+  "report/fetchPurchaseReport",
+  async ({ startDate, endDate, page, perPage }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("Access_Token");
 
+      const params = {
+        startDate,
+        endDate,
+        page,
+        per_page: perPage,
+      };
+
+      console.log("Fetching PURCHASE report with params:", params);
+
+      const response = await axios.get(`${API}/purchase_report`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching purchase report:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch purchase report"
+      );
+    }
+  }
+);
+
+// ------------------------------
+// BUSINESS REPORT
+// ------------------------------
+export const fetchBusinessReport = createAsyncThunk(
+  "report/fetchBusinessReport",
+  async ({ startDate, endDate }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("Access_Token");
+
+      const params = {
+        startDate,
+        endDate,
+      };
+
+      console.log("Fetching BUSINESS report with params:", params);
+
+      const response = await axios.get(`${API}/business_report`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching business report:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch business report"
+      );
+    }
+  }
+);
+
+// ------------------------------
+// PAYMENT REPORT
+// ------------------------------
+export const fetchPaymentReport = createAsyncThunk(
+  "report/fetchPaymentReport",
+  async ({ startDate, endDate, page, perPage }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("Access_Token");
+
+      const params = {
+        startDate,
+        endDate,
+        page,
+        per_page: perPage,
+      };
+
+      console.log("Fetching PAYMENT report with params:", params);
+
+      const response = await axios.get(`${API}/payment_report`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching payment report:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch payment report"
+      );
+    }
+  }
+);
 
   const reportSlice = createSlice({
     name: 'report',
@@ -98,13 +199,34 @@
       totalCount: 0,
       perPage: 10,  // Default per page value
 
-      // ---- SALES REPORT STATE (NEW) ----
+      // ---- SALES REPORT STATE ----
     salesReports: [],
     salesLoading: false,
     salesError: null,
     salesCurrentPage: 1,
     salesTotalPages: 1,
-    },
+    
+    // ---- PURCHASE REPORT STATE ----
+    purchaseReports: [],
+    purchaseLoading: false,
+    purchaseError: null,
+    purchaseCurrentPage: 1,
+    purchaseTotalPages: 1,
+
+    // ---- BUSINESS REPORT STATE ----
+    businessReports: [],
+    businessLoading: false,
+    businessError: null,
+
+    // ---- PAYMENT REPORT STATE ----
+    paymentReports: [],
+    paymentLoading: false,
+    paymentError: null,
+    paymentCurrentPage: 1,
+    paymentTotalPages: 1,
+
+  },
+
 reducers: {
   resetSalesReport: (state) => {
     state.salesReports = [];
@@ -113,7 +235,31 @@ reducers: {
     state.salesCurrentPage = 1;
     state.salesTotalPages = 1;
   },
+
+  resetPurchaseReport: (state) => {
+      state.purchaseReports = [];
+      state.purchaseLoading = false;
+      state.purchaseError = null;
+      state.purchaseCurrentPage = 1;
+      state.purchaseTotalPages = 1;
+  },
+
+  resetBusinessReport: (state) => {
+      state.businessReports = [];
+      state.businessLoading = false;
+      state.businessError = null;
+  },
+
+  resetPaymentReport: (state) => {
+      state.paymentReports = [];
+      state.paymentLoading = false;
+      state.paymentError = null;
+      state.paymentCurrentPage = 1;
+      state.paymentTotalPages = 1;
+  },
+
 },
+
     extraReducers: (builder) => {
       builder
         .addCase(fetchActivityReport.pending, (state) => {
@@ -170,11 +316,88 @@ reducers: {
     console.log("Fetching SALES report - Rejected", action.error.message);
     state.salesLoading = false;
     state.salesError = action.error.message || "Unknown error";
-  });
+  })
+
+  // ------------------------------
+    // PURCHASE REPORT REDUCERS
+    // ------------------------------
+      .addCase(fetchPurchaseReport.pending, (state) => {
+        console.log("Fetching PURCHASE report - Pending...");
+        state.purchaseLoading = true;
+        state.purchaseError = null;
+      })
+      .addCase(fetchPurchaseReport.fulfilled, (state, action) => {
+        console.log("Fetching PURCHASE report - Fulfilled", action.payload);
+        state.purchaseLoading = false;
+        state.purchaseReports = action.payload.purchases || [];
+        state.purchaseCurrentPage = action.payload.currentPage || 1;
+        state.purchaseTotalPages = action.payload.totalPages || 1;
+      })
+      .addCase(fetchPurchaseReport.rejected, (state, action) => {
+        console.log("Fetching PURCHASE report - Rejected", action.error.message);
+        state.purchaseLoading = false;
+        state.purchaseError = action.error.message || "Unknown error";
+      })
+
+      // ------------------------------
+// BUSINESS REPORT REDUCERS
+// ------------------------------
+.addCase(fetchBusinessReport.pending, (state) => {
+  console.log("Fetching BUSINESS report - Pending...");
+  state.businessLoading = true;
+  state.businessError = null;
+})
+.addCase(fetchBusinessReport.fulfilled, (state, action) => {
+  console.log("Fetching BUSINESS report - Fulfilled", action.payload);
+  state.businessLoading = false;
+
+  // ✅ FIXED: match backend response key
+  state.businessReports = action.payload.businessReport || [];
+
+  state.businessTotalCount = action.payload.totalCount || 0;
+})
+
+.addCase(fetchBusinessReport.rejected, (state, action) => {
+  console.log("Fetching BUSINESS report - Rejected", action.error.message);
+  state.businessLoading = false;
+  state.businessError = action.error.message || "Unknown error";
+})
+
+// ------------------------------
+// PAYMENT REPORT REDUCERS
+// ------------------------------
+.addCase(fetchPaymentReport.pending, (state) => {
+  console.log("Fetching PAYMENT report - Pending...");
+  state.paymentLoading = true;
+  state.paymentError = null;
+})
+
+.addCase(fetchPaymentReport.fulfilled, (state, action) => {
+  console.log("Fetching PAYMENT report - Fulfilled", action.payload);
+
+  state.paymentLoading = false;
+
+  // API structure:
+  // {
+  //   currentPage: 1,
+  //   payment_report: [ {...} ]
+  // }
+
+  state.paymentReports = action.payload.payment_report || [];
+  state.paymentCurrentPage = action.payload.currentPage || 1;
+  state.paymentTotalPages = action.payload.totalPages || 1;
+})
+
+.addCase(fetchPaymentReport.rejected, (state, action) => {
+  console.log("Fetching PAYMENT report - Rejected", action.error.message);
+  state.paymentLoading = false;
+  state.paymentError = action.error.message || "Unknown error";
+});
 
     },
   });
 
-  export const { resetSalesReport } = reportSlice.actions;
+  
+export const { resetSalesReport, resetPurchaseReport,  resetBusinessReport, resetPaymentReport } = reportSlice.actions;
 
-  export default reportSlice.reducer;
+export default reportSlice.reducer;

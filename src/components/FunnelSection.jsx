@@ -25,7 +25,7 @@ import { ToastContainer } from "react-toastify";
 const FunnelSection = () => {
   const dispatch = useDispatch();
   const [selectedCustomerId, setSelectedCustomerId] = useState(null); // Track selected customer changes made
-
+  const [searchType, setSearchType] = useState("name"); 
 
 //tableref part removed
 const [taskTime, setTaskTime] = useState("12:00");
@@ -33,7 +33,6 @@ const resetTaskInputs = () => {
   setNewTask('');
   setTaskTime('12:00');
 };
-
 const [showTaskPopup, setShowTaskPopup] = useState(false);
 const [selectedTaskCustomerId, setSelectedTaskCustomerId] = useState(null);
 const [selectedDate, setSelectedDate] = useState(new Date());
@@ -214,26 +213,6 @@ const sliderRef = useRef(null); // Create a ref for the slider
   const modalState = useSelector((state) => state.funnel.modalState);
   const totalPages = useSelector((state) => state.funnel.totalPages);
   
-  const placeholders = ["Search by Customer Name...", "Search by Customer Address...", "Search by Customer Area..."];
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [focused, setFocused] = useState(false);
-  const [animate, setAnimate] = useState(false);
-
-  // Rotate placeholders
-  useEffect(() => {
-    if (focused || searchTerm) return; // pause when typing/focused
-
-    const interval = setInterval(() => {
-      setAnimate(true); // start slide up animation
-      setTimeout(() => {
-        setAnimate(false);
-        setCurrentIndex((prev) => (prev + 1) % placeholders.length);
-      }, 400); // match animation duration
-    }, 3500);
-
-    return () => clearInterval(interval);
-  }, [focused, searchTerm]);
-  
   //const [totalPages, setTotalPages] = useState(1);
  
   // Calculate page boundaries based on rows per page
@@ -245,18 +224,48 @@ const sliderRef = useRef(null); // Create a ref for the slider
 
   // Handle pagination changes
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);//page = 1, limit = 10, companyName = ""
-      dispatch(loadFunneldata((currentPage+1), rowsPerPage, debouncedSearchTerm));
-    }
-  };
+  if (currentPage < totalPages) {
+    const backendSearchType =
+  searchType === "name" ? "company" :
+  searchType === "area" ? "area" :
+  searchType === "email" ? "email" :
+  "phone"; // default fallback
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-      dispatch(loadFunneldata((currentPage-1), rowsPerPage, debouncedSearchTerm));
-    }
-  };
+
+    setCurrentPage(currentPage + 1);
+
+    dispatch(
+      loadFunneldata(
+        currentPage + 1,
+        rowsPerPage,
+        debouncedSearchTerm,
+        backendSearchType
+      )
+    );
+  }
+};
+const handlePrevPage = () => {
+  if (currentPage > 1) {
+    const backendSearchType =
+  searchType === "name" ? "company" :
+  searchType === "area" ? "area" :
+  searchType === "email" ? "email" :
+  "phone"; // default fallback
+
+
+    setCurrentPage(currentPage - 1);
+
+    dispatch(
+      loadFunneldata(
+        currentPage - 1,
+        rowsPerPage,
+        debouncedSearchTerm,
+        backendSearchType
+      )
+    );
+  }
+};
+
 
   // Recalculate total pages based on rows per page
   // useEffect(() => {
@@ -286,29 +295,26 @@ const sliderRef = useRef(null); // Create a ref for the slider
   }, [searchTerm]);
 
   // Fetch funnel data when searchTerm changes
-  // useEffect(() => {
-  //   if (debouncedSearchTerm.trim() !== '') {
-  //     dispatch(loadFunneldata(1, rowsPerPage, debouncedSearchTerm));
-  //   }
-  // }, [debouncedSearchTerm, dispatch, rowsPerPage]);
-  const [filteredData, setFilteredData] = useState([]);
+  useEffect(() => {
+  if (debouncedSearchTerm.trim() === "") return;
 
-  const [masterData, setMasterData] = useState([]);
-useEffect(() => {
-  setMasterData(funnelData);
-  setFilteredData(funnelData);
-}, [funnelData]);
-useEffect(() => {
-  const lower = debouncedSearchTerm.toLowerCase();
+  const backendSearchType =
+  searchType === "name" ? "company" :
+  searchType === "area" ? "area" :
+  searchType === "email" ? "email" :
+  "phone"; // default fallback
 
-  const filtered = masterData.filter((cust) =>
-    (cust.companyName?.toLowerCase() || "").includes(lower) ||
-    (cust.address?.toLowerCase() || "").includes(lower) ||
-    (cust.area?.toLowerCase() || "").includes(lower)
+
+  dispatch(
+    loadFunneldata(
+      1,
+      rowsPerPage,
+      debouncedSearchTerm,
+      backendSearchType
+    )
   );
 
-  setFilteredData(filtered);
-}, [debouncedSearchTerm, masterData]);
+}, [debouncedSearchTerm, searchType, dispatch, rowsPerPage]);
 
 
   // Fetch customer comments only if they haven't been fetched already
@@ -443,6 +449,7 @@ toast.error("Please select a customer and enter a comment!!!.");  }
     }));
   };
   
+  
 
   // Close slider when clicking outside
   useEffect(() => {
@@ -472,28 +479,82 @@ toast.error("Please select a customer and enter a comment!!!.");  }
 
       <h3>My Funnel</h3>
       <br></br>
-
-<div className="search-wrapper">
+      
+     <div className="search-wrapper">
   <input
     type="text"
+    placeholder={
+      searchType === "name"
+        ? "Search by Customer Name"
+        : searchType === "area"
+        ? "Search by Area"
+        : searchType === "email"
+        ? "Search by Email"
+        : "Search by Phone"
+    }
     value={searchTerm}
     onChange={(e) => setSearchTerm(e.target.value)}
-    onFocus={() => setFocused(true)}
-    onBlur={() => setFocused(false)}
     className="search_company"
   />
 
-  {!searchTerm && !focused && (
-    <span className={`animated-placeholder ${animate ? "slide-up" : ""}`}>
-      {placeholders[currentIndex]}
-    </span>
-  )}
+  <div className="search-radio-group">
+
+  <div>
+    <input
+      type="radio"
+      id="searchName"
+      name="searchType"
+      value="name"
+      checked={searchType === "name"}
+      onChange={() => setSearchType("name")}
+    />
+    <label htmlFor="searchName">Search by Name</label>
+  </div>
+
+  <div>
+    <input
+      type="radio"
+      id="searchArea"
+      name="searchType"
+      value="area"
+      checked={searchType === "area"}
+      onChange={() => setSearchType("area")}
+    />
+    <label htmlFor="searchArea">Search by Area</label>
+  </div>
+
+{/* Search by Email */}
+    <div>
+      <input
+        type="radio"
+        id="searchEmail"
+        name="searchType"
+        value="email"
+        checked={searchType === "email"}
+        onChange={() => setSearchType("email")}
+      />
+      <label htmlFor="searchEmail">Search by Email</label>
+    </div>
+
+    {/* Search by Phone */}
+    <div>
+      <input
+        type="radio"
+        id="searchPhone"
+        name="searchType"
+        value="phone"
+        checked={searchType === "phone"}
+        onChange={() => setSearchType("phone")}
+      />
+      <label htmlFor="searchPhone">Search by Phone</label>
+    </div>
+
+</div>
+
 </div>
 
 
-          {/* changes made--searchbar classname */}
-
-      {filteredData && filteredData.length > 0 ? (
+      {funnelData && funnelData.length > 0 ? (
         
      <div className='right-pannel'>
      <table className="funnel-table" >
@@ -511,7 +572,7 @@ toast.error("Please select a customer and enter a comment!!!.");  }
          </tr>
        </thead>
        <tbody>
-       {filteredData.map((item) => (
+       {currentRows.map((item) => (
             <tr
             key={item._id}
             onClick={() => setSelectedCustomerId(item._id)}
@@ -582,9 +643,9 @@ toast.error("Please select a customer and enter a comment!!!.");  }
       color: "#069696",
       padding: "20px",
       width: "100%",
-      marginTop: "40%",
+      marginTop: "39%",
       fontFamily: '"Shippori Mincho B1", "Times New Roman", serif',
-    }}>No matching results found for the current search. 🔍 <br /> Clear the search and try again.</p> 
+    }}>No matching results found for the current search.🔍 <br></br> Clear the search and try again.</p> 
         
       )}
 
