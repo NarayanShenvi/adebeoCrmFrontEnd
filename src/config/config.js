@@ -1,4 +1,4 @@
-const API = "https://crm-dev-backend.onrender.com";
+const API = "https://adebeo-crm1.onrender.com";
 //"https://crm-dev-backend.onrender.com"; "https://adebeo-crm1.onrender.com"
 //const API = "http://127.0.0.1:5000"
 export default API ;
