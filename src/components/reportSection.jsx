@@ -21,7 +21,7 @@ const ReportSection = () => {
   const [reportType, setReportType] = useState('short');
   const [user, setUser] = useState('');
   const [page, setPage] = useState(1);
-  const perPage = 5;
+  const perPage = 200;
 
   const { activities, loading, totalPages, totalCount, error } = useSelector(state => state.report);
   const { users = [], loading: usersLoading, error: usersError } = useSelector(state => state.users);
