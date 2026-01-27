@@ -106,7 +106,7 @@ const categories = useMemo(() => {
 
   products.forEach((p) => {
     const code = p.categoryCode && String(p.categoryCode).trim() !== "" ? String(p.categoryCode) : null;
-    const name = p.categoryName || p.category || code || "Uncategorized";
+    const name = p.category_info.Category_Name || p.category || code || "Uncategorized";
 
     if (code) {
       if (!map[code]) map[code] = { _id: code, categoryName: name, products: [] };
@@ -867,7 +867,8 @@ useEffect(() => {
                         line.selectedProduct?._id === p._id ? "selected" : ""
                       }`}
                     >
-                      {p.productName} ({p.ProductDisplay || ""}) — Code: {p.productCode}
+                      {p.ProductDisplay || ""} — Code: {p.productCode}
+                      
                     </div>
                   ))}
             </div>

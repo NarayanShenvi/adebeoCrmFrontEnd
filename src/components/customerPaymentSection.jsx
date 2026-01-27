@@ -102,10 +102,18 @@ useEffect(() => {
 
   const remaining = payment.amount_due - paidAmount;
 
+  // const updatedPayment = {
+  //   ...payment,
+  //   paid_amount: paidAmount,
+  //   comment: combinedComment,
+  //   amount_due: remaining,
+  //   payment_status: remaining <= 0 ? "Completed" : "Pending",
+  // };
+
   const updatedPayment = {
     ...payment,
     paid_amount: paidAmount,
-    comment: combinedComment,
+    comment: newComment || "",
     amount_due: remaining,
     payment_status: remaining <= 0 ? "Completed" : "Pending",
   };
