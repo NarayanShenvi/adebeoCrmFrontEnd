@@ -55,26 +55,27 @@ export const fetchProformas = createAsyncThunk(
 // Async thunk to fetch paginated purchase orders
 export const fetchPurchaseOrders = createAsyncThunk(
   'purchaseOrder/fetchPurchaseOrders',
-  async ({ page = 1, rows_per_page = 10 }) => {
-    // Retrieve the access token from localStorage (or wherever you store it)
-    const token = localStorage.getItem('Access_Token');  // Adjust if you use sessionStorage or another method
-    
+  async ({ page = 1, rows_per_page = 10, search = "" }) => {  // add search parameter
+    const token = localStorage.getItem('Access_Token');
     if (!token) {
       throw new Error("No access token found");
     }
 
     try {
-      const response = await axios.get(
-        `${API}/get_purchase_orders?page=${page}&rows_per_page=${rows_per_page}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,  // Add the token to the headers
-          },
-        }
-      );
-      return response.data;  // Return the response data (purchase orders)
+      // Build query string
+      let url = `${API}/get_purchase_orders?page=${page}&rows_per_page=${rows_per_page}`;
+      if (search) {
+        url += `&search=${encodeURIComponent(search)}`;  // append search term
+      }
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data;  // Return the response data
     } catch (error) {
-      // Handle the error if token is expired or any other issue
       if (error.response && error.response.status === 401) {
         throw new Error("Token has expired or is invalid.");
       }
@@ -111,6 +112,7 @@ const purchaseOrderSlice = createSlice({
     totalOrders: 0,
     isProformasFetched: false,
     orderStatus: null, // To store the status of order creation (success or failure)
+    searchTerm: "",
   },
   reducers: {
     setProformasFetched: (state) => {
@@ -124,6 +126,9 @@ const purchaseOrderSlice = createSlice({
       state.totalOrders = action.payload.total_orders;
       state.totalPages = action.payload.total_pages;
     },
+    setSearchTerm: (state, action) => {  // <-- new reducer
+    state.searchTerm = action.payload;
+  },
   },
   extraReducers: (builder) => {
     builder
@@ -164,7 +169,8 @@ const purchaseOrderSlice = createSlice({
   },
 });
 
-export const { setProformasFetched, resetProformasFetched, setRecentOrders } = purchaseOrderSlice.actions;
+export const { setProformasFetched, resetProformasFetched, setRecentOrders} = purchaseOrderSlice.actions;
+export const { setSearchTerm } = purchaseOrderSlice.actions;
 
 export default purchaseOrderSlice.reducer;
 

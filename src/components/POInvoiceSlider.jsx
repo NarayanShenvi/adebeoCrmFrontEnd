@@ -42,8 +42,6 @@ const [hoveredCatId, setHoveredCatId] = useState(null); // category currently ho
 const [activeCatId, setActiveCatId] = useState(null); // category clicked/tapped (persist)
 const hideTimerRef = useRef(null);
 
-const itemsPerPage = 5; // Adjust based on your requirement
-  //const [currentPerformas, setCurrentPerformas] = useState(1);
 
 const sliderRef = useRef(null); // Reference for the slider container changes made
 const wrapperRef = useRef(null);
@@ -92,14 +90,7 @@ const [portalPos, setPortalPos] = useState({ top: 0, left: 0 });
     }
   }, [dispatch, currentPageState, customerId]);
 
-  const indexOfLastQuote = currentPageState * itemsPerPage;
-  const indexOfFirstQuote = indexOfLastQuote - itemsPerPage;
-//  console.log ("current ProformalInvoices are:", proformaInvoices)
- const currentPerformas = Array.isArray(performas) ? performas.slice(indexOfFirstQuote, indexOfLastQuote) : [];
-useEffect(() => {
-  dispatch(fetchProductsAsync());
-  dispatch(fetchComboProductsAsync()); // important for combo dropdowns
-}, [dispatch]);
+  const currentPerformas = Array.isArray(performas) ? performas : [];
 
 const clearHideTimer = () => {
   if (hideTimerRef.current) {
@@ -858,9 +849,15 @@ updateTotal(quoteItems);
 
 
   const handlePageChange = (pageNumber) => {
-    setCurrentPageState(pageNumber);
-    dispatch(fetchPerformasAsync({ page: pageNumber }));
-  };
+  if (pageNumber < 1 || pageNumber > totalPages) return;
+
+  setCurrentPageState(pageNumber);
+  dispatch(fetchPerformasAsync({
+    page: pageNumber,
+    customer_id: customerId
+  }));
+};
+
 
   useEffect(() => {
   function handleClick(e) {
@@ -1451,7 +1448,19 @@ useEffect(() => {
         </div>
         {/* Available PO's Section (Empty Placeholder for now) */}
         <div className="proforma-created-section">
+ <div className="proforma-header">
   <h4>Previous Proformas</h4>
+
+  {currentPageState > 1 && (
+     <div className="pagination-home-poinvoice-slider">
+    <button
+      onClick={() => handlePageChange(1)}
+    >
+      ⏮ Home
+    </button> </div>
+  )}
+</div>
+
 {loading ? (
     <p className="loading-po">Loading proformas...</p>   // ✅ show loader while fetching
   ) : currentPerformas && currentPerformas.length > 0 ? (

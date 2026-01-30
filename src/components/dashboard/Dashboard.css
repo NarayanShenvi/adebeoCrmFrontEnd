@@ -278,6 +278,48 @@ html, body {
   min-height: 100vh;
 }
 
+/* Header row: title left, button right */
+.pagination-home-funnel {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -39px;
+  margin-top: 1%;
+  margin-right: 22px;
+}
+
+/* Professional Home button styling */
+.pagination-home-funnel button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-funnel button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-funnel button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-funnel button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .funnel-table {
   width: 100%;
   border-collapse: collapse;
@@ -1358,6 +1400,13 @@ font-family: "Shippori Mincho B1", "Times New Roman", serif;
   font-weight: 900;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
+.quote-header h4 {
+  color: #703803;
+  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 900;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
 .quote-created-section {
   margin-top: 20px;
   width: 100%;
@@ -1379,6 +1428,54 @@ font-family: "Shippori Mincho B1", "Times New Roman", serif;
   color: #db6c03;
   text-align:center;
  margin-top: 10%;
+}
+
+/* Header row: title left, button right */
+.quote-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+/* Container for the Home button */
+.pagination-home-quote-slider {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-quote-slider button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 3px 10px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-quote-slider button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-quote-slider button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-quote-slider button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
 }
 
 .quote-table {
@@ -2155,6 +2252,15 @@ input.form-control-ref:focus {
   font-weight: 900;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
+
+.proforma-header h4 {
+  color: #703803;
+  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 900;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
 .proforma-created-section {
   margin-top: 20px;
   width: 100%;
@@ -2176,6 +2282,53 @@ input.form-control-ref:focus {
   color: #db6c03;
   text-align:center;
  margin-top: 10%;
+}
+
+.proforma-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+/* Container for the Home button */
+.pagination-home-poinvoice-slider {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-poinvoice-slider button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 3px 10px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-poinvoice-slider button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-poinvoice-slider button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-poinvoice-slider button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
 }
 
 .po-table {
@@ -2590,6 +2743,59 @@ a:hover {
   margin-bottom: 15px;
 }
 
+
+/* Header row: title left, button right */
+.information-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.information-header h4 {
+  color: #703803;
+  font-size: 15px;
+  font-weight: 900;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+/* Container for the Home button */
+.pagination-home-information-slider {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Professional Home button styling */
+.pagination-home-information-slider button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 3px 10px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-information-slider button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-information-slider button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-information-slider button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .invoice-table {
   width: 100%;
   border-collapse: collapse;
@@ -2603,7 +2809,6 @@ a:hover {
   max-width: 1200px; /* Adjust as needed */
   table-layout: fixed; /* Prevents columns from resizing */
   overflow: hidden;
-  margin-top: 10%;
 }
 
 .invoice-table thead
@@ -2692,6 +2897,7 @@ a:hover {
 .invoice-table-wrapper {
   text-align: center; /* ensures everything inside is centered */
   width: 100%;
+  margin-top: 10%;
 }
 
 .pagination-controls-inv {
@@ -4334,7 +4540,7 @@ a:hover {
   margin-left: 98%;
   transition: color 0.3s ease-in-out;
   font-size: 23px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .submit-button-p-order:disabled {
@@ -4359,7 +4565,7 @@ a:hover {
   font-size: 18px;
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  margin-top: 5%;
+  margin-top: 3%;
 }
 
 .recent-orders-section .no-purchase-orders
@@ -4374,13 +4580,12 @@ a:hover {
 
 
 /* Pagination rows per page */
-
 .pagination-section {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 20px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .pagination-section label {
@@ -4407,6 +4612,82 @@ a:hover {
 
 select option {
   padding: 5px;
+}
+
+/*search bar*/
+.search-by-po-number
+ {
+  width: 100%; 
+  height: 30px;
+  background: rgba(170, 207, 234, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121);
+  color: rgb(7, 94, 121);
+  box-sizing: border-box; /* ensures padding doesn't expand width */
+  display: block;
+  min-width: 310px !important;
+  margin-bottom:1%;
+}
+
+.search-by-po-number:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+
+.pagination-and-search {
+  display: flex;
+  justify-content: space-between; /* left & right */
+  align-items: center;
+  margin-bottom: 22px; /* optional spacing below */
+  margin-top: -6px;
+}
+
+/* Container for the Home button */
+.pagination-home-porder {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  margin-top: -2%;
+  margin-bottom: 1%;
+}
+
+/* Professional Home button styling */
+.pagination-home-porder button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 500;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 13px;
+  color: #333333;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-porder button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-porder button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-porder button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
 }
 
 /* Recent Orders Section Table */
@@ -4736,6 +5017,74 @@ select option {
   margin-bottom: 4%;
 }
 
+.search-by-invoice-number
+ {
+  width: 100%; 
+  height: 30px;
+  background: rgba(170, 207, 234, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121);
+  color: rgb(7, 94, 121);
+  box-sizing: border-box; /* ensures padding doesn't expand width */
+  display: block;
+  max-width: 310px !important;
+  margin-bottom:1%;
+}
+
+.search-by-invoice-number:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+
+/* Container for the Home button */
+.pagination-home-cx {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  margin-top: -2%;
+  margin-bottom: 1%;
+}
+
+/* Professional Home button styling */
+.pagination-home-cx button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 500;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 13px;
+  color: #333333;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-cx button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-cx button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-cx button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
+/* Cx - Payment Table */
 .payments-table {
   width: 100%;
   border-collapse: collapse;
@@ -4969,6 +5318,39 @@ select option {
   background-color: #f1f1f1; 
   cursor: default;          /* no pointer change */
 }
+
+/* ================================
+   Disable ALL icon hover in disabled rows
+   ================================ */
+
+/* Prevent hover effects & pointer cursor */
+.payments-table tr.cancelled-row svg,
+.payments-table tr.regenerated-row svg {
+  pointer-events: none !important; /* stops hover + click */
+  cursor: default !important;
+  transform: none !important;
+}
+
+/* Stop hover styles specifically */
+.payments-table tr.cancelled-row svg:hover,
+.payments-table tr.regenerated-row svg:hover {
+  color: inherit !important;
+  transform: none !important;
+}
+/* Generic disabled state for icons */
+.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;   /* 🚀 THIS is the key */
+}
+
+/* Prevent hover effects explicitly */
+.is-disabled:hover {
+  color: inherit;
+  background: none;
+  transform: none;
+}
+
 .cxpay{
   background: none;
   border: none;
@@ -5301,6 +5683,7 @@ select option {
   flex-grow: 1;
   box-sizing: border-box;
   margin: 0 auto;
+  margin-bottom: -20px;
 }
 
 .report-section .form-group {
@@ -5405,6 +5788,47 @@ select option {
 }
 
 
+/* Header row: title left, button right */
+.pagination-home-report {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  margin-top: -2%;
+  margin-bottom: 1%;
+}
+
+/* Professional Home button styling */
+.pagination-home-report button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-report button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-report button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-report button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
 
 /* Report Table */
 .report-table {
@@ -5556,6 +5980,8 @@ select option {
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   margin-left: 35%;
+  margin-top: -35px;
+  margin-bottom: -35px;
 }
 
 .loading-spinner-report {
@@ -7422,6 +7848,51 @@ select option {
   background-color: #e7f5f7;
 }
 
+/* Header row: title left, button right */
+.pagination-home-poinvstatus {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: 10px;
+  margin-left: 85%;
+  margin-top: -2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-poinvstatus button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-poinvstatus button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-poinvstatus button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-poinvstatus button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .poinvoice-status-invoice-table {
   width: 100%;
   border-collapse: collapse;
@@ -8032,6 +8503,51 @@ select option {
   font-size: 10px;
   font-weight: 800;
   background-color: #e7f5f7;
+}
+
+/* Header row: title left, button right */
+.pagination-home-invstatus {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: 10px;
+  margin-left: 85%;
+  margin-top: -2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-invstatus button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-invstatus button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-invstatus button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-invstatus button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
 }
 
 .invoice-status-table {
@@ -9031,6 +9547,51 @@ select option {
   background-color: #e7f5f7;
 }
 
+/* Header row: title left, button right */
+.pagination-home-custstatus {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: 10px;
+  margin-left: 85%;
+  margin-top: -2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-custstatus button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-custstatus button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-custstatus button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-custstatus button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .customer-status-table {
   width: 100%;
   border-collapse: collapse;
@@ -10013,6 +10574,51 @@ select option {
 }
 
 /* Sales Report Table */
+/* Header row: title left, button right */
+.pagination-home-salesreport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 84.5%;
+  margin-top: -2px;
+}
+
+/* Professional Home button styling */
+.pagination-home-salesreport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-salesreport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-salesreport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-salesreport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .SalesReport-table {
   margin-top: 20px !important;
   width: 100%;
@@ -10922,6 +11528,51 @@ select option {
 }
 
 /* Purchase Report Table */
+/* Header row: title left, button right */
+.pagination-home-purchasereport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 84.5%;
+  margin-top: -2px;
+}
+
+/* Professional Home button styling */
+.pagination-home-purchasereport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-purchasereport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-purchasereport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-purchasereport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .PurchaseReport-table {
   margin-top: 20px !important;
   width: 100%;
@@ -11879,6 +12530,51 @@ select option {
 }
 
 /* Business Report Table */
+/* Header row: title left, button right */
+.pagination-home-businessreport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 84.5%;
+  margin-top: -2px;
+}
+
+/* Professional Home button styling */
+.pagination-home-businessreport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-businessreport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-businessreport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-businessreport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .BusinessReport-table {
   margin-top: 20px !important;
   width: 100%;
@@ -12824,6 +13520,51 @@ select option {
 }
 
 /* Payment Report Table */
+/* Header row: title left, button right */
+.pagination-home-paymentreport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 84.5%;
+  margin-top: 1%;
+}
+
+/* Professional Home button styling */
+.pagination-home-paymentreport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-paymentreport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-paymentreport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-paymentreport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .PaymentReport-table {
   margin-top: 20px !important;
   margin-bottom: 10px;
@@ -12834,9 +13575,8 @@ select option {
   margin-left: auto;
   margin-right: auto;
   cursor: default !important;
-  overflow-x: hidden;
   margin: 0 auto;
-  cursor: default !important;
+  height: auto;
 }
 
 .PaymentReport-table table {
@@ -12846,7 +13586,6 @@ select option {
   border-radius: 1px;
   border: none;
   font-family: "Shippori Mincho B1", "Times New Roman", serif;
-  table-layout: fixed; /* ✅ forces wrapping instead of scrolling */
 }
 
 .PaymentReport-table th, .PaymentReport-table td {
@@ -12876,9 +13615,9 @@ select option {
   padding-bottom:8px;
   overflow-wrap: break-word; /* Enable word breaking */
   overflow: hidden;
-  position: sticky;
+  position: static;
   top: 0;
-  z-index: 2;
+  z-index: auto;
   background-color: #069696;
   border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
 }
@@ -13002,9 +13741,9 @@ select option {
   padding-bottom: 6px;
   overflow-wrap: break-word; /* Enable word breaking */
   overflow: hidden;
-  position: sticky;
+  position: static;
   top: 0;
-  z-index: 2;
+  z-index: auto;
   background-color: rgba(170, 207, 234, 0.87);
   border-bottom: 2px dashed rgb(2, 128, 121); /* Adds a subtle separator */
   border-top: 2px dashed rgb(2, 128, 121);
@@ -13374,3 +14113,7 @@ select option {
 
 
 /* Submenu5------------>Report Section */
+
+
+
+

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProformas, fetchPurchaseOrders, createPurchaseOrder } from '../redux/slices/purchaseOrderSlice';
+import { fetchProformas, fetchPurchaseOrders, createPurchaseOrder, setSearchTerm } from '../redux/slices/purchaseOrderSlice';
 import API from '../config/config';
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { HiDocumentArrowDown } from "react-icons/hi2";
@@ -13,7 +13,7 @@ const CreatePurchaseOrder = () => {
   const dispatch = useDispatch();
 
   
-  const { proformas = [], recentOrders = [], status, currentPage = 1, totalPages = 0, totalOrders = 0, isProformasFetched, orderStatus } = useSelector((state) => state.purchaseOrder || {});
+  const { proformas = [], recentOrders = [], status, totalPages = 0, totalOrders = 0, isProformasFetched, orderStatus } = useSelector((state) => state.purchaseOrder || {});
 
   const [selectedProforma, setSelectedProforma] = useState('');
   const [items, setItems] = useState([]);
@@ -22,18 +22,26 @@ const CreatePurchaseOrder = () => {
   const [loading, setLoading] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
 
+  
   // ✅ Added state
   const [isPOGenerated, setIsPOGenerated] = useState(false);
 
   // Fetch proformas and recent orders
-  useEffect(() => {
-    if (!isProformasFetched) {
-      dispatch(fetchProformas());
-    }
+ useEffect(() => {
+  if (!isProformasFetched) {
+    dispatch(fetchProformas());
+  }
 
-    dispatch(fetchPurchaseOrders({ page: currentPage, rows_per_page: rowsPerPage }));
-  }, [dispatch, currentPage, rowsPerPage, isProformasFetched]);
+  dispatch(fetchPurchaseOrders({
+    page: currentPage,
+    rows_per_page: rowsPerPage,
+    search: searchTerm,   // <-- include search term here
+  }));
+}, [dispatch, currentPage, rowsPerPage, searchTerm, isProformasFetched]);
+
 
   // Handle Proforma Selection
   const handleProformaSelect = useCallback((proformaId) => {
@@ -101,7 +109,7 @@ const handleGeneratePurchaseOrder = async () => {
         setIsPOGenerated(true); // ✅ lock after creation
 
     // refresh list
-    dispatch(fetchPurchaseOrders({ page: currentPage, rows_per_page: rowsPerPage }));
+    dispatch(fetchPurchaseOrders({ page: currentPage, rows_per_page: rowsPerPage, search: searchTerm}));
     dispatch(fetchProformas());
 
   } catch (error) {
@@ -116,14 +124,22 @@ const handleGeneratePurchaseOrder = async () => {
 
   // Handle Page Change for Recent Orders
   const handleRecentOrdersPageChange = (page) => {
-    dispatch(fetchPurchaseOrders({ page, rows_per_page: rowsPerPage }));
-  };
+  if (page < 1 || page > totalPages) return;
+
+  setCurrentPage(page);
+  dispatch(fetchPurchaseOrders({
+    page,
+    rows_per_page: rowsPerPage,
+    search: searchTerm, // send current search
+  }));
+};
+
 
   // Handle Rows per Page Change for Recent Orders
   const handleRowsPerPageChange = (e) => {
     const newRowsPerPage = e.target.value;
     setRowsPerPage(newRowsPerPage);
-    dispatch(fetchPurchaseOrders({ page: currentPage, rows_per_page: newRowsPerPage }));
+    dispatch(fetchPurchaseOrders({ page: currentPage, rows_per_page: newRowsPerPage, search: searchTerm }));
   };
 
   // Download PDF for the Purchase Order
@@ -165,6 +181,16 @@ const handleGeneratePurchaseOrder = async () => {
     setSelectedTypes(updatedTypes);
   };
    
+const handleSearchChange = (term) => {
+  setSearchTerm(term);   // ✅ local state
+  setCurrentPage(1);               // reset to page 1
+
+  dispatch(fetchPurchaseOrders({
+    page: 1,
+    rows_per_page: rowsPerPage,
+    search: term,
+  }));
+};
 
   return (
     <div className="purchase-order-container">
@@ -294,25 +320,43 @@ const handleGeneratePurchaseOrder = async () => {
       {/* Recent Purchase Orders Section */}
       <div className="recent-orders-section">
         <h5>Recent Purchase Orders</h5>
-        {recentOrders && recentOrders.length > 0 && (
 
-        <div className="pagination-section">
-        {totalPages > 0 && (
-          <div>
-            <label>Rows per page:</label>
-            <select value={rowsPerPage} onChange={handleRowsPerPageChange}>
-              {[10, 20, 30].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-
-            
-          </div>
-        )}
-      </div>
+       {recentOrders && recentOrders.length > 0 && (
+  <div className="pagination-and-search">
+    <div className="pagination-section">
+      {totalPages > 0 && (
+        <div>
+          <label>Rows per page:</label>
+          <select value={rowsPerPage} onChange={handleRowsPerPageChange}>
+            {[10, 20, 30].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
+    </div>
+
+    <div className="search-section">
+      <input
+    type="text"
+    placeholder="Search by PO Number..."
+    value={searchTerm}
+    onChange={(e) => handleSearchChange(e.target.value)}
+    className="search-by-po-number"
+  /> 
+    </div>
+  </div>
+)}
+
+      {/* Home button (top) */}
+{recentOrders && recentOrders.length > 0 && currentPage > 1 && (
+  <div className="pagination-home-porder">
+    <button onClick={() => handleRecentOrdersPageChange(1)}>⏮ Home</button>
+  </div>
+)}
+
         {recentOrders && recentOrders.length > 0 ? (
     <table className="purchase-orders-table">
             <thead>
@@ -371,25 +415,25 @@ const handleGeneratePurchaseOrder = async () => {
           <p className="no-purchase-orders">No Recent Purchase Orders Found.</p>
         )}
       </div>
-      {recentOrders && recentOrders.length > 0 && (
-      <div className="pagination-controls">
-              <button
-                onClick={() => handleRecentOrdersPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <FaChevronLeft />
-              </button>
-              <span className='page-quote'>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => handleRecentOrdersPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-               <FaChevronRight />
-              </button>
-            </div>
-             )}
+          {recentOrders && recentOrders.length > 0 && (
+          <div className="pagination-controls">
+                  <button
+                    onClick={() => handleRecentOrdersPageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <FaChevronLeft />
+                  </button>
+                  <span className='page-quote'>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => handleRecentOrdersPageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                  <FaChevronRight />
+                  </button>
+                </div>
+                )}
     </div>
   );
 };

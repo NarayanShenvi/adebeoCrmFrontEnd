@@ -238,10 +238,12 @@
   }, [useReportFilters]);
   
     // Pagination handler
-    const handlePageChange = (newPage) => {
-      if (newPage < 1 || newPage > frontendTotalPages) return;
-      setPage(newPage);
-    };
+const handlePageChange = (newPage) => {
+  if (newPage < 1 || newPage > paymentTotalPages) return;
+  setPage(newPage);
+  fetchReportData(newPage); // fetch from backend
+};
+
      useEffect(() => {
       setPage(1);
     }, [appliedFilters]);
@@ -357,13 +359,26 @@ if (appliedFilters.customerObj && appliedFilters.customerObj.length > 0) {
   }, [paymentReports, appliedFilters]);
 
 const perPage = 1000; // max rows per page
-const frontendTotalPages = Math.ceil(filteredPaymentReports.length / perPage);
+const { paymentCurrentPage, paymentTotalPages } = useSelector((state) => state.report);
 
-  const paginatedPaymentReports = useMemo(() => {
-    const start = (page - 1) * perPage;
-    const end = start + perPage;
-    return filteredPaymentReports.slice(start, end);
-  }, [filteredPaymentReports, page]);
+const paginatedPaymentReports = useMemo(() => {
+  let data = [...paymentReports];
+
+  // Apply filters ONLY if using report filters
+  if (useReportFilters && appliedFilters.customerObj.length > 0) {
+    const customerNames = appliedFilters.customerObj.map(c =>
+      (c.companyName || c.company_name || c.company || "").toLowerCase()
+    );
+    data = data.filter(row =>
+      row["Customer Name"] &&
+      customerNames.some(name =>
+        row["Customer Name"].toLowerCase().includes(name)
+      )
+    );
+  }
+
+  return data;
+}, [paymentReports, appliedFilters, useReportFilters]);
 
  useEffect(() => {
   return () => {
@@ -663,7 +678,7 @@ return (
         <br />
 
         {/* Loading & Error */}
-      {paymentLoading && (
+  {paymentLoading && (
     <div className="loading-container-report-payment">
       <div className="loading-spinner-report-payment"></div>
       <p className="loading-message-report-payment">Loading payment report...</p>
@@ -677,6 +692,15 @@ return (
 )}
 
 {/* Report Table */}
+{/* Home button (top) */}
+{paymentCurrentPage  > 1 && (
+  <div className="pagination-home-paymentreport">
+    <button onClick={() => handlePageChange(1)}>
+      ⏮ Home
+    </button>
+  </div>
+)}
+
       <div className="PaymentReport-table">
     {paginatedPaymentReports.length > 0 ? (
       <table>
@@ -774,22 +798,22 @@ return (
     )}
     
     {/* Pagination */}
-    {filteredPaymentReports.length > perPage && frontendTotalPages > 1 && (
+   {paymentTotalPages > 1 && (
       <div className="pagination-controls-paymentreport">
         <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 1}
+          onClick={() => handlePageChange(paymentCurrentPage  - 1)}
+          disabled={paymentCurrentPage  === 1}
         >
           <FaChevronLeft />
         </button>
 
         <span className="page-paymentreport">
-          {page} of {frontendTotalPages}
+          {paymentCurrentPage } of {paymentTotalPages}
         </span>
 
         <button
           onClick={() => handlePageChange(page + 1)}
-          disabled={page === frontendTotalPages}
+          disabled={paymentCurrentPage  === paymentTotalPages}
         >
           <FaChevronRight />
         </button>

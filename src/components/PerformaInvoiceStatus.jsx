@@ -272,7 +272,7 @@ const confirmDisable = (invoice) => {
 
   // 🔹 Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 5;
   const totalPages = Math.ceil(tableData.length / rowsPerPage);
 
   const indexOfLastRow = currentPage * rowsPerPage;
@@ -352,6 +352,14 @@ useEffect(() => {
 
 {selectedCustomer && tableData.length > 0 && (
         <>
+        {/* Home button (top) */}
+    {currentPage > 1 && (
+      <div className="pagination-home-poinvstatus">
+        <button onClick={() => setCurrentPage(1)}>
+          ⏮ Home
+        </button>
+      </div>
+    )}
           <table className="poinvoice-status-invoice-table">
             <thead>
               <tr>

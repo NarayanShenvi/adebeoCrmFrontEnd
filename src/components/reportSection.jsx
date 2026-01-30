@@ -21,7 +21,7 @@ const ReportSection = () => {
   const [reportType, setReportType] = useState('short');
   const [user, setUser] = useState('');
   const [page, setPage] = useState(1);
-  const perPage = 5;
+  const perPage = 10;
 
   const { activities, loading, totalPages, totalCount, error } = useSelector(state => state.report);
   const { users = [], loading: usersLoading, error: usersError } = useSelector(state => state.users);
@@ -103,6 +103,10 @@ const handleEndDateChange = (e) => {
     setPage(newPage);
     fetchReportData(newPage);
   };
+const handleHomePage = () => {
+  setPage(1);
+  fetchReportData(1);
+};
 
   // Client-side filtering for companyName (optional if backend doesn't support partial match)
   // Apply company name filter on frontend (case-insensitive)
@@ -222,7 +226,15 @@ const filteredActivities = activities.filter(act => {
       )}
 
       {/* Report Table */}
-     
+{/* Home button (top) */}
+{filteredActivities.length > 0 && page > 1 && (
+  <div className="pagination-home-report">
+    <button onClick={handleHomePage}>
+      ⏮ Home
+    </button>
+  </div>
+)}
+
 <div className="report-table">
   {reportType === 'detailed' && companyName ? (
     <p className="no-activity-message-short">

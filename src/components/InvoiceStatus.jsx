@@ -314,7 +314,7 @@ const result = await dispatch(fetchInvoicesByCustomer(safeName)).unwrap();
   };
 
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 1;
   const totalPages = Math.ceil(tableData.length / rowsPerPage);
 
   const indexOfLastRow = currentPage * rowsPerPage;
@@ -396,6 +396,13 @@ const result = await dispatch(fetchInvoicesByCustomer(safeName)).unwrap();
       {/* Bottom Section: Table */}
       {selectedCustomer && tableData.length > 0 && (
         <>
+        {currentPage > 1 && (
+      <div className="pagination-home-invstatus">
+        <button onClick={() => setCurrentPage(1)}>
+          ⏮ Home
+        </button>
+      </div>
+    )}
           <table className="invoice-status-table">
             <thead>
               <tr>

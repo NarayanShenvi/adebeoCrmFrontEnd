@@ -1116,6 +1116,14 @@ setSelectedUser(selected ? selected.map(s => s.value) : []);
 )}
 
 {/* Report Table */}
+{/* Home button (top) */}
+{page > 1 && (
+  <div className="pagination-home-businessreport">
+    <button onClick={() => handlePageChange(1)}>
+      ⏮ Home
+    </button>
+  </div>
+)}
       <div className="BusinessReport-table">
     {paginatedBusinessReports .length > 0 ? (
       <table>

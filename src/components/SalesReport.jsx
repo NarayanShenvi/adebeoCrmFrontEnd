@@ -1272,6 +1272,15 @@ const productCount = productCombinedChartData?.length || 0;
 )}
 
 {/* Report Table */}
+{/* Home button (top) */}
+{page > 1 && (
+  <div className="pagination-home-salesreport">
+    <button onClick={() => handlePageChange(1)}>
+      ⏮ Home
+    </button>
+  </div>
+)}
+
       <div className="SalesReport-table">
     {paginatedSalesReports.length > 0 ? (
       <table>

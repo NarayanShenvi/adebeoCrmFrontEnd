@@ -1020,9 +1020,22 @@ useEffect(() => {
         </div>
 
         {/* Quote Display Section (Created Quotes as Table) */}
-        <div className="quote-created-section">
-          <h4>Previous Quotes</h4>
-           {loading ? (
+<div className="quote-created-section">
+          {/* Quote Header with Home button */}
+<div className="quote-header">
+  <h4>Previous Quotes</h4>
+
+  {currentPageState > 1 && (
+    <div className="pagination-home-quote-slider">
+      <button onClick={() => handlePageChange(1)}>
+        ⏮ Home
+      </button>
+    </div>
+  )}
+</div>
+
+          
+  {loading ? (
     <p className="loading-quote">Loading quotes...</p>   // ✅ Show loader first
   ) : quotes.length === 0 ? (
     <p className="no-quote">No Quotes Available</p>  // ✅ Only show when finished & empty

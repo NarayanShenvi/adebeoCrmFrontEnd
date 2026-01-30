@@ -52,7 +52,7 @@ const [localSearchLoading, setLocalSearchLoading] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [localPage, setLocalPage] = useState(1);
-  const perPage = 10;
+  const perPage = 5;
 
   const [checkedRows, setCheckedRows] = useState({});
   const [rowAssignment, setRowAssignment] = useState({});
@@ -342,6 +342,18 @@ const handleSearchChange = (e) => {
       loadFunneldata(next, perPage, selectedCustomer?.companyName || "")
     );
   };
+  const handleHomePage = () => {
+  setLocalPage(1);
+  dispatch(
+    loadFunneldata(
+      1,
+      perPage,
+      selectedCustomer?.companyName || ""
+    )
+  );
+};
+
+  
 useEffect(() => {
   setSelectedCustomerId(""); // reset dropdown whenever search results change
 }, [customers, dispatch]);
@@ -398,6 +410,13 @@ useEffect(() => {
           }}>Loading funnel data...</div>
       ) : funnelData && funnelData.length > 0 ? (
         <>   
+        {localPage > 1 && (
+      <div className="pagination-home-custstatus">
+        <button onClick={handleHomePage}>
+          ⏮ Home
+        </button>
+      </div>
+       )}
             <table className="customer-status-table">
               <thead>
                 <tr>
@@ -436,7 +455,7 @@ useEffect(() => {
                         <td>{item.address}</td>
                         <td>{item.mobileNumber}</td>
                         <td>{item.primaryEmail}</td>
-<td>{item.assigned_to || item.insertBy}</td>
+                        <td>{item.assigned_to || item.insertBy}</td>
                         <td>
                           <select
                             value={rowAssignment[rowId] || ""}
