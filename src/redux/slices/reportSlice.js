@@ -228,6 +228,16 @@ export const fetchPaymentReport = createAsyncThunk(
   },
 
 reducers: {
+
+  resetActivityReport: (state) => {
+  state.activities = [];
+  state.loading = false;
+  state.error = null;
+  state.currentPage = 1;
+  state.totalPages = 1;
+  state.totalCount = 0;
+},
+
   resetSalesReport: (state) => {
     state.salesReports = [];
     state.salesLoading = false;
@@ -398,6 +408,6 @@ reducers: {
   });
 
   
-export const { resetSalesReport, resetPurchaseReport,  resetBusinessReport, resetPaymentReport } = reportSlice.actions;
+export const { resetActivityReport, resetSalesReport, resetPurchaseReport,  resetBusinessReport, resetPaymentReport } = reportSlice.actions;
 
 export default reportSlice.reducer;

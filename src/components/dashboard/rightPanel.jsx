@@ -10,6 +10,8 @@ import  CreatePurchaseOrder from '../purchaseOrderSection';
 import {fetchProformas} from '../../redux/slices/purchaseOrderSlice';
 import {fetchCustomerPaymentsAsync} from '../../redux/slices/customerPaymentSlice';
 import CustomerPaymentSection from '../customerPaymentSection';
+import VendorPaymentSection from '../vendorPaymentSection';
+import RenewalSection from '../RenewalSection';
 import Createreport from '../reportSection';
 import fetchReportsAsync from '../../redux/slices/reportSlice'
 import { returnStatement } from '@babel/types';
@@ -45,6 +47,14 @@ const customerLoading = useSelector((state) => state.customer?.loading);
   const loadCutomerPayments =() =>  {
     dispatch(fetchCustomerPaymentsAsync());
   }
+  
+  const loadVendorPayments =() =>  {
+   // dispatch(fetchVendorPaymentsAsync());
+  }
+
+  const loadRenewal =() =>  {
+   // dispatch(fetchRenewalAsync());
+  }
 
   const loadReports =() =>  {
   //  dispatch(fetchReportsAsync());
@@ -66,6 +76,12 @@ const customerLoading = useSelector((state) => state.customer?.loading);
         else if (selectedSection === 'cx_payment'){
         loadCutomerPayments();
       }
+        else if (selectedSection === 'vx_payment'){
+        loadVendorPayments();
+      }
+        else if (selectedSection === 'renewal'){
+        loadRenewal();
+      }
         else if (selectedSection === 'reports'){
         loadReports();
         }
@@ -86,6 +102,10 @@ const customerLoading = useSelector((state) => state.customer?.loading);
         return <CreatePurchaseOrder/>;
       case 'cx_payment':
         return <CustomerPaymentSection/>;
+      case 'vx_payment':
+        return <VendorPaymentSection/>;
+      case 'renewal':
+        return <RenewalSection/>;
       case 'reports':
         return <Createreport/>;
       case 'admin':

@@ -48,6 +48,8 @@ const LeftMenu = ({ onMenuItemClick }) => {
       
       {role === 'admin' && (<li><button className={activeButton === 'purchase_orders' ? 'active' : ''} onClick={() => handleButtonClick('purchase_orders')}>Purchase Orders</button></li> )}
       {role === 'admin' && (<li><button className={activeButton === 'cx_payment' ? 'active' : ''} onClick={() => handleButtonClick('cx_payment')}>Cx Payment</button></li> )}
+      {role === 'admin' && (<li><button className={activeButton === 'vx_payment' ? 'active' : ''} onClick={() => handleButtonClick('vx_payment')}>Vx Payment</button></li> )}
+      {role === 'admin' && (<li><button className={activeButton === 'renewal' ? 'active' : ''} onClick={() => handleButtonClick('renewal')}>Renewal</button></li> )}
       <li><button className={activeButton === 'reports' ? 'active' : ''} onClick={() => handleButtonClick('reports')}>Reports</button></li>
       {role === 'admin' && (<li><button className={activeButton === 'admin' ? 'active' : ''} onClick={() => handleButtonClick('admin')}>Admin</button></li> )}
     </ul>

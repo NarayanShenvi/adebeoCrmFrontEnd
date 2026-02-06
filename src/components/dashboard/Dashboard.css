@@ -5692,7 +5692,7 @@ select option {
   flex-direction: column;
   pointer-events: auto;
   position: relative;
-  margin-top: 15px;
+  margin-top: -2px;
 }
 
 .report-section label {
@@ -5832,7 +5832,7 @@ select option {
 
 /* Report Table */
 .report-table {
-  margin-top: 50px;
+  margin-top: 30px;
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed; /* Ensure columns are of fixed size */
@@ -5980,8 +5980,8 @@ select option {
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   margin-left: 35%;
-  margin-top: -35px;
-  margin-bottom: -35px;
+  margin-top: -40px;
+  margin-bottom: -20px;
 }
 
 .loading-spinner-report {
@@ -14112,8 +14112,999 @@ select option {
 }
 
 
-/* Submenu5------------>Report Section */
+/* RENEWAL Section */
+.RenewalReport-section {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 40px);
+  max-height: 100vh; 
+  background-color: #feffff;
+  margin-left: 140px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  width: 100%;
+}
+
+.RenewalReport-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 25px;
+  margin-bottom: -10px;
+}
+
+.filter-form-renewal
+{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 900px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.RenewalReport-section .form-group {
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  margin-top: -30px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.RenewalReport-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.required-label::after {
+  content: " *"; 
+  color: rgb(223, 3, 3);    
+  font-weight: 800;
+}
+
+.filter-form-renewal .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
 
 
+.filter-form-renewal .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-renewal .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.filter-form-renewal .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
 
 
+.filter-form-renewal .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-renewal .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+.dates{
+  max-width: 240px;
+}
+.datess{
+  max-width: 240px;
+  margin-left: 295px;
+}
+
+/* Custom Checkbox Container */
+.custom-checkbox-renewal {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  margin-top: 30px;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox-renewal input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #069696; /* Default border color */
+  border-radius: 1px;
+  background-color: white; /* Default background */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-right: 10px;
+}
+
+/* Checkbox Checked State */
+.custom-checkbox-renewal input[type="checkbox"]:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+/* Checkbox Checkmark */
+.custom-checkbox-renewal input[type="checkbox"]::after {
+  content: "";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Show Checkmark When Checked */
+.custom-checkbox-renewal input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkbox Hover Effect */
+.custom-checkbox-renewal input[type="checkbox"]:hover {
+  border-color: #06b4b4; /* Darker blue */
+}
+
+/* Checkbox Label */
+.custom-checkbox-renewal label {
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Change Label Color on Checked */
+.custom-checkbox-renewal input[type="checkbox"]:checked + label {
+  color: #28a745;
+  font-size: 14px;
+}
+
+/* ===== DISABLED CHECKBOX ===== */
+.custom-checkbox-renewal input[type="checkbox"]:disabled {
+  background-color: #f2f2f2;
+  border-color: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== TOTAL AMOUNT CONTAINER ===== */
+.total-amount-text-renewal {
+  display: flex;
+  align-items: center;
+  
+  padding: 6px 14px;
+  border-radius: 2px;
+  margin-top: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(39, 142, 170, 0.27),
+    rgba(46, 107, 125, 0.11)
+  );
+
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+   
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* animation */
+  animation: totalFadeSlide 0.45s ease-out forwards;
+}
+
+/* Amount value */
+.total-amount-text-renewal strong {
+  font-size: 16px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #2e7d32;
+  letter-spacing: 0.3px;
+}
+
+/* Hover effect */
+.total-amount-text-renewal:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
+  transition: all 0.25s ease;
+}
+
+.wrap-amount {
+  max-width: 180px;          /* adjust based on layout */
+  word-break: break-word;    /* break long numbers */
+  overflow-wrap: anywhere;   /* allow wrapping anywhere */
+  white-space: normal;       /* allow multi-line */
+}
+
+/* ===== ENTRY ANIMATION ===== */
+@keyframes totalFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+/* WHEN TOTAL IS NOT PRESENT & WHEN IT IS PRESENT */
+/* Make row flexible */
+.renewal-filter-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Default behavior (when total exists) */
+.renewal-filter-row > .col-md-3 {
+  transition: all 0.3s ease;
+}
+
+/* 🔹 CENTER FIRST 3 COLS WHEN TOTAL IS NOT PRESENT */
+.renewal-filter-row:not(:has(.total-amount-text-renewal)) {
+  justify-content: center;
+}
+
+/* WHEN TOTAL IS NOT PRESENT → 3 columns only */
+.renewal-filter-row:not(:has(.total-amount-text-renewal)) {
+  justify-content: center;
+  column-gap: 32px;   /* 👈 space between the 3 columns */
+}
+
+/* Slightly wider columns so they don't squeeze */
+.renewal-filter-row:not(:has(.total-amount-text-renewal)) > .col-md-3 {
+  width: 275px;       /* adjust: 240–280px */
+  margin-bottom: -20px;
+}
+
+/* Serch Filelds--customer */
+.RenewalReport-section .search-field-customer-name-renewal {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.search-field1-customer-name-renewal .NoCustomerNameFound-renewal
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-customer-name-renewal .CustomerNameLoading-renewal 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-customer-name-renewal .TypeMoreCustData-renewal 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+
+.search-field1-customer-name-renewal select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 254px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 1%;
+  display: block;
+} 
+.search-field1-customer-name-renewal select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-customer-name-renewal option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+/* Serch Filelds--product */
+.RenewalReport-section .search-field-product-name-renewal {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.search-field1-product-name-renewal .NoProductNameFound-renewal
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name-renewal .ProductNameLoading-renewal 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name-renewal .TypeMoreProd-renewal 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+
+.search-field1-product-name-renewal select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 254px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 1%;
+  display: block;
+} 
+.search-field1-product-name-renewal select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-product-name-renewal option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+/* Serch Filelds--user */
+.RenewalReport__control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0px 8px;
+  min-height: 32px;          /* ✅ correct */
+  height: auto;              /* ✅ allow hover area */
+  background-color: rgba(134, 195, 238, 0.31) !important;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-weight: 800;
+  pointer-events: auto;
+  color: #555555;
+}
+
+.RenewalReport__control--is-focused {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+}
+
+/* Hover when NOT focused */
+.RenewalReport__control:not(.RenewalReport__control--is-focused):hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+  border-color: #6ac7e0;
+}
+
+/* Hover even when focused */
+.RenewalReport__control--is-focused:hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+}
+
+/* Loading and Error Container */
+.loading-container-report-renewal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-left: 35%;
+}
+
+.loading-spinner-report-renewal {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #028618;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1.5s linear infinite; /* Slightly slower spin */
+  margin-left: 10%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.loading-message-report-renewal {
+  font-size: 18px;
+  font-weight: bold;
+  color: #028618;
+  margin-top: 15px;
+  text-align: center;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.error-container-report-renewal {
+  display: flex;
+  align-items: center;       /* vertical center text */
+  justify-content: center;   /* horizontal center text */
+
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 36%;
+
+  color: #f51009;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+
+  border-radius: 5px;
+  padding-top: 10px;
+  padding-bottom: -3px;
+  width: 100%;
+  max-width: 28%;
+  min-height: 60px;
+
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+
+.error-container-report-renewal {
+  animation: fadeSlide 0.3s ease-in-out;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.report-button-renewal {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+  text-align: center;
+  color: #05555f;
+  width: 20px;
+  margin-left: 65%;
+}
+
+.filecheck
+{
+  font-size: 25px !important;
+}
+
+.report-button-renewal:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.report-button-renewal:hover:not(:disabled) {
+  transform: scale(1.3); 
+  color: #0e7204;
+}
+
+/* Renewal Report Table */
+/* Header row: title left, button right */
+.pagination-home-renewalreport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 90.5%;
+  margin-top: -2px;
+}
+
+/* Professional Home button styling */
+.pagination-home-renewalreport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-renewalreport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-renewalreport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-renewalreport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
+.RenewalReport-table {
+  margin-top: 20px !important;
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  margin: 0 auto;
+  cursor: default !important;
+  min-width: 1100px; /* Ensures form doesn't shrink too much */
+  max-width: 1255px; /* Adjust as needed */
+}
+
+.RenewalReport-table th, .RenewalReport-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold; 
+  cursor: default !important;
+}
+
+.RenewalReport-table th {
+  color: rgb(255, 255, 255);
+  color: aliceblue;
+  text-align: left;
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:12px;
+  padding-bottom:12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #069696;
+  border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
+}
+
+.RenewalReport-table td {
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  color: #161616da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  background-color: rgba(170, 207, 234, 0.87);
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.RenewalReport-table th:nth-child(1),
+.RenewalReport-table td:nth-child(1) {
+  width: 20%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+.RenewalReport-table th:nth-child(2),
+.RenewalReport-table td:nth-child(2) {
+  width: 20%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; }
+
+.RenewalReport-table th:nth-child(3),
+.RenewalReport-table td:nth-child(3) {
+  width: 20%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+.RenewalReport-table th:nth-child(4),
+.RenewalReport-table td:nth-child(4) {
+  width: 7%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(5),
+.RenewalReport-table td:nth-child(5) {
+  width:7%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(6),
+.RenewalReport-table td:nth-child(6) {
+  width:8%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(7),
+.RenewalReport-table td:nth-child(7) {
+  width:7%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(8),
+.RenewalReport-table td:nth-child(8) {
+  width:3%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(8),
+.RenewalReport-table td:nth-child(8) {
+  width:7%; /* Fixed width */
+}
+
+.RenewalReport-table th:last-child,
+.RenewalReport-table td:last-child {
+  width: 8%; /* Adjust as needed */
+}
+
+.RenewalReport-table tbody tr:hover {
+  background-color: #05afc5; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+/* No Sales */
+.no-renewal-message {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 900;
+  font-size: 20px;
+  text-align: center;
+  margin-top: 5%;
+  word-spacing: 2px;
+
+  background: linear-gradient(
+    90deg,
+    #d86902ff,
+    #f5b274ff,
+    #d86902ff
+  );
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Pagination Controls */
+.pagination-controls-renewalreport {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  margin-left: 121px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -5px;
+  gap: 10px;
+  white-space: nowrap;
+  margin-bottom: -40px;
+}
+
+.pagination-controls-renewalreport button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls-renewalreport button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls-renewalreport button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls-renewalreport span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* ================== RESPONSIVE ================== */
+
+/* ========================= */
+/* ===== 1024px ===== */
+/* ========================= */
+@media (max-width: 1024px) {
+
+  .RenewalReport-section {
+    margin-left: 80px;
+    padding: 16px;
+  }
+
+  .filter-form-renewal {
+    max-width: 100%;
+    min-width: unset;
+    padding: 16px;
+  }
+
+  .dates {
+    max-width: 200px;
+  }
+
+  .renewal-filter-row {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 20px;
+  }
+
+  .RenewalReport-table {
+    min-width: 1000px;
+  }
+
+  .pagination-controls-renewalreport {
+    margin-left: 0;
+    max-width: 100%;
+  }
+}
+
+/* ========================= */
+/* ===== 768px (Tablet) ===== */
+/* ========================= */
+@media (max-width: 768px) {
+
+  .RenewalReport-section {
+    margin-left: 0;
+    padding: 14px;
+  }
+
+  .filter-form-renewal {
+    min-width: unset;
+    width: 100%;
+    padding: 14px;
+  }
+
+  /* Stack filters */
+  .renewal-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .renewal-filter-row .col-md-3 {
+    width: 100% !important;
+  }
+
+  .dates {
+    max-width: 100%;
+  }
+
+  .custom-checkbox-renewal {
+    margin-top: 10px;
+  }
+
+  .total-amount-text-renewal {
+    justify-content: space-between;
+    font-size: 13px;
+  }
+
+  /* Table scroll instead of squeezing */
+  .RenewalReport-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    min-width: 900px;
+  }
+
+  .pagination-home-renewalreport {
+    margin-left: auto;
+    margin-right: 10px;
+  }
+
+  .pagination-controls-renewalreport {
+    margin-left: 0;
+    padding: 10px;
+  }
+}
+
+/* ========================= */
+/* ===== 480px (Mobile) ===== */
+/* ========================= */
+@media (max-width: 480px) {
+
+  .RenewalReport-section h3 {
+    font-size: 16px;
+    margin-top: 15px;
+  }
+
+  .filter-form-renewal {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .RenewalReport-section label {
+    font-size: 11px;
+  }
+
+  .filter-form-renewal .form-control,
+  .filter-form-renewal .form-select {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .custom-checkbox-renewal label {
+    font-size: 12px;
+  }
+
+  .total-amount-text-renewal {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .total-amount-text-renewal strong {
+    font-size: 14px;
+  }
+
+  /* Table */
+  .RenewalReport-table {
+    min-width: 850px;
+  }
+
+  .no-renewal-message {
+    font-size: 16px;
+  }
+
+  .pagination-controls-renewalreport span {
+    font-size: 12px;
+  }
+}
+
+/* ================== RESPONSIVE ================== */
+
+/* ========================= */
+/* ===== 1024px ===== */
+/* ========================= */
+
+/* ========================= */
+/* ===== 768px (Tablet) ===== */
+/* ========================= */
+
+/* ========================= */
+/* ===== 480px (Mobile) ===== */
+/* ========================= */
