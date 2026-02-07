@@ -4490,14 +4490,7 @@ a:hover {
   border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
   overflow: hidden;
 }
-.p-order-invoice-table th:nth-child(3),
-.p-order-invoice-table td:nth-child(3) {
-  width: 160px; /* Fixed width */
-}
-.p-order-invoice-table th:nth-child(4),
-.p-order-invoice-table td:nth-child(4) {
-  width: 80px; /* Fixed width */
-}
+
 .p-order-invoice-table input{
   padding-left: 10px;
   width: 100%;
@@ -4515,7 +4508,7 @@ a:hover {
   cursor: pointer;
 }
 .p-order-invoice-table select {
-  padding-left: 10px;
+  padding-left: 5px;
   width: 100%;
   max-width: 87px; /* Adjust this to control the width of the dropdown */
   height: 34px;
@@ -4530,6 +4523,105 @@ a:hover {
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   cursor: pointer;
 }
+
+.renewalSelect__control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0px 3px;
+  min-height: 32px;          /* ✅ correct */
+  height: auto;              /* ✅ allow hover area */
+  background: rgba(206, 234, 238, 0.87) !important;
+  border: 1px solid #8bcfcf !important;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 13px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-weight: 800;
+  pointer-events: auto;
+  color: #161616da;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  margin-top: 10px;
+  cursor: pointer !important;
+}
+
+.renewalSelect__control--is-focused {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+}
+
+/* Hover when NOT focused */
+.renewalSelect__control:not(.renewalSelect__control--is-focused):hover {
+  border-color: #6ac7e0;
+}
+
+.p-order-invoice-table th:nth-child(1),
+.p-order-invoice-table td:nth-child(1) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(2),
+.p-order-invoice-table td:nth-child(2) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(3),
+.p-order-invoice-table td:nth-child(3) {
+  width: 9%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(4),
+.p-order-invoice-table td:nth-child(4) {
+  width: 3%;
+}
+
+.p-order-invoice-table th:nth-child(5),
+.p-order-invoice-table td:nth-child(5) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(6),
+.p-order-invoice-table td:nth-child(6) {
+  width: 4%;
+}
+
+.p-order-invoice-table th:nth-child(7),
+.p-order-invoice-table td:nth-child(7) {
+  width: 5%;
+}
+
+.p-order-invoice-table th:nth-child(8),
+.p-order-invoice-table td:nth-child(8) {
+  width: 11%;
+}
+
+.p-order-invoice-table th:nth-child(9),
+.p-order-invoice-table td:nth-child(9) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(10),
+.p-order-invoice-table td:nth-child(10) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:last-child,
+.p-order-invoice-table td:last-child {
+  width: 6%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
 
 .submit-button-p-order{
   background: none;
@@ -4750,6 +4842,7 @@ select option {
   white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
   word-wrap: break-word; /* Ensures long words wrap to the next line */
 }
+
 /* Hover effect for table rows */
 .purchase-orders-table tbody tr:hover {
   background-color: #4f9203; /* Light blue background on hover */
@@ -14833,17 +14926,17 @@ select option {
 
 .RenewalReport-table th:nth-child(4),
 .RenewalReport-table td:nth-child(4) {
-  width: 7%; /* Fixed width */
+  width:7%; /* Fixed width */
 }
 
 .RenewalReport-table th:nth-child(5),
 .RenewalReport-table td:nth-child(5) {
-  width:7%; /* Fixed width */
+  width:8%; /* Fixed width */
 }
 
 .RenewalReport-table th:nth-child(6),
 .RenewalReport-table td:nth-child(6) {
-  width:8%; /* Fixed width */
+  width: 7%; /* Fixed width */
 }
 
 .RenewalReport-table th:nth-child(7),
@@ -14856,8 +14949,8 @@ select option {
   width:3%; /* Fixed width */
 }
 
-.RenewalReport-table th:nth-child(8),
-.RenewalReport-table td:nth-child(8) {
+.RenewalReport-table th:nth-child(9),
+.RenewalReport-table td:nth-child(9) {
   width:7%; /* Fixed width */
 }
 
@@ -15108,3 +15201,5 @@ select option {
 /* ========================= */
 /* ===== 480px (Mobile) ===== */
 /* ========================= */
+
+

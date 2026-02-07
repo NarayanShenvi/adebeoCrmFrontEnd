@@ -7,7 +7,8 @@ import { HiDocumentArrowDown } from "react-icons/hi2";
 import { FaSpinner, FaFilePdf } from 'react-icons/fa';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify"; 
+import Select from "react-select";
 
 const CreatePurchaseOrder = () => {
   const dispatch = useDispatch();
@@ -45,15 +46,24 @@ const CreatePurchaseOrder = () => {
 
   // Handle Proforma Selection
   const handleProformaSelect = useCallback((proformaId) => {
-    setSelectedProforma(proformaId);
-        setIsPOGenerated(false); // ✅ reset when new proforma selected
+  setSelectedProforma(proformaId);
+  setIsPOGenerated(false);
 
-    const selected = proformas.find(proforma => proforma.proforma_id === proformaId);
-    if (selected) {
-      setItems(selected.items || []);
-      setDiscounts(new Array(selected.items.length).fill(0));
-    }
-  }, [proformas]);
+  const selected = proformas.find(
+    (proforma) => proforma.proforma_id === proformaId
+  );
+
+  if (selected) {
+    setItems(selected.items || []);
+    setDiscounts(new Array(selected.items.length).fill(0));
+
+    // ✅ CORRECT PLACE
+    setSelectedRenewals(
+      new Array(selected.items.length).fill([])
+    );
+  }
+}, [proformas]);
+
 
   // Handle Discount Input Change
   const handleDiscountChange = useCallback((index, value) => {
@@ -80,23 +90,30 @@ const handleGeneratePurchaseOrder = async () => {
   setLoading(true);
 
   const itemsWithDiscount = items.map((item, index) => {
-    const mode = selectedModes[index] || 'regular';
-    const businessType = selectedTypes[index] || 'new';
-    const purchaseCost = parseFloat(item.purchase_cost);
-    const quantity = parseFloat(item.quantity);
-    const discountAmount = discounts[index] || 0;
+  const mode = selectedModes[index] || 'regular';
+  const businessType = selectedTypes[index] || 'new';
 
-    const totalBeforeTax = (purchaseCost - discountAmount) * quantity;
-    const taxAmount = Math.ceil(totalBeforeTax * 0.18);
+  const purchaseCost = parseFloat(item.purchase_cost);
+  const quantity = parseFloat(item.quantity);
+  const discountAmount = discounts[index] || 0;
 
-    return {
-      ...item,
-      discount: discountAmount,
-      mode,
-      business_type: businessType,
-      tax_amount: taxAmount
-    };
-  });
+  const totalBeforeTax = (purchaseCost - discountAmount) * quantity;
+  const taxAmount = Math.ceil(totalBeforeTax * 0.18);
+
+  return {
+    ...item,
+    discount: discountAmount,
+    mode,
+    business_type: businessType,
+    tax_amount: taxAmount,
+
+    // 🔥 NEW KEY ONLY FOR RENEWAL
+    selected_renewals:
+      businessType === "renewal"
+        ? selectedRenewals[index] || []
+        : [],
+  };
+});
 
   try {
     // dispatch and wait for result
@@ -192,6 +209,17 @@ const handleSearchChange = (term) => {
   }));
 };
 
+// 🔥 NEW: per item selected renewals
+const [selectedRenewals, setSelectedRenewals] = useState([]);
+
+const getRenewalOptions = (item) =>
+  (item.renewalOpportunities || []).map(r => ({
+    value: r.renewal_id,
+    label: `${r.orderNumber}, Qty ${r.originalQuantity}`,
+    orderNumber: r.orderNumber,
+    originalQuantity: r.originalQuantity,
+  }));
+
   return (
     <div className="purchase-order-container">
       {/* Top Section */}      
@@ -233,7 +261,7 @@ const handleSearchChange = (term) => {
                   <th>Product Name</th>
                   <th>Vendor Name</th>
                   <th>Vendor Address</th>
-                  <th>Quantity</th>
+                  <th>Qty</th>
                   <th>Purchase Price</th>
                   <th>Discount</th>
                   <th>Mode</th>
@@ -279,13 +307,106 @@ const handleSearchChange = (term) => {
 
 <td>
   <select
-    value={selectedTypes[index] || 'new'} // Default to 'new'
+    value={selectedTypes[index] || 'new'}
     onChange={(e) => handleTypeChange(index, e.target.value)}
   >
     <option value="new">New</option>
     <option value="renewal">Renewal</option>
   </select>
+
+  {/* 🔥 Renewal multi-select */}
+  {selectedTypes[index] === "renewal" &&
+  item.renewalOpportunities?.length > 0 && (
+    <Select
+  className="renewal-react-select"
+  classNamePrefix="renewalSelect"
+  menuPortalTarget={document.body}
+  menuPosition="fixed"
+  styles={{
+    menuPortal: base => ({ ...base, zIndex: 9999 }),
+
+    /* 1️⃣ Container must allow wrapping */
+    valueContainer: (base) => ({
+      ...base,
+      flexWrap: "wrap",
+      overflow: "visible",
+    }),
+
+    /* 2️⃣ Each selected pill */
+    multiValue: (base) => ({
+      ...base,
+      display: "flex",
+      alignItems: "center",
+      maxWidth: "100%",
+      overflow: "visible",
+    }),
+
+    /* 3️⃣ Text inside pill */
+    multiValueLabel: (base) => ({
+      ...base,
+      whiteSpace: "nowrap",
+      overflow: "visible",
+      textOverflow: "clip",
+    }),
+
+    /* 4️⃣ Remove (✕) button */
+    multiValueRemove: (base) => ({
+      ...base,
+      display: "flex",
+      alignItems: "center",
+      padding: "8px 8px",
+      cursor: "pointer",
+      ':hover': {
+        backgroundColor: "#d32f2f",
+        color: "#fff",
+      },
+    }),
+  }}
+
+  isMulti
+  isClearable
+  placeholder="Select renewals"
+  options={getRenewalOptions(item)}
+  value={(selectedRenewals[index] || []).map(r => ({
+  value: r.renewal_id,
+  label: `${r.orderNumber}, Qty ${r.originalQuantity}`, 
+  orderNumber: r.orderNumber,
+  originalQuantity: r.originalQuantity,
+}))}
+
+  formatOptionLabel={(option, { context }) => {
+  // 🟢 DROPDOWN MENU
+  if (context === "menu") {
+    return (
+      <div style={{ display: "flex", justifyContent: "space-between"}}>
+        <span style={{ color: "#666", fontWeight: 700, fontSize: "13px" }}>{option.orderNumber}</span>
+        <span style={{ color: "#666", fontWeight: 700, fontSize: "13px" }}>Qty {option.originalQuantity}</span>
+      </div>
+    );
+  }
+
+  // 🟢 SELECTED VALUE (chips)
+  return option.label;
+}}
+
+  onChange={(selected) => {
+    const updated = [...selectedRenewals];
+    updated[index] = selected
+  ? selected.map(s => ({
+      renewal_id: s.value,
+      label: s.label,                 // ✅ KEEP LABEL
+      orderNumber: s.orderNumber,
+      originalQuantity: s.originalQuantity,
+    }))
+  : [];
+
+    setSelectedRenewals(updated);
+  }}
+/>
+
+)}
 </td>
+
 
                       <td>₹&nbsp;{total.toFixed(2)}</td>
                       <td>₹&nbsp;{taxAmount.toFixed(2)}</td>

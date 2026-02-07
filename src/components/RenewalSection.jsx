@@ -1001,10 +1001,10 @@ const formattedTotalRenewedQty = useMemo(() => {
     <th>Customer</th>
     <th>Product</th>
     <th>Vendor</th>
+    <th>Validity</th>
+    <th>Order #</th>
     <th>Original Qty</th>
     <th>Renewed Qty</th>
-    <th>Order #</th>
-    <th>Validity</th>
     <th>Completion %</th>
     <th>Completion Date</th>
     <th>Status</th>
@@ -1019,10 +1019,10 @@ const formattedTotalRenewedQty = useMemo(() => {
 <td>{row.Customer || "-"}</td>
 <td>{row.Product || "-"}</td>
 <td>{row.Vendor || "-"}</td>
+<td>{row.Validity || "-"}</td>
+<td>{row["Order #"] || "-"}</td>
 <td>{row["Original Quantity"] ?? "-"}</td>
 <td>{row["Renewed Quantity"] ?? "-"}</td>
-<td>{row["Order #"] || "-"}</td>
-<td>{row.Validity || "-"}</td>
 <td>{row["Completion %"] ?? "0"}%</td>
 <td>{row["Completion Date"] ?? "-"}</td>
 <td>{row.Status || "-"}</td>
