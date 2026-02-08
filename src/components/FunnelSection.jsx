@@ -266,6 +266,24 @@ const handlePrevPage = () => {
   }
 };
 
+const handleHomePage = () => {
+  const backendSearchType =
+    searchType === "name" ? "company" :
+    searchType === "area" ? "area" :
+    searchType === "email" ? "email" :
+    "phone";
+
+  setCurrentPage(1);
+
+  dispatch(
+    loadFunneldata(
+      1,
+      rowsPerPage,
+      debouncedSearchTerm,
+      backendSearchType
+    )
+  );
+};
 
   // Recalculate total pages based on rows per page
   // useEffect(() => {
@@ -550,8 +568,16 @@ toast.error("Please select a customer and enter a comment!!!.");  }
     </div>
 
 </div>
-
 </div>
+
+{/* Home button (top) */}
+{funnelData && funnelData.length > 0 && currentPage > 1 && (
+  <div className="pagination-home-funnel">
+    <button onClick={handleHomePage}>
+      ⏮ Home
+    </button>
+  </div>
+)}
 
 
       {funnelData && funnelData.length > 0 ? (

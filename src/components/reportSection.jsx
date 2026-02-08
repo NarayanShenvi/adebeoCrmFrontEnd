@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchActivityReport } from '../redux/slices/reportSlice';
+import { fetchActivityReport, resetActivityReport } from '../redux/slices/reportSlice';
 import { fetchUsers } from '../redux/slices/userSlice';
 import { Form } from 'react-bootstrap';
 import { Row, Col } from 'react-bootstrap';
@@ -103,6 +103,10 @@ const handleEndDateChange = (e) => {
     setPage(newPage);
     fetchReportData(newPage);
   };
+const handleHomePage = () => {
+  setPage(1);
+  fetchReportData(1);
+};
 
   // Client-side filtering for companyName (optional if backend doesn't support partial match)
   // Apply company name filter on frontend (case-insensitive)
@@ -111,6 +115,13 @@ const filteredActivities = activities.filter(act => {
   if (!companyName) return true; // no filter applied
   return act.company_name?.toLowerCase().includes(companyName.toLowerCase());
 });
+
+useEffect(() => {
+  return () => {
+    dispatch(resetActivityReport());
+  };
+}, [dispatch]);
+
 
   return (
     <div className='report-section'>
@@ -222,7 +233,15 @@ const filteredActivities = activities.filter(act => {
       )}
 
       {/* Report Table */}
-     
+{/* Home button (top) */}
+{filteredActivities.length > 0 && page > 1 && (
+  <div className="pagination-home-report">
+    <button onClick={handleHomePage}>
+      ⏮ Home
+    </button>
+  </div>
+)}
+
 <div className="report-table">
   {reportType === 'detailed' && companyName ? (
     <p className="no-activity-message-short">

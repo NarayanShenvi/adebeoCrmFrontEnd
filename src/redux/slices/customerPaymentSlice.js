@@ -6,26 +6,41 @@ import API from "../../config/config";
 // fetchCustomerPaymentsAsync: unchanged
 export const fetchCustomerPaymentsAsync = createAsyncThunk(
   'customerPayment/fetchCustomerPayments',
-  async ({ page = 1, per_page = 10 }) => {
-    const token = localStorage.getItem('Access_Token');
-    if (!token) throw new Error("No access token found. Please log in.");
+  async ({ page = 1, per_page = 10, search = "" }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('Access_Token');
+      if (!token) throw new Error("No access token found.");
 
-    const response = await axios.get(`${API}/get_cxpayment`, {
-      params: { page, per_page,include_disabled: true },
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      const response = await axios.get(`${API}/get_cxpayment`, {
+        params: {
+          page,
+          per_page,
+          search, // ✅ invoice number
+          include_disabled: true,
+        },
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    const { payments, total_count, total_pages, current_page } = response.data;
-    const calculatedTotalPages = total_pages || Math.ceil((total_count || 0) / per_page);
+      const { payments, total_count, total_pages, current_page } = response.data;
 
-    return {
-      payments: payments || [],
-      totalCount: total_count || 0,
-      totalPages: calculatedTotalPages,
-      currentPage: current_page || 1,
-    };
+      return {
+        payments: payments || [],
+        totalCount: total_count || 0,
+        totalPages: total_pages || 1,
+        currentPage: current_page || 1,
+      };
+    } catch (err) {
+      // ✅ extract backend error from response
+      if (err.response && err.response.data) {
+        // the backend returns { error: "..." } instead of message
+        return rejectWithValue(err.response.data.message || err.response.data.error);
+      }
+      return rejectWithValue(err.message); // fallback
+    }
   }
 );
+
+
 
 // generateInvoicePdfAsync, processCustomerPaymentAsync, recreateInvoiceAsync, disableInvoiceAsync:
 export const generateInvoicePdfAsync = createAsyncThunk(
@@ -38,11 +53,24 @@ export const generateInvoicePdfAsync = createAsyncThunk(
 
 export const processCustomerPaymentAsync = createAsyncThunk(
   'customerPayment/processCustomerPayment',
-  async (paymentData) => {
-    const response = await axios.post(`${API}/process_payment`, paymentData);
-    return response.data;
+  async (paymentData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API}/process_payment`, paymentData);
+      return response.data;
+    } catch (err) {
+      // ✅ Extract backend error safely
+      if (err.response && err.response.data) {
+        return rejectWithValue(
+          err.response.data.message ||
+          err.response.data.error ||
+          "Payment processing failed"
+        );
+      }
+      return rejectWithValue(err.message || "Payment processing failed");
+    }
   }
 );
+
 
 export const recreateInvoiceAsync = createAsyncThunk(
   'customerPayment/recreateInvoice',
@@ -94,10 +122,13 @@ const customerPaymentSlice = createSlice({
   initialState: {
     payments: [],
     payment: null,
-    loading: false,
+    loading: false,          // only for big loading (e.g., full table reload)
+    pageLoading: false,      // for pagination/search
+    firstLoad: true, 
     error: null,
     currentPage: 1,
     totalPages: 1,
+    searchTerm: "",
     totalCount: 0,
     pdfGenerating: false,
     pdfError: null,
@@ -140,39 +171,46 @@ const customerPaymentSlice = createSlice({
         delete state.localCancelled[invoiceNum];
       }
     },
+
+    setSearchTerm: (state, action) => {
+    state.searchTerm = action.payload;
+    },
   },
-  extraReducers: (builder) => {
+
+extraReducers: (builder) => {
     builder
       // fetch
-      .addCase(fetchCustomerPaymentsAsync.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchCustomerPaymentsAsync.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error?.message || "An error occurred while fetching payments.";
-      })
+.addCase(fetchCustomerPaymentsAsync.pending, (state) => {
+  if (state.firstLoad) {
+    state.pageLoading = true; // show loading spinner only for first table load
+  }
+  state.error = null;
+})
+.addCase(fetchCustomerPaymentsAsync.fulfilled, (state, action) => {
+  state.pageLoading = false;
+  state.firstLoad = false; // mark first load done
+  
+  const { payments, totalCount, totalPages, currentPage } = action.payload;
+  state.payments = payments || [];
+  state.totalCount = totalCount || 0;
+  state.totalPages = totalPages || 1;
+  state.currentPage = currentPage || 1;
 
-      .addCase(fetchCustomerPaymentsAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        const { payments, totalCount, totalPages, currentPage } = action.payload;
-      
-        state.payments = payments || [];
-        state.totalCount = totalCount || 0;
-        state.totalPages = totalPages || 1;
-        state.currentPage = currentPage || 1;
-      
-        // --- MERGE any client-side cancelled entries that backend omitted ---
-        Object.keys(state.localCancelled).forEach(invNum => {
-          const local = state.localCancelled[invNum];
-          const exists = state.payments.some(p => p.invoice_number === invNum);
-      
-          if (!exists && local) {
-            state.payments.unshift(local); // Add if missing
-          }
-          // 🔁 REMOVE else-if to avoid overwriting backend's updated invoice
-        });
-      });
+  Object.keys(state.localCancelled).forEach(invNum => {
+    const local = state.localCancelled[invNum];
+    const exists = state.payments.some(p => p.invoice_number === invNum);
+    if (!exists && local) {
+      state.payments.unshift(local);
+    }
+  });
+})
+.addCase(fetchCustomerPaymentsAsync.rejected, (state, action) => {
+  state.pageLoading = false;
+  state.firstLoad = false;
+  state.error = action.payload || "An error occurred while fetching payments.";
+  state.error = action.error?.message || "An error occurred while fetching payments.";
+});
+
       
       // .addCase(fetchCustomerPaymentsAsync.fulfilled, (state, action) => {
       //   state.loading = false;
@@ -214,6 +252,7 @@ const customerPaymentSlice = createSlice({
       })
       .addCase(processCustomerPaymentAsync.rejected, (state, action) => {
         state.loading = false;
+         state.error = action.payload || "An error occurred while processing the payment.";
         state.error = action.error?.message || "An error occurred while processing the payment.";
       });
 
@@ -294,5 +333,5 @@ builder
   },
 });
 
-export const { setPaymentStatus, upsertPayment } = customerPaymentSlice.actions;
+export const { setPaymentStatus, upsertPayment, setSearchTerm } = customerPaymentSlice.actions;
 export default customerPaymentSlice.reducer;

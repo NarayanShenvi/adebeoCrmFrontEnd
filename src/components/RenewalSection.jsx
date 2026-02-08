@@ -5,7 +5,11 @@
   import { LuFileCheck2 } from "react-icons/lu";
   import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-  import { fetchSalesReport, resetSalesReport } from "../redux/slices/reportSlice";
+  import {
+  fetchRenewalReport,
+  resetRenewalReport,
+} from "../redux/slices/renewalSlice";
+
   import { fetchUsers } from "../redux/slices/userSlice";
   import { fetchCustomerAsync, clearCustomers } from "../redux/slices/customerSlice"; // adjust path/names if different
   import { setProductToEdit, updateProductAsync, fetchProductsAsync, addProductAsync } from '../redux/slices/productSlice';
@@ -16,27 +20,10 @@
   import { BiSolidMessageRoundedError } from "react-icons/bi";
   import { IoIosWarning } from "react-icons/io";
   import { BiSolidCommentCheck } from "react-icons/bi";
-  import {
-  ResponsiveContainer,
-  LineChart,
-  BarChart,
-  ComposedChart,   
-  Line,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  Label,
-} from "recharts";
-import { PieChart, Pie, Cell } from "recharts";
-import { Collapse, Button } from "react-bootstrap";
-
-  const SalesReport = () => {
+  
+  const RenewalReport = () => {
     const dispatch = useDispatch();
-      const [chartsOpen, setChartsOpen] = useState(false);
-
+  
     // Dates
     const today = new Date().toISOString().split("T")[0];
     const [startDate, setStartDate] = useState("");
@@ -66,9 +53,12 @@ import { Collapse, Button } from "react-bootstrap";
 
     // Redux slices
   const {
-    salesReports = [],
-    salesLoading,
-  } = useSelector((state) => state.report);
+  renewalReports = [],
+  renewalLoading,
+  totalCount,
+  renewalError,
+} = useSelector((state) => state.renewal);
+
 
     const { users = [], loading: usersLoading } = useSelector((state) => state.users);
     const { customers = [], loading: customersLoading } = useSelector(
@@ -103,27 +93,27 @@ import { Collapse, Button } from "react-bootstrap";
     // --- Date handlers & validations ---
     const handleStartDateChange = (e) => {
       const selected = e.target.value;
-      if (selected > today) {
-        toast.warn("You cannot select a future Date!!", {
-                                                    position: "top-right",
-                                                    toastClassName: "toast-warn-zfix",
-                                                    autoClose: 4000,
-                                                    hideProgressBar: false,
-                                                    closeOnClick: true,
-                                                    pauseOnHover: true,
-                                                    draggable: true,
-                                                    progress: undefined,
-                                                    theme: "colored", // "light", "dark", or "colored"
-                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
-                                                      fontSize: "14px",       // ✅ Change font size
-                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
-                                                      fontWeight: "bold",    // ✅ Make text bold
-                                                     },
-                                                     icon: <IoIosWarning  
-                                                     style={{ fontSize: '25px', color: 'white' }} />
-                                                });
-        return;
-      }
+      // if (selected > today) {
+      //   toast.warn("You cannot select a future Date!!", {
+      //                                               position: "top-right",
+      //                                               toastClassName: "toast-warn-zfix",
+      //                                               autoClose: 4000,
+      //                                               hideProgressBar: false,
+      //                                               closeOnClick: true,
+      //                                               pauseOnHover: true,
+      //                                               draggable: true,
+      //                                               progress: undefined,
+      //                                               theme: "colored", // "light", "dark", or "colored"
+      //                                                style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+      //                                                 fontSize: "14px",       // ✅ Change font size
+      //                                                 fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+      //                                                 fontWeight: "bold",    // ✅ Make text bold
+      //                                                },
+      //                                                icon: <IoIosWarning  
+      //                                                style={{ fontSize: '25px', color: 'white' }} />
+      //                                           });
+      //   return;
+      // }
       setStartDate(selected);
       // Clear end date whenever start date changes (as you requested earlier)
       setEndDate("");
@@ -156,27 +146,27 @@ import { Collapse, Button } from "react-bootstrap";
         return;
       }
       const selected = e.target.value;
-      if (selected > today) {
-        toast.warn("You cannot select a future Date!!", {
-                                                    position: "top-right",
-                                                    toastClassName: "toast-warn-zfix",
-                                                    autoClose: 4000,
-                                                    hideProgressBar: false,
-                                                    closeOnClick: true,
-                                                    pauseOnHover: true,
-                                                    draggable: true,
-                                                    progress: undefined,
-                                                    theme: "colored", // "light", "dark", or "colored"
-                                                     style: { background: "rgba(187, 184, 9, 1)", color: "white", 
-                                                      fontSize: "14px",       // ✅ Change font size
-                                                      fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
-                                                      fontWeight: "bold",    // ✅ Make text bold
-                                                     },
-                                                     icon: <IoIosWarning  
-                                                     style={{ fontSize: '25px', color: 'white' }} />
-                                                });
-        return;
-      }
+      // if (selected > today) {
+      //   toast.warn("You cannot select a future Date!!", {
+      //                                               position: "top-right",
+      //                                               toastClassName: "toast-warn-zfix",
+      //                                               autoClose: 4000,
+      //                                               hideProgressBar: false,
+      //                                               closeOnClick: true,
+      //                                               pauseOnHover: true,
+      //                                               draggable: true,
+      //                                               progress: undefined,
+      //                                               theme: "colored", // "light", "dark", or "colored"
+      //                                                style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+      //                                                 fontSize: "14px",       // ✅ Change font size
+      //                                                 fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+      //                                                 fontWeight: "bold",    // ✅ Make text bold
+      //                                                },
+      //                                                icon: <IoIosWarning  
+      //                                                style={{ fontSize: '25px', color: 'white' }} />
+      //                                           });
+      //   return;
+      // }
       if (selected < startDate) {
         toast.warn("End Date cannot be before Start Date!", {
                                                     position: "top-right",
@@ -229,11 +219,9 @@ import { Collapse, Button } from "react-bootstrap";
     setReportGenerated(true);
 
     dispatch(
-    fetchSalesReport({
+    fetchRenewalReport({
       startDate,
       endDate,
-      page: pageNum,
-      perPage,
       customerId: selectedCustomerId || undefined,
       productId: selectedProductId || undefined,
       user: selectedUser || undefined,
@@ -390,31 +378,6 @@ import { Collapse, Button } from "react-bootstrap";
   };
 
 
-  //   // --- Load all customers initially ---
-  // // --- Load all customers initially ---
-  // useEffect(() => {
-  //   // Fetch all customers once on mount
-  //   const fetchAllCustomers = async () => {
-  //     try {
-  //       setLocalSearchLoading(true); // show spinner while loading
-  //       await dispatch(fetchCustomerAsync("")); // empty string fetches all
-  //     } catch (err) {
-  //       console.error(err);
-  //     } finally {
-  //       setLocalSearchLoading(false);
-  //     }
-  //   };
-
-  //   fetchAllCustomers();
-  // }, [dispatch]);
-
-  // // --- Prepare options ---
-  // const customerOptions = customers.map(c => ({
-  //   value: c._id,
-  //   label: c.companyName || c.company_name || c.company
-  // }));
-
-
   // -----------------------
   // Product search (single products only) — USING REDUX ONLY
   // -----------------------
@@ -524,8 +487,8 @@ import { Collapse, Button } from "react-bootstrap";
     // const hideProductColumn = !!selectedProductId;   // hide only when product filter applied
 
 
-  const filteredSalesReports = useMemo(() => {
-    let data = [...salesReports];
+  const filteredRenewalReports = useMemo(() => {
+    let data = [...renewalReports];
 
     // ✅ CUSTOMER FILTER (multi-select)
 if (appliedFilters.customerObj && appliedFilters.customerObj.length > 0) {
@@ -565,20 +528,20 @@ if (appliedFilters.user && appliedFilters.user.length > 0) {
 }
 
     return data;
-  }, [salesReports, appliedFilters]);
+  }, [renewalReports, appliedFilters]);
 
-const perPage = 1000; // max rows per page
-const frontendTotalPages = Math.ceil(filteredSalesReports.length / perPage);
+const perPage = 10; // max rows per page
+const frontendTotalPages = Math.ceil(filteredRenewalReports.length / perPage);
 
-  const paginatedSalesReports = useMemo(() => {
+  const paginatedRenewalReports = useMemo(() => {
     const start = (page - 1) * perPage;
     const end = start + perPage;
-    return filteredSalesReports.slice(start, end);
-  }, [filteredSalesReports, page]);
+    return filteredRenewalReports.slice(start, end);
+  }, [filteredRenewalReports, page]);
 
  useEffect(() => {
   return () => {
-    dispatch(resetSalesReport()); // cleanup on unmount
+    dispatch(resetRenewalReport()); // cleanup on unmount
   };
 }, []);
 
@@ -586,33 +549,33 @@ const frontendTotalPages = Math.ceil(filteredSalesReports.length / perPage);
   const reportCustomerOptions = useMemo(() => {
     const map = new Map();
 
-    salesReports.forEach((row) => {
-      const name = row["Customer Name"];
+    renewalReports.forEach((row) => {
+      const name = row["Customer"];
       if (name) {
         map.set(name, { value: name, label: name });
       }
     });
 
     return Array.from(map.values());
-  }, [salesReports]);
+  }, [renewalReports]);
 
   const reportProductOptions = useMemo(() => {
     const map = new Map();
 
-    salesReports.forEach((row) => {
-      const name = row["Description"];
+    renewalReports.forEach((row) => {
+      const name = row["Product"];
       if (name) {
         map.set(name, { value: name, label: name });
       }
     });
 
     return Array.from(map.values());
-  }, [salesReports]);
+  }, [renewalReports]);
 
   const reportUserOptions = useMemo(() => {
     const map = new Map();
 
-    salesReports.forEach((row) => {
+    renewalReports.forEach((row) => {
       const user = row["User"];
       if (user) {
         map.set(user, { value: user, label: user });
@@ -620,7 +583,7 @@ const frontendTotalPages = Math.ceil(filteredSalesReports.length / perPage);
     });
 
     return Array.from(map.values());
-  }, [salesReports]);
+  }, [renewalReports]);
 
   useEffect(() => {
     setSelectedCustomerId([]);
@@ -632,37 +595,17 @@ const frontendTotalPages = Math.ceil(filteredSalesReports.length / perPage);
     setSearchTerm("");
   }, [useReportFilters]);
 
-//   const totalAmountBilled = useMemo(() => {
-//   if (!salesReports || salesReports.length === 0) return 0;
-
-//   return salesReports.reduce((sum, row) => {
-//     const amount = Number(
-//       String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
-//     );
-//     return sum + (isNaN(amount) ? 0 : amount);
-//   }, 0);
-// }, [salesReports]);
-
-// const formattedTotalAmount = useMemo(() => {
-//   return totalAmountBilled.toLocaleString("en-IN", {
-//     style: "currency",
-//     currency: "INR",
-//     minimumFractionDigits: 2,
-//   });
-// }, [totalAmountBilled]);
-
-const { salesError } = useSelector((state) => state.report);
 
 useEffect(() => {
-  if (!salesError) return;
+  if (!renewalError) return;
 
   // 🌐 Network error
  if (
-       salesError  === "Failed to fetch business report" || "Rejected" ||
-       salesError.toLowerCase().includes("network") || salesError.toLowerCase().includes("Token has expired")
+       renewalError  === "Failed to fetch business report" || "Rejected" ||
+       renewalError.toLowerCase().includes("network") || renewalError.toLowerCase().includes("Token has expired")
      ) {
        toast.error(
-       salesError.toLowerCase().includes("Token has expired")
+       renewalError.toLowerCase().includes("Token has expired")
          ? "Session expired!! Please log in again."
          : "Rejected!! Network error. Please check your internet connection or Re-login",  {
                                                 autoClose: 4000,
@@ -684,7 +627,7 @@ useEffect(() => {
   }
   // ❌ Auth / backend / validation error
   else {
-toast.error(salesError, {
+toast.error(renewalError, {
   autoClose: 4000,
   toastClassName: "toast-warn-zfix",
   hideProgressBar: false,
@@ -706,242 +649,47 @@ toast.error(salesError, {
     />
   ),
 });  }
-}, [salesError]);
-
-
-const salesLineChartData = useMemo(() => {
-  const map = {};
-
-  filteredSalesReports.forEach((row) => {
-    const date = row["Invoice Date"];
-    const amount = Number(
-      String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
-    );
-
-    if (!date) return;
-
-    if (!map[date]) {
-      map[date] = { date, amount: 0 };
-    }
-
-    map[date].amount += isNaN(amount) ? 0 : amount;
-  });
-
-  return Object.values(map);
-}, [filteredSalesReports]);
-
-const salesBarChartData = useMemo(() => {
-  const map = {};
-
-  filteredSalesReports.forEach((row) => {
-    const customer = row["Customer Name"] || "Unknown";
-    const amount = Number(
-      String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
-    );
-
-    if (!map[customer]) {
-      map[customer] = { customer, amount: 0 };
-    }
-
-    map[customer].amount += isNaN(amount) ? 0 : amount;
-  });
-
-  return Object.values(map);
-}, [filteredSalesReports]);
-
-const productCombinedChartData = useMemo(() => {
-  const map = {};
-
-  filteredSalesReports.forEach((row) => {
-    const product = row["Description"] || "Unknown";
-    const qty = Number(row["Qty"] || 0);
-    const amount = Number(
-      String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
-    );
-
-    if (!map[product]) {
-      map[product] = {
-        product,
-        quantity: 0,
-        amount: 0,
-      };
-    }
-
-    map[product].quantity += isNaN(qty) ? 0 : qty;
-    map[product].amount += isNaN(amount) ? 0 : amount;
-  });
-
-  return Object.values(map);
-}, [filteredSalesReports]);
+}, [renewalError]);
 
 // Total based on filtered rows (so it updates when filters change)
-const totalAmountBilled = useMemo(() => {
-  if (!filteredSalesReports || filteredSalesReports.length === 0) return 0;
+const totalOriginalQty = useMemo(() => {
+  if (!filteredRenewalReports || filteredRenewalReports.length === 0) return 0;
 
-  return filteredSalesReports.reduce((sum, row) => {
-    const amount = Number(
-      String(row["Amount Billed (INR)"] || 0).replace(/,/g, "")
+  return filteredRenewalReports.reduce((sum, row) => {
+    const qty = Number(
+      String(row["Original Quantity"] || 0).replace(/,/g, "")
     );
-    return sum + (isNaN(amount) ? 0 : amount);
+    return sum + (isNaN(qty) ? 0 : qty);
   }, 0);
-}, [filteredSalesReports]);
-const formattedTotalAmount = useMemo(() => {
-  return totalAmountBilled.toLocaleString("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 2,
-  });
-}, [totalAmountBilled]);
+}, [filteredRenewalReports]);
 
- // bar chart
-const CustomCustomerTick = ({ x, y, payload }) => {
-  let text = payload.value || "";
+const totalRenewedQty = useMemo(() => {
+  if (!filteredRenewalReports || filteredRenewalReports.length === 0) return 0;
 
-  // 1️⃣ Trim name to 50% length
-  const half = Math.ceil(text.length / 2);
-  const trimmed = text.length > 12 ? text.slice(0, half) + "…" : text;
-
-  // 2️⃣ Wrap into 2 lines (every ~10 chars)
-  const words = trimmed.match(/.{1,12}/g) || [trimmed];
-
-  return (
-    <g transform={`translate(${x - 90},${y})`}>
-      {words.map((line, i) => (
-        <text
-          key={i}
-          dy={i * 12}
-          fill="#585757ff"
-          fontSize={12}
-          fontWeight={600}
-          fontFamily="Shippori Mincho B1, Times New Roman, serif"
-        >
-          {line}
-        </text>
-      ))}
-    </g>
-  );
-};
-const rowHeight = 40; // space per bar
-const chartHeight = Math.max(300, salesBarChartData.length * rowHeight);
-
-// Dynamic Pie Size Logic
-const productCount = productCombinedChartData?.length || 0;
-    
-    const sortedProductData = useMemo(() => {
-    return [...productCombinedChartData].sort(
-      (a, b) => b.amount - a.amount
+  return filteredRenewalReports.reduce((sum, row) => {
+    const qty = Number(
+      String(row["Renewed Quantity"] || 0).replace(/,/g, "")
     );
-  }, [productCombinedChartData]);
-  
-    const COLORS = [
-      "#0a8181",
-      "#f39c12",
-      "#e74c3c",
-      "#9b59b6",
-      "#3498db",
-      "#2ecc71",
-      "#1abc9c",
-      "#8e44ad",
-      "#34495e",
-      "#c0392b",
-    ];
-  
-    const generateColors = (count) =>
-    Array.from({ length: count }, (_, i) => {
-      const hue = (i * 137.508) % 360;
-      return `hsl(${hue}, 60%, 50%)`;
-    });
-  
-  const remainingColors = generateColors(
-    Math.max(0, sortedProductData.length - COLORS.length)
-  );
-  
-  const finalColors = [
-    ...COLORS,
-    ...remainingColors,
-  ]; 
-  
-  const cx = "35%";   // leave room for legend
-  const cy = "50%";   // stable center
-  const MAX_LABEL_PRODUCTS = 6;
-  const showSliceLabels = productCombinedChartData.length <= MAX_LABEL_PRODUCTS;
-  
-  const safeOuterRadius = Math.min(
-    160,
-    Math.max(
-      150,                        // minimum size
-      80 + productCount * 6      // 🔥 grows with product count
-    )
-  );
-  const piechartHeight = Math.max(
-    360,
-    productCount * 28
-  );
-  
-  const TwoColumnPieLegend = ({ payload }) => {
-    if (!payload || payload.length === 0) return null;
-  
-    const mid = Math.ceil(payload.length / 2);
-    const col1 = payload.slice(0, mid);
-    const col2 = payload.slice(mid);
-  
-    const renderItem = (entry, index) => {
-      const name = entry.value || "";
-      const wrapped = name.match(/.{1,26}/g)?.join("\n") || name;
-  
-      return (
-        <div
-          key={index}
-          style={{
-                  display: "flex",
-                  alignItems: "center",
-                  color: entry.color,
-                  marginBottom: "10px",
-                  whiteSpace: "pre-line", // ⭐ enables wrapping
-                  fontFamily: "Shippori Mincho B1, Times New Roman, serif",
-                  fontWeight: 600,
-                  fontSize: "13px",
-                }}
-        >
-          <span
-            style={{
-                    width: "30px",      // ⭐ wider box
-                    height: "15px",
-                    borderRadius: "2px",
-                    backgroundColor: entry.color,
-                    marginRight: "9px",
-                  }}
-          />
-          <span>{wrapped}</span>
-        </div>
-      );
-    };
-  
-    return (
-      <div
-        style={{
-          display: "flex",
-          gap: "22px",
-          padding: "8px 10px",
-          maxHeight: "420px",
-          overflowY: "auto",
-        }}
-      >
-        <div>{col1.map(renderItem)}</div>
-        <div>{col2.map(renderItem)}</div>
-      </div>
-    );
-  };
+    return sum + (isNaN(qty) ? 0 : qty);
+  }, 0);
+}, [filteredRenewalReports]);
 
+const formattedTotalOriginalQty = useMemo(() => {
+  return totalOriginalQty.toLocaleString("en-IN");
+}, [totalOriginalQty]);
+
+const formattedTotalRenewedQty = useMemo(() => {
+  return totalRenewedQty.toLocaleString("en-IN");
+}, [totalRenewedQty]);
 
     return (
-      <div className="SalesReport-section">
-        <h3>Sales Report</h3>
+      <div className="RenewalReport-section">
+        <h3>Renewals Report</h3>
         <ToastContainer />
 
-        <Form onSubmit={handleSubmit} className="filter-form-sales">
+        <Form onSubmit={handleSubmit} className="filter-form-renewal">
           {/* Date row */}
-<Row className="g-4 mt-3 sales-filter-row">
+<Row className="g-4 mt-3 renewal-filter-row align-items-end">
   {/* Start Date */}
   <Col md={3}>
     <Form.Label className="required-label">Start Date:</Form.Label>
@@ -950,7 +698,6 @@ const productCount = productCombinedChartData?.length || 0;
       value={startDate}
       onChange={handleStartDateChange}
       required
-      max={today}
       className="dates"
     />
   </Col>
@@ -963,7 +710,6 @@ const productCount = productCombinedChartData?.length || 0;
       value={endDate}
       onChange={handleEndDateChange}
       required
-      max={today}
       min={startDate || ""}
       className="dates"
     />
@@ -977,20 +723,29 @@ const productCount = productCombinedChartData?.length || 0;
       checked={useReportFilters}
       onChange={(e) => setUseReportFilters(e.target.checked)}
       disabled={!reportGenerated}
-      className="custom-checkbox-sales"
+      className="custom-checkbox-renewal"
     />
     </Col>
 
-<Col md={3}>
-    {reportGenerated && (
-      <div className="total-amount-text">
-        <span>Total Amount:</span>
+<Col md={3} >
+  {reportGenerated && (
+    <div className="total-amount-text-renewal d-flex gap-1">
+      <div>
+        <span>Total Original Qty:&nbsp;</span>
         <strong className="wrap-amount">
-        {formattedTotalAmount} {/* This already has ₹ symbol & formatting */}
-      </strong>
+          {formattedTotalOriginalQty}
+        </strong>
       </div>
-    )}
-  </Col>
+
+      <div>
+        <span>Total Renewed Qty:&nbsp;</span>
+        <strong className="wrap-amount">
+          {formattedTotalRenewedQty}
+        </strong>
+      </div>
+    </div>
+  )}
+</Col>
 </Row>
 
 
@@ -1005,8 +760,8 @@ const productCount = productCombinedChartData?.length || 0;
     {useReportFilters ? (
       // ✅ DROPDOWN FROM GENERATED REPORT DATA
       <Select
-  className="SalesReport-select"
-  classNamePrefix="SalesReport"
+  className="RenewalReport-select"
+  classNamePrefix="RenewalReport"
   menuPortalTarget={document.body}
   menuPosition="fixed"
   styles={{
@@ -1027,16 +782,16 @@ const productCount = productCombinedChartData?.length || 0;
       <>
         <input
           type="text"
-          className="search-field-customer-name form-control"
+          className="search-field-customer-name-renewal form-control"
           placeholder="Search by Company Name"
           value={searchQuery}
           onChange={handleSearchChange}
         />
 
-        <div className="search-field1-customer-name mt-1">
+        <div className="search-field1-customer-name-renewal mt-1">
           {searchQuery.length >= 3 ? (
             localSearchLoading || customersLoading ? (
-              <p className="CustomerNameLoading">Loading...</p>
+              <p className="CustomerNameLoading-renewal">Loading...</p>
             ) : customers.length > 0 ? (
               <select
                 value={selectedCustomerId || ""}
@@ -1050,10 +805,10 @@ const productCount = productCombinedChartData?.length || 0;
                 ))}
               </select>
             ) : (
-              <p className="NoCustomerNameFound">No customers found...</p>
+              <p className="NoCustomerNameFound-renewal">No customers found...</p>
             )
           ) : searchQuery.length > 0 && searchQuery.length < 3 ? (
-            <p className="TypeMoreCustData">
+            <p className="TypeMoreCustData-renewal">
               Type at least 3 characters to search
             </p>
           ) : null}
@@ -1062,50 +817,7 @@ const productCount = productCombinedChartData?.length || 0;
     )}
   </Form.Group>
             </Col> }
-            {/* <Col md={4}>
-    <Form.Group className="form-group">
-      <Form.Label>Customer</Form.Label>
-    <Select
-    options={customerOptions}
-    value={
-      selectedCustomerId && selectedCustomerObj
-        ? { value: selectedCustomerId, label: selectedCustomerObj.companyName || selectedCustomerObj.company_name || selectedCustomerObj.company }
-        : null
-    }
-    onInputChange={(inputValue) => {
-      setSearchQuery(inputValue);
-
-      // Only search after 3+ characters
-      if (inputValue.trim().length >= 3) {
-        setLocalSearchLoading(true);
-        dispatch(fetchCustomerAsync(inputValue.trim()))
-          .finally(() => setLocalSearchLoading(false));
-      } else {
-        // If less than 3 chars, show all customers (already fetched)
-        setLocalSearchLoading(false);
-      }
-    }}
-    onChange={(selected) => {
-      setSelectedCustomerId(selected?.value || "");
-      const cust = customers.find(c => c._id === selected?.value) || null;
-      setSelectedCustomerObj(cust);
-
-      if (!startDate || !endDate) {
-        toast.warn("Please select Start Date and End Date before applying customer filter.");
-      }
-    }}
-    isClearable
-    isSearchable
-    placeholder="Select or search customer"
-    isLoading={localSearchLoading} // only show spinner while searching
-    noOptionsMessage={() =>
-      searchQuery.length >= 3 ? "No customers found" : "Start typing to search"
-    }
-  />
-
-    </Form.Group>
-  </Col> */}
-
+            
 
           {/* Product search (single products only) */}
   <Col md={4}>
@@ -1117,8 +829,8 @@ const productCount = productCombinedChartData?.length || 0;
     {useReportFilters ? (
       // ✅ PRODUCT DROPDOWN FROM REPORT DATA
       <Select
-  className="SalesReport-select"
-  classNamePrefix="SalesReport"
+  className="RenewalReport-select"
+  classNamePrefix="RenewalReport"
   menuPortalTarget={document.body}
   menuPosition="fixed"
   styles={{
@@ -1139,7 +851,7 @@ const productCount = productCombinedChartData?.length || 0;
       // 🔴 EXISTING PRODUCT SEARCH UI — UNCHANGED
       <>
         <input
-          className="search-field-product-name form-control"
+          className="search-field-product-name-renewal form-control"
           type="text"
           placeholder="Search by Product Name"
           value={searchTerm}
@@ -1156,10 +868,10 @@ const productCount = productCombinedChartData?.length || 0;
           }}
         />
 
-        <div className="search-field1-product-name mt-1">
+        <div className="search-field1-product-name-renewal mt-1">
           {searchTerm.length >= 3 ? (
             searchLoading ? (
-              <p className="ProductNameLoading">Loading...</p>
+              <p className="ProductNameLoading-renewal">Loading...</p>
             ) : searchResults.length > 0 ? (
               <select
                 onChange={handleSelectProduct}
@@ -1173,10 +885,10 @@ const productCount = productCombinedChartData?.length || 0;
                 ))}
               </select>
             ) : (
-              <p className="NoProductNameFound">No products found...</p>
+              <p className="NoProductNameFound-renewal">No products found...</p>
             )
           ) : searchTerm.length > 0 && searchTerm.length < 3 ? (
-            <p className="TypeMoreProd">
+            <p className="TypeMoreProd-renewal">
               Type at least 3 characters to search
             </p>
           ) : null}
@@ -1193,8 +905,8 @@ const productCount = productCombinedChartData?.length || 0;
     <Form.Label>User</Form.Label>
 
     <Select
-  className="SalesReport-select"
-  classNamePrefix="SalesReport"
+  className="RenewalReport-select"
+  classNamePrefix="RenewalReport"
   menuPortalTarget={document.body}
   menuPosition="fixed"
   styles={{
@@ -1247,7 +959,7 @@ const productCount = productCombinedChartData?.length || 0;
             <Col md={1}>
               <Form.Group className="form-group">
                 <Form.Label className="invisible">&nbsp;</Form.Label>
-                <button type="submit" className="report-button-sales" title="Generate Sales Report">
+                <button type="submit" className="report-button-renewal" title="Generate Renewal Report">
                   <LuFileCheck2 className="filecheck" />
                 </button>
               </Form.Group>
@@ -1258,69 +970,63 @@ const productCount = productCombinedChartData?.length || 0;
         <br />
 
         {/* Loading & Error */}
-      {salesLoading && (
-    <div className="loading-container-report-sales">
-      <div className="loading-spinner-report-sales"></div>
-      <p className="loading-message-report-sales">Loading sales report...</p>
+      {renewalLoading && (
+    <div className="loading-container-report-renewal">
+      <div className="loading-spinner-report-renewal"></div>
+      <p className="loading-message-report-renewal">Loading renewals...</p>
     </div>
   )}
 
-  {salesError && salesError !== "Rejected" && (
-  <div className="error-container-report-sales">
-    <p className="error-message-report-sales">{salesError}</p>
+  {renewalError && renewalError !== "Rejected" && (
+  <div className="error-container-report-renewal">
+    <p className="error-message-report-renewal">{renewalError}</p>
   </div>
 )}
 
 {/* Report Table */}
 {/* Home button (top) */}
 {page > 1 && (
-  <div className="pagination-home-salesreport">
+  <div className="pagination-home-renewalreport">
     <button onClick={() => handlePageChange(1)}>
       ⏮ Home
     </button>
   </div>
 )}
 
-      <div className="SalesReport-table">
-    {paginatedSalesReports.length > 0 ? (
+      <div className="RenewalReport-table">
+    {paginatedRenewalReports.length > 0 ? (
       <table>
         <thead>
   <tr>
-    <th>Customer Name</th>
-    <th>Product Name</th>
-    <th>Product Qty</th>
-    <th>Invoice Number</th>
-    <th>Invoice Date</th>
-    <th>Mode</th>
-    <th>Business Type</th>
-    <th>Amount Billed (INR)</th>
-    <th>PO Number</th>
+    <th>Customer</th>
+    <th>Product</th>
+    <th>Vendor</th>
+    <th>Validity</th>
+    <th>Order #</th>
+    <th>Original Qty</th>
+    <th>Renewed Qty</th>
+    <th>Completion %</th>
+    <th>Completion Date</th>
+    <th>Status</th>
   </tr>
 </thead>
 
 
         <tbody>
-          {paginatedSalesReports.map((row, idx) => (
+          {paginatedRenewalReports.map((row, idx) => (
             <tr key={idx}>
-  <td>{row["Customer Name"] || "-"}</td>
-  <td>{row["Description"] || "-"}</td>
-  <td>{row["Qty"] || "-"}</td>
 
-  <td>{row["Invoice #"] || "-"}</td>
-  <td>{row["Invoice Date"] || "-"}</td>
+<td>{row.Customer || "-"}</td>
+<td>{row.Product || "-"}</td>
+<td>{row.Vendor || "-"}</td>
+<td>{row.Validity || "-"}</td>
+<td>{row["Order #"] || "-"}</td>
+<td>{row["Original Quantity"] ?? "-"}</td>
+<td>{row["Renewed Quantity"] ?? "-"}</td>
+<td>{row["Completion %"] ?? "0"}%</td>
+<td>{row["Completion Date"] ?? "-"}</td>
+<td>{row.Status || "-"}</td>
 
-  {/* 👉 NEW COLUMNS */}
-  <td>{row["Mode"] || "-"}</td>
-  <td>{row["Business Type"] || "-"}</td>
-
-  <td>
-    {row["Amount Billed (INR)"]
-      ? `₹ ${row["Amount Billed (INR)"]}`
-      : "-"
-    }
-  </td>
-
-  <td>{row["PO Number"] || "-"}</td>
 </tr>
 
           ))}
@@ -1328,14 +1034,14 @@ const productCount = productCombinedChartData?.length || 0;
       </table>
     ) : (
       reportGenerated &&
-      !salesLoading && (
-        <p className="no-sales-message">NO SALES FOUND...</p>
+      !renewalLoading && (
+        <p className="no-renewal-message">NO RENEWALS FOUND...</p>
       )
     )}
     
     {/* Pagination */}
-    {filteredSalesReports.length > perPage && frontendTotalPages > 1 && (
-      <div className="pagination-controls-salesreport">
+    {filteredRenewalReports.length > perPage && frontendTotalPages > 1 && (
+      <div className="pagination-controls-renewalreport">
         <button
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 1}
@@ -1343,7 +1049,7 @@ const productCount = productCombinedChartData?.length || 0;
           <FaChevronLeft />
         </button>
 
-        <span className="page-salesreport">
+        <span className="page-renewalreport">
           {page} of {frontendTotalPages}
         </span>
 
@@ -1356,359 +1062,10 @@ const productCount = productCombinedChartData?.length || 0;
       </div>
     )}
 
-    {/* ================== CHARTS ================== */}
-{/* --- Collapsible Charts Section --- */}
-{filteredSalesReports.length > 0 && (
-  <div className="charts-collapsible mt-4">
-    <Button
-      onClick={() => setChartsOpen(!chartsOpen)}
-      aria-controls="charts-collapse"
-      aria-expanded={chartsOpen}
-      variant="outline-primary"
-      className={`mb-3 ${chartsOpen ? "open" : ""}`} // ✅ add class for arrow rotation
-    >
-      <span className="arrow">{chartsOpen ? "▼" : "►"}</span>
-  {chartsOpen ? " Hide Charts & Analysis" : " View Charts & Analysis"}
-</Button>
-
-    <Collapse in={chartsOpen}>
-      <div
-        id="charts-collapse"
-        className={chartsOpen ? "show" : ""}
-      >
-        <div className="sales-report-charts mt-3">
-          {/* --- Line Chart --- */}
-         <div className="sales-line-chart">
-  <h5 className="text-center mb-3">Sales Trend (Date-wise)</h5>
-
-  <ResponsiveContainer width="100%" height="100%">
-    <LineChart data={salesLineChartData}  margin={{ top: 20, right: 20, bottom: 20, left: 40 }}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis
-        dataKey="date"
-        interval={0}
-        angle={-45}
-        textAnchor="end"
-        height={70}
-        axisLine={{ stroke: "#888888ff", strokeWidth: 1 }}
-        tick={{
-    fill: "#585757ff",
-    fontSize: 12,
-    fontWeight: 600,
-    fontFamily: "Shippori Mincho B1, Times New Roman, serif"
-  }}
-    >
-      <Label
-    value="Date ➜"
-    position="insideBottom"
-    offset={-5}
-    style={{ fill: "#0a3d62", fontSize: 13, fontWeight: 600, fontFamily: "Shippori Mincho B1, Times New Roman, serif"
- }}
-  />
-  </XAxis>
-
-  <YAxis
-  axisLine={{ stroke: "#888888ff", strokeWidth: 1 }}
-   tick={{
-    fill: "#585757ff",
-    fontSize: 12,
-    fontWeight: 600,
-    fontFamily: "Shippori Mincho B1, Times New Roman, serif"
-  }}>
-  <Label
-    value="  Sales Amount (₹) ➜"
-    angle={-90}
-    position="outsideLeft"
-    dx={-40}  
-       style={{ fill: "#0a3d62", fontSize: 12, fontWeight: 600, fontFamily: "Shippori Mincho B1, Times New Roman, serif"
-    }}
-  />
-  </YAxis>
-
-  <Tooltip formatter={(value) => [`₹ ${value}`, "Total Amount"]}  
-    wrapperStyle={{
-    borderRadius: "2px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-  }}
-  contentStyle={{
-    backgroundColor: "#2d7174ff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "3px",
-    padding: "8px 12px", 
-    fontSize: "12px",
-    fontFamily: "Shippori Mincho B1, Times New Roman, serif",
-  }}
-  itemStyle={{ color: "#fff",  fontFamily: "Shippori Mincho B1, Times New Roman, serif", fontWeight: 600
- }}
-  labelStyle={{
-    color: "#fff",
-    fontWeight: 600,
-        fontFamily: "Shippori Mincho B1, Times New Roman, serif"
-  }}
-  cursor={{ stroke: "#0a8181", strokeWidth: 2, fill: "rgba(10,129,129,0.1)" }}/>
-    
-      <Line
-        type="monotone"
-        dataKey="amount"
-        stroke="#0a8181"
-        strokeWidth={3}
-        dot={{ r: 4 }}
-        style={{ cursor: "pointer" }}
-      />
-    </LineChart>
-  </ResponsiveContainer>
-</div>
-<br></br>
-<br></br>
-<br></br>
-
-          {/* --- Bar Chart --- */}
-           <div className="sales-bar-chart">
-  <h5 className="sales-bar-chart-head">Customer-wise Sales:</h5>
-
-  <ResponsiveContainer width="100%" height={chartHeight}>
-    <BarChart
-      data={salesBarChartData}
-      layout="vertical"
-      wrapperStyle={{ overflow: "visible" }} 
-      margin={{ top: 20, right: 30, bottom: 20, left: 10 }}
-    >
-      <CartesianGrid strokeDasharray="3 3" />
-
-      {/* Y Axis → Customer Names */}
-      <YAxis
-  dataKey="customer"
-  type="category"
-  width={180}      // 👈 This is the correct prop
-  axisLine={{ stroke: "#888888ff", strokeWidth: 1 }}
-  tick={<CustomCustomerTick />}
-><Label
-    value="Customers ➜"
-    angle={-90}
-    position="outsideLeft"
-    dx={-40}  
-       style={{ fill: "#0a3d62", fontSize: 13, fontWeight: 600, fontFamily: "Shippori Mincho B1, Times New Roman, serif"
-    }}
-  />
-  </YAxis>
-
-      {/* X Axis → Amount */}
-      <XAxis
-        type="number"
-        axisLine={{ stroke: "#888888ff", strokeWidth: 1 }}
-        tick={{
-          fill: "#585757ff",
-          fontSize: 13,
-          fontWeight: 600,
-          fontFamily: "Shippori Mincho B1, Times New Roman, serif",
-        }}
-      >
-        <Label
-          value=" Sales Amount (₹) ➜"
-          position="insideBottom"
-          offset={-20}
-          style={{
-            fill: "#0a3d62",
-            fontSize: 13,
-            fontWeight: 600,
-            fontFamily: "Shippori Mincho B1, Times New Roman, serif",
-          }}
-        />
-      </XAxis>
-
-      {/* Tooltip same look as line chart */}
-      <Tooltip
-      labelFormatter={(label) => {
-    const wrapped = label.match(/.{1,55}/g)?.join("\n") || label;
-    return wrapped;
-  }}
-        formatter={(value) => [`₹ ${value}`, "Total Sales"]}
-        wrapperStyle={{
-          borderRadius: "2px",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-        }}
-        contentStyle={{
-              whiteSpace: "pre-line",
-          backgroundColor: "#f7fbfcfd",
-          color: "#1b5d61ff",
-          border: "none",
-          borderRadius: "3px",
-          padding: "8px 12px",
-          fontSize: "13px",
-          fontWeight: 600,
-          fontFamily: "Shippori Mincho B1, Times New Roman, serif",
-        }}
-        itemStyle={{
-          color: "#1b5d61ff",
-          fontFamily: "Shippori Mincho B1, Times New Roman, serif",
-          fontWeight: 600,
-        }}
-        labelStyle={{
-              whiteSpace: "pre-line",
-          color: "#1b5d61ff",
-          fontWeight: 600,
-          fontFamily: "Shippori Mincho B1, Times New Roman, serif",
-        }}
-        cursor={{ fill: "rgba(10,129,129,0.15)" }}
-      />
-
-      {/* Bars */}
-      <Bar
-        dataKey="amount"
-        fill="#0a8181"
-        radius={[0, 4, 4, 0]}
-        barSize={20}
-        style={{ cursor: "pointer" }}
-      />
-    </BarChart>
-  </ResponsiveContainer>
-</div>
-<br></br><br></br>
-<br></br><br></br>
-
-          {/* --- Pie Chart --- */}
-
-<h5 className="sales-pie-chart-head">
-  Product-wise Sales Percentage:
-</h5>
-
-<ResponsiveContainer width="100%" height={piechartHeight}>
-  <PieChart margin={{ top: 20, right: 180, bottom: 20, left: 20 }}>
-    <Pie
-      data={productCombinedChartData}
-      dataKey="amount"
-      nameKey="product"
-      cx="45%"
-      cy="50%"
-      outerRadius={safeOuterRadius}
-      label={showSliceLabels
-        ? ({ cx, cy, midAngle, outerRadius, payload, percent }) => {
-            const RAD = Math.PI / 180;
-            const radius = outerRadius + 18;
-            const x = cx + radius * Math.cos(-midAngle * RAD);
-            const y = cy + radius * Math.sin(-midAngle * RAD);
-
-            const name = payload.product || "";
-            const short =
-              name.length > 22 ? name.slice(0, 22) + "…" : name;
-
-            return (
-              <text
-                x={x}
-                y={y}
-                textAnchor={x > cx ? "start" : "end"}
-                dominantBaseline="central"
-                fill="#585757ff"
-                fontSize={12}
-                fontWeight={600}
-                fontFamily="Shippori Mincho B1, Times New Roman, serif"
-              >
-                {short}
-                <tspan
-                  dx={4}
-                  fill="#026464ff"
-                  fontSize={14}
-                  fontWeight={700}
-                >
-                  ({(percent * 100).toFixed(1)}%)
-                </tspan>
-              </text>
-            );
-          }
-        : false}
-    >
-      {sortedProductData.map((entry, index) => (
-        <Cell key={index} fill={finalColors[index]} />
-      ))}
-    </Pie>
-
-    {/* Tooltip */}
-    <Tooltip
-      content={({ active, payload }) => {
-        if (!active || !payload?.length) return null;
-
-        const { product, amount } = payload[0]?.payload || {};
-
-        const total = productCombinedChartData.reduce(
-          (sum, i) => sum + i.amount,
-          0
-        );
-
-        const percentage = total
-          ? ((amount / total) * 100).toFixed(1)
-          : 0;
-
-        const wrapped =
-          product?.match(/.{1,30}/g)?.join("\n") || product;
-
-        return (
-          <div
-            style={{
-              whiteSpace: "pre-line",
-              backgroundColor: "#1b5d61ff",
-              color: "#f7fbfcfd",
-              borderRadius: "3px",
-              padding: "8px 12px",
-              fontFamily:
-                "Shippori Mincho B1, Times New Roman, serif",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-              fontSize: "13px",
-              fontWeight: 600,
-              border: "none",
-            }}
-          >
-            {/* Product Name */}
-            <div
-              style={{
-                marginBottom: "6px",
-                fontWeight: 600,
-              }}
-            >
-              {wrapped}
-            </div>
-
-            {/* Sales + % */}
-            <div>
-              Total Sales:&nbsp;&nbsp;
-              <strong>₹ {amount}</strong>{" "}
-              <span
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 900,
-                  color: "#fffffffd",
-                }}
-              >
-                ({percentage}%)
-              </span>
-            </div>
-          </div>
-        );
-      }}
-    />
-
-    {/* Legend */}
-    <Legend
-      layout="vertical"
-      align="right"
-      verticalAlign="middle"
-      wrapperStyle={{
-        right: -7,
-      }}
-      content={<TwoColumnPieLegend />}
-    />
-  </PieChart>
-</ResponsiveContainer>
-
-        </div>
-      </div>
-    </Collapse>
-  </div>
-)}
   </div>
 
       </div>
     );
   };
 
-  export default SalesReport;
+  export default RenewalReport;

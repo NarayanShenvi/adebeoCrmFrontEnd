@@ -278,6 +278,48 @@ html, body {
   min-height: 100vh;
 }
 
+/* Header row: title left, button right */
+.pagination-home-funnel {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -39px;
+  margin-top: 1%;
+  margin-right: 22px;
+}
+
+/* Professional Home button styling */
+.pagination-home-funnel button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-funnel button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-funnel button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-funnel button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .funnel-table {
   width: 100%;
   border-collapse: collapse;
@@ -1358,6 +1400,13 @@ font-family: "Shippori Mincho B1", "Times New Roman", serif;
   font-weight: 900;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
+.quote-header h4 {
+  color: #703803;
+  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 900;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
 .quote-created-section {
   margin-top: 20px;
   width: 100%;
@@ -1379,6 +1428,54 @@ font-family: "Shippori Mincho B1", "Times New Roman", serif;
   color: #db6c03;
   text-align:center;
  margin-top: 10%;
+}
+
+/* Header row: title left, button right */
+.quote-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+/* Container for the Home button */
+.pagination-home-quote-slider {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-quote-slider button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 3px 10px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-quote-slider button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-quote-slider button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-quote-slider button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
 }
 
 .quote-table {
@@ -2155,6 +2252,15 @@ input.form-control-ref:focus {
   font-weight: 900;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
+
+.proforma-header h4 {
+  color: #703803;
+  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 900;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
 .proforma-created-section {
   margin-top: 20px;
   width: 100%;
@@ -2176,6 +2282,53 @@ input.form-control-ref:focus {
   color: #db6c03;
   text-align:center;
  margin-top: 10%;
+}
+
+.proforma-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+/* Container for the Home button */
+.pagination-home-poinvoice-slider {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-poinvoice-slider button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 3px 10px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-poinvoice-slider button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-poinvoice-slider button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-poinvoice-slider button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
 }
 
 .po-table {
@@ -2590,6 +2743,59 @@ a:hover {
   margin-bottom: 15px;
 }
 
+
+/* Header row: title left, button right */
+.information-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.information-header h4 {
+  color: #703803;
+  font-size: 15px;
+  font-weight: 900;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+/* Container for the Home button */
+.pagination-home-information-slider {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Professional Home button styling */
+.pagination-home-information-slider button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 3px 10px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-information-slider button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-information-slider button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-information-slider button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .invoice-table {
   width: 100%;
   border-collapse: collapse;
@@ -2603,7 +2809,6 @@ a:hover {
   max-width: 1200px; /* Adjust as needed */
   table-layout: fixed; /* Prevents columns from resizing */
   overflow: hidden;
-  margin-top: 10%;
 }
 
 .invoice-table thead
@@ -2692,6 +2897,7 @@ a:hover {
 .invoice-table-wrapper {
   text-align: center; /* ensures everything inside is centered */
   width: 100%;
+  margin-top: 10%;
 }
 
 .pagination-controls-inv {
@@ -4284,14 +4490,7 @@ a:hover {
   border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
   overflow: hidden;
 }
-.p-order-invoice-table th:nth-child(3),
-.p-order-invoice-table td:nth-child(3) {
-  width: 160px; /* Fixed width */
-}
-.p-order-invoice-table th:nth-child(4),
-.p-order-invoice-table td:nth-child(4) {
-  width: 80px; /* Fixed width */
-}
+
 .p-order-invoice-table input{
   padding-left: 10px;
   width: 100%;
@@ -4309,7 +4508,7 @@ a:hover {
   cursor: pointer;
 }
 .p-order-invoice-table select {
-  padding-left: 10px;
+  padding-left: 5px;
   width: 100%;
   max-width: 87px; /* Adjust this to control the width of the dropdown */
   height: 34px;
@@ -4325,6 +4524,105 @@ a:hover {
   cursor: pointer;
 }
 
+.renewalSelect__control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0px 3px;
+  min-height: 32px;          /* ✅ correct */
+  height: auto;              /* ✅ allow hover area */
+  background: rgba(206, 234, 238, 0.87) !important;
+  border: 1px solid #8bcfcf !important;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 13px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-weight: 800;
+  pointer-events: auto;
+  color: #161616da;
+  caret-color: rgb(7, 94, 121); /* Change cursor color */
+  margin-top: 10px;
+  cursor: pointer !important;
+}
+
+.renewalSelect__control--is-focused {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+}
+
+/* Hover when NOT focused */
+.renewalSelect__control:not(.renewalSelect__control--is-focused):hover {
+  border-color: #6ac7e0;
+}
+
+.p-order-invoice-table th:nth-child(1),
+.p-order-invoice-table td:nth-child(1) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(2),
+.p-order-invoice-table td:nth-child(2) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(3),
+.p-order-invoice-table td:nth-child(3) {
+  width: 9%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(4),
+.p-order-invoice-table td:nth-child(4) {
+  width: 3%;
+}
+
+.p-order-invoice-table th:nth-child(5),
+.p-order-invoice-table td:nth-child(5) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(6),
+.p-order-invoice-table td:nth-child(6) {
+  width: 4%;
+}
+
+.p-order-invoice-table th:nth-child(7),
+.p-order-invoice-table td:nth-child(7) {
+  width: 5%;
+}
+
+.p-order-invoice-table th:nth-child(8),
+.p-order-invoice-table td:nth-child(8) {
+  width: 11%;
+}
+
+.p-order-invoice-table th:nth-child(9),
+.p-order-invoice-table td:nth-child(9) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:nth-child(10),
+.p-order-invoice-table td:nth-child(10) {
+  width: 5%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.p-order-invoice-table th:last-child,
+.p-order-invoice-table td:last-child {
+  width: 6%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+
 .submit-button-p-order{
   background: none;
   border: none;
@@ -4334,7 +4632,7 @@ a:hover {
   margin-left: 98%;
   transition: color 0.3s ease-in-out;
   font-size: 23px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .submit-button-p-order:disabled {
@@ -4359,7 +4657,7 @@ a:hover {
   font-size: 18px;
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
-  margin-top: 5%;
+  margin-top: 3%;
 }
 
 .recent-orders-section .no-purchase-orders
@@ -4374,13 +4672,12 @@ a:hover {
 
 
 /* Pagination rows per page */
-
 .pagination-section {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 20px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .pagination-section label {
@@ -4407,6 +4704,82 @@ a:hover {
 
 select option {
   padding: 5px;
+}
+
+/*search bar*/
+.search-by-po-number
+ {
+  width: 100%; 
+  height: 30px;
+  background: rgba(170, 207, 234, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121);
+  color: rgb(7, 94, 121);
+  box-sizing: border-box; /* ensures padding doesn't expand width */
+  display: block;
+  min-width: 310px !important;
+  margin-bottom:1%;
+}
+
+.search-by-po-number:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+
+.pagination-and-search {
+  display: flex;
+  justify-content: space-between; /* left & right */
+  align-items: center;
+  margin-bottom: 22px; /* optional spacing below */
+  margin-top: -6px;
+}
+
+/* Container for the Home button */
+.pagination-home-porder {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  margin-top: -2%;
+  margin-bottom: 1%;
+}
+
+/* Professional Home button styling */
+.pagination-home-porder button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 500;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 13px;
+  color: #333333;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-porder button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-porder button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-porder button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
 }
 
 /* Recent Orders Section Table */
@@ -4469,6 +4842,7 @@ select option {
   white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
   word-wrap: break-word; /* Ensures long words wrap to the next line */
 }
+
 /* Hover effect for table rows */
 .purchase-orders-table tbody tr:hover {
   background-color: #4f9203; /* Light blue background on hover */
@@ -4736,6 +5110,74 @@ select option {
   margin-bottom: 4%;
 }
 
+.search-by-invoice-number
+ {
+  width: 100%; 
+  height: 30px;
+  background: rgba(170, 207, 234, 0.87);
+  border: 1px solid #8bcfcf;
+  border-radius: 1px;
+  outline: none;
+  padding-left: 10px;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  caret-color: rgb(7, 94, 121);
+  color: rgb(7, 94, 121);
+  box-sizing: border-box; /* ensures padding doesn't expand width */
+  display: block;
+  max-width: 310px !important;
+  margin-bottom:1%;
+}
+
+.search-by-invoice-number:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+
+/* Container for the Home button */
+.pagination-home-cx {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  margin-top: -2%;
+  margin-bottom: 1%;
+}
+
+/* Professional Home button styling */
+.pagination-home-cx button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 500;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 13px;
+  color: #333333;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-cx button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-cx button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-cx button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
+/* Cx - Payment Table */
 .payments-table {
   width: 100%;
   border-collapse: collapse;
@@ -4969,6 +5411,39 @@ select option {
   background-color: #f1f1f1; 
   cursor: default;          /* no pointer change */
 }
+
+/* ================================
+   Disable ALL icon hover in disabled rows
+   ================================ */
+
+/* Prevent hover effects & pointer cursor */
+.payments-table tr.cancelled-row svg,
+.payments-table tr.regenerated-row svg {
+  pointer-events: none !important; /* stops hover + click */
+  cursor: default !important;
+  transform: none !important;
+}
+
+/* Stop hover styles specifically */
+.payments-table tr.cancelled-row svg:hover,
+.payments-table tr.regenerated-row svg:hover {
+  color: inherit !important;
+  transform: none !important;
+}
+/* Generic disabled state for icons */
+.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;   /* 🚀 THIS is the key */
+}
+
+/* Prevent hover effects explicitly */
+.is-disabled:hover {
+  color: inherit;
+  background: none;
+  transform: none;
+}
+
 .cxpay{
   background: none;
   border: none;
@@ -5301,6 +5776,7 @@ select option {
   flex-grow: 1;
   box-sizing: border-box;
   margin: 0 auto;
+  margin-bottom: -20px;
 }
 
 .report-section .form-group {
@@ -5309,7 +5785,7 @@ select option {
   flex-direction: column;
   pointer-events: auto;
   position: relative;
-  margin-top: 15px;
+  margin-top: -2px;
 }
 
 .report-section label {
@@ -5405,10 +5881,51 @@ select option {
 }
 
 
+/* Header row: title left, button right */
+.pagination-home-report {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  margin-top: -2%;
+  margin-bottom: 1%;
+}
+
+/* Professional Home button styling */
+.pagination-home-report button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-report button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-report button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-report button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
 
 /* Report Table */
 .report-table {
-  margin-top: 50px;
+  margin-top: 30px;
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed; /* Ensure columns are of fixed size */
@@ -5556,6 +6073,8 @@ select option {
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   margin-left: 35%;
+  margin-top: -40px;
+  margin-bottom: -20px;
 }
 
 .loading-spinner-report {
@@ -7422,6 +7941,51 @@ select option {
   background-color: #e7f5f7;
 }
 
+/* Header row: title left, button right */
+.pagination-home-poinvstatus {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: 10px;
+  margin-left: 85%;
+  margin-top: -2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-poinvstatus button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-poinvstatus button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-poinvstatus button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-poinvstatus button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .poinvoice-status-invoice-table {
   width: 100%;
   border-collapse: collapse;
@@ -8032,6 +8596,51 @@ select option {
   font-size: 10px;
   font-weight: 800;
   background-color: #e7f5f7;
+}
+
+/* Header row: title left, button right */
+.pagination-home-invstatus {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: 10px;
+  margin-left: 85%;
+  margin-top: -2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-invstatus button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-invstatus button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-invstatus button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-invstatus button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
 }
 
 .invoice-status-table {
@@ -9031,6 +9640,51 @@ select option {
   background-color: #e7f5f7;
 }
 
+/* Header row: title left, button right */
+.pagination-home-custstatus {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: 10px;
+  margin-left: 85%;
+  margin-top: -2%;
+}
+
+/* Professional Home button styling */
+.pagination-home-custstatus button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-custstatus button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-custstatus button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-custstatus button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .customer-status-table {
   width: 100%;
   border-collapse: collapse;
@@ -10013,6 +10667,51 @@ select option {
 }
 
 /* Sales Report Table */
+/* Header row: title left, button right */
+.pagination-home-salesreport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 84.5%;
+  margin-top: -2px;
+}
+
+/* Professional Home button styling */
+.pagination-home-salesreport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-salesreport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-salesreport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-salesreport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .SalesReport-table {
   margin-top: 20px !important;
   width: 100%;
@@ -10922,6 +11621,51 @@ select option {
 }
 
 /* Purchase Report Table */
+/* Header row: title left, button right */
+.pagination-home-purchasereport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 84.5%;
+  margin-top: -2px;
+}
+
+/* Professional Home button styling */
+.pagination-home-purchasereport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-purchasereport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-purchasereport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-purchasereport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .PurchaseReport-table {
   margin-top: 20px !important;
   width: 100%;
@@ -11879,6 +12623,51 @@ select option {
 }
 
 /* Business Report Table */
+/* Header row: title left, button right */
+.pagination-home-businessreport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 84.5%;
+  margin-top: -2px;
+}
+
+/* Professional Home button styling */
+.pagination-home-businessreport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-businessreport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-businessreport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-businessreport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .BusinessReport-table {
   margin-top: 20px !important;
   width: 100%;
@@ -12824,6 +13613,51 @@ select option {
 }
 
 /* Payment Report Table */
+/* Header row: title left, button right */
+.pagination-home-paymentreport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 84.5%;
+  margin-top: 1%;
+}
+
+/* Professional Home button styling */
+.pagination-home-paymentreport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-paymentreport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-paymentreport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-paymentreport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
 .PaymentReport-table {
   margin-top: 20px !important;
   margin-bottom: 10px;
@@ -12834,9 +13668,8 @@ select option {
   margin-left: auto;
   margin-right: auto;
   cursor: default !important;
-  overflow-x: hidden;
   margin: 0 auto;
-  cursor: default !important;
+  height: auto;
 }
 
 .PaymentReport-table table {
@@ -12846,7 +13679,6 @@ select option {
   border-radius: 1px;
   border: none;
   font-family: "Shippori Mincho B1", "Times New Roman", serif;
-  table-layout: fixed; /* ✅ forces wrapping instead of scrolling */
 }
 
 .PaymentReport-table th, .PaymentReport-table td {
@@ -12876,9 +13708,9 @@ select option {
   padding-bottom:8px;
   overflow-wrap: break-word; /* Enable word breaking */
   overflow: hidden;
-  position: sticky;
+  position: static;
   top: 0;
-  z-index: 2;
+  z-index: auto;
   background-color: #069696;
   border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
 }
@@ -13002,9 +13834,9 @@ select option {
   padding-bottom: 6px;
   overflow-wrap: break-word; /* Enable word breaking */
   overflow: hidden;
-  position: sticky;
+  position: static;
   top: 0;
-  z-index: 2;
+  z-index: auto;
   background-color: rgba(170, 207, 234, 0.87);
   border-bottom: 2px dashed rgb(2, 128, 121); /* Adds a subtle separator */
   border-top: 2px dashed rgb(2, 128, 121);
@@ -13373,4 +14205,1001 @@ select option {
 }
 
 
-/* Submenu5------------>Report Section */
+/* RENEWAL Section */
+.RenewalReport-section {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 40px);
+  max-height: 100vh; 
+  background-color: #feffff;
+  margin-left: 140px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  width: 100%;
+}
+
+.RenewalReport-section h3 {
+  text-align: center;
+  color: #069696;
+  font-size: 20px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 25px;
+  margin-bottom: -10px;
+}
+
+.filter-form-renewal
+{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;  
+  width: 100%;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 900px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0 auto;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.RenewalReport-section .form-group {
+  display: flex;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  position: relative;
+  margin-top: -30px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.RenewalReport-section label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #1a1919;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.required-label::after {
+  content: " *"; 
+  color: rgb(223, 3, 3);    
+  font-weight: 800;
+}
+
+.filter-form-renewal .form-control {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #333;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-renewal .form-control:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-renewal .form-control:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);;
+}
+
+.filter-form-renewal .form-select {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+
+.filter-form-renewal .form-select:focus {
+  border-color: rgba(6, 41, 66, 0.31);
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795);
+}
+
+.filter-form-renewal .form-select:hover
+{
+  background-color: rgba(52, 164, 245, 0.31);
+}
+.dates{
+  max-width: 240px;
+}
+.datess{
+  max-width: 240px;
+  margin-left: 295px;
+}
+
+/* Custom Checkbox Container */
+.custom-checkbox-renewal {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  margin-top: 30px;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox-renewal input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #069696; /* Default border color */
+  border-radius: 1px;
+  background-color: white; /* Default background */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-right: 10px;
+}
+
+/* Checkbox Checked State */
+.custom-checkbox-renewal input[type="checkbox"]:checked {
+  background-color: #5ed67a; /* Green when checked */
+  border-color: #28a745;
+}
+
+/* Checkbox Checkmark */
+.custom-checkbox-renewal input[type="checkbox"]::after {
+  content: "";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Show Checkmark When Checked */
+.custom-checkbox-renewal input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Checkbox Hover Effect */
+.custom-checkbox-renewal input[type="checkbox"]:hover {
+  border-color: #06b4b4; /* Darker blue */
+}
+
+/* Checkbox Label */
+.custom-checkbox-renewal label {
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Change Label Color on Checked */
+.custom-checkbox-renewal input[type="checkbox"]:checked + label {
+  color: #28a745;
+  font-size: 14px;
+}
+
+/* ===== DISABLED CHECKBOX ===== */
+.custom-checkbox-renewal input[type="checkbox"]:disabled {
+  background-color: #f2f2f2;
+  border-color: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== TOTAL AMOUNT CONTAINER ===== */
+.total-amount-text-renewal {
+  display: flex;
+  align-items: center;
+  
+  padding: 6px 14px;
+  border-radius: 2px;
+  margin-top: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(39, 142, 170, 0.27),
+    rgba(46, 107, 125, 0.11)
+  );
+
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+   
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* animation */
+  animation: totalFadeSlide 0.45s ease-out forwards;
+}
+
+/* Amount value */
+.total-amount-text-renewal strong {
+  font-size: 16px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #2e7d32;
+  letter-spacing: 0.3px;
+}
+
+/* Hover effect */
+.total-amount-text-renewal:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
+  transition: all 0.25s ease;
+}
+
+.wrap-amount {
+  max-width: 180px;          /* adjust based on layout */
+  word-break: break-word;    /* break long numbers */
+  overflow-wrap: anywhere;   /* allow wrapping anywhere */
+  white-space: normal;       /* allow multi-line */
+}
+
+/* ===== ENTRY ANIMATION ===== */
+@keyframes totalFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+/* WHEN TOTAL IS NOT PRESENT & WHEN IT IS PRESENT */
+/* Make row flexible */
+.renewal-filter-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* Default behavior (when total exists) */
+.renewal-filter-row > .col-md-3 {
+  transition: all 0.3s ease;
+}
+
+/* 🔹 CENTER FIRST 3 COLS WHEN TOTAL IS NOT PRESENT */
+.renewal-filter-row:not(:has(.total-amount-text-renewal)) {
+  justify-content: center;
+}
+
+/* WHEN TOTAL IS NOT PRESENT → 3 columns only */
+.renewal-filter-row:not(:has(.total-amount-text-renewal)) {
+  justify-content: center;
+  column-gap: 32px;   /* 👈 space between the 3 columns */
+}
+
+/* Slightly wider columns so they don't squeeze */
+.renewal-filter-row:not(:has(.total-amount-text-renewal)) > .col-md-3 {
+  width: 275px;       /* adjust: 240–280px */
+  margin-bottom: -20px;
+}
+
+/* Serch Filelds--customer */
+.RenewalReport-section .search-field-customer-name-renewal {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.search-field1-customer-name-renewal .NoCustomerNameFound-renewal
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-customer-name-renewal .CustomerNameLoading-renewal 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-customer-name-renewal .TypeMoreCustData-renewal 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+
+.search-field1-customer-name-renewal select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 254px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 1%;
+  display: block;
+} 
+.search-field1-customer-name-renewal select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-customer-name-renewal option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+/* Serch Filelds--product */
+.RenewalReport-section .search-field-product-name-renewal {
+  border: 1px solid #ccc;         /* Light gray border */
+  border-radius: 4px;             /* Slightly rounded corners */
+  padding: 8px 12px;              /* Padding inside the input */
+  font-size: 12px;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background-color: rgba(134, 195, 238, 0.31);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: #555555;
+  font-weight: 800;
+  pointer-events: auto;
+}
+
+.search-field1-product-name-renewal .NoProductNameFound-renewal
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name-renewal .ProductNameLoading-renewal 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+.search-field1-product-name-renewal .TypeMoreProd-renewal 
+{
+  text-align: left;
+  color: #0a8181ff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-top: 10px;
+  margin-bottom: 40px;
+  margin-left: 1%;
+}
+
+.search-field1-product-name-renewal select{
+  border: 1px solid #8bcfcf;
+  border-radius: 2px;             /* Slightly rounded corners */              
+  font-size: 12px;               /* Consistent font size */
+  background: rgba(195, 237, 243, 0.87);
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-weight: 800;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 254px;
+  height: 100vh;
+  max-height: 30px;
+  outline: none;
+  padding-left: 10px;
+  padding-top: -18px;
+  margin-left: 1%;
+  display: block;
+} 
+.search-field1-product-name-renewal select:focus {
+  border-color: #6ac7e0;
+  box-shadow: 0px 0px 5px rgba(11, 111, 139, 0.6);
+}
+.search-field1-product-name-renewal option
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  color: rgb(7, 94, 121); /* Change input text color */
+  font-size: 10px;
+  font-weight: 800;
+  background-color: #e7f5f7;
+}
+
+/* Serch Filelds--user */
+.RenewalReport__control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0px 8px;
+  min-height: 32px;          /* ✅ correct */
+  height: auto;              /* ✅ allow hover area */
+  background-color: rgba(134, 195, 238, 0.31) !important;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-weight: 800;
+  pointer-events: auto;
+  color: #555555;
+}
+
+.RenewalReport__control--is-focused {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+}
+
+/* Hover when NOT focused */
+.RenewalReport__control:not(.RenewalReport__control--is-focused):hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+  border-color: #6ac7e0;
+}
+
+/* Hover even when focused */
+.RenewalReport__control--is-focused:hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+}
+
+/* Loading and Error Container */
+.loading-container-report-renewal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-left: 35%;
+}
+
+.loading-spinner-report-renewal {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #028618;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1.5s linear infinite; /* Slightly slower spin */
+  margin-left: 10%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.loading-message-report-renewal {
+  font-size: 18px;
+  font-weight: bold;
+  color: #028618;
+  margin-top: 15px;
+  text-align: center;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.error-container-report-renewal {
+  display: flex;
+  align-items: center;       /* vertical center text */
+  justify-content: center;   /* horizontal center text */
+
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 36%;
+
+  color: #f51009;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+
+  border-radius: 5px;
+  padding-top: 10px;
+  padding-bottom: -3px;
+  width: 100%;
+  max-width: 28%;
+  min-height: 60px;
+
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+}
+
+.error-container-report-renewal {
+  animation: fadeSlide 0.3s ease-in-out;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.report-button-renewal {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+  text-align: center;
+  color: #05555f;
+  width: 20px;
+  margin-left: 65%;
+}
+
+.filecheck
+{
+  font-size: 25px !important;
+}
+
+.report-button-renewal:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.report-button-renewal:hover:not(:disabled) {
+  transform: scale(1.3); 
+  color: #0e7204;
+}
+
+/* Renewal Report Table */
+/* Header row: title left, button right */
+.pagination-home-renewalreport {
+  display: block;
+  justify-content: flex-end;
+  width: 100%;
+  position: relative;  /* ⭐ prevents clipping */
+  z-index: 9999;
+  margin-bottom: -15px;
+  margin-left: 90.5%;
+  margin-top: -2px;
+}
+
+/* Professional Home button styling */
+.pagination-home-renewalreport button {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 700;
+  padding: 5px 12px;          /* Comfortable click area */
+  font-size: 12px;
+  color: #3d3c3c;             /* Neutral dark text */
+  background-color: #f5f5f5; /* Soft light background */
+  border: 1px solid #d1d1d1; /* Subtle border */
+  border-radius: 4px;         /* Slightly rounded edges */
+  cursor: pointer;
+  transition: all 0.2s ease;  /* Smooth, subtle transition */
+}
+
+/* Hover effect */
+.pagination-home-renewalreport button:hover {
+  background-color: #e0e0e0;  /* Slightly darker on hover */
+  border-color: #bcbcbc;      /* Slight border highlight */
+}
+
+/* Active / Click effect */
+.pagination-home-renewalreport button:active {
+  background-color: #d9d9d9;
+  border-color: #aaaaaa;
+  transform: translateY(1px);
+}
+
+/* Focus for accessibility */
+.pagination-home-renewalreport button:focus {
+  outline: 2px solid #1a73e8; /* Professional focus ring in blue */
+  outline-offset: 2px;
+}
+
+.RenewalReport-table {
+  margin-top: 20px !important;
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 1px;
+  border: none; /* Removes border */
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  margin: 0 auto;
+  cursor: default !important;
+  min-width: 1100px; /* Ensures form doesn't shrink too much */
+  max-width: 1255px; /* Adjust as needed */
+}
+
+.RenewalReport-table th, .RenewalReport-table td {
+  text-align: left;
+  border-bottom: 2px solid rgb(10, 6, 6);
+  word-wrap: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px; 
+  font-weight: bold; 
+  cursor: default !important;
+}
+
+.RenewalReport-table th {
+  color: rgb(255, 255, 255);
+  color: aliceblue;
+  text-align: left;
+  font-size: 13px;
+  white-space: normal; /* Allows multi-line wrapping */
+  word-wrap: break-word; /* Ensures long words break */
+  padding-right: 5px; /* Slight padding for column spacing */
+  padding: 11px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top:12px;
+  padding-bottom:12px;
+  overflow-wrap: break-word; /* Enable word breaking */
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #069696;
+  border-bottom: 3px solid rgb(255, 255, 255); /* Adds a subtle separator */
+}
+
+.RenewalReport-table td {
+  white-space: pre-line; /* Allows line breaks and wraps content into multiple lines */
+  word-wrap: break-word; /* Ensures long words wrap to the next line */
+  overflow: hidden;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  color: #161616da;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  text-overflow: unset;  /* Prevent ellipsis (...) */
+  background-color: rgba(170, 207, 234, 0.87);
+  border-bottom: 2px solid rgb(255, 255, 255); /* Adds a subtle separator */
+  overflow: hidden;
+  max-width: 150px; /* Adjust to limit width and force line breaks */ 
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.RenewalReport-table th:nth-child(1),
+.RenewalReport-table td:nth-child(1) {
+  width: 20%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+.RenewalReport-table th:nth-child(2),
+.RenewalReport-table td:nth-child(2) {
+  width: 20%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; }
+
+.RenewalReport-table th:nth-child(3),
+.RenewalReport-table td:nth-child(3) {
+  width: 20%; /* Fixed width */
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+.RenewalReport-table th:nth-child(4),
+.RenewalReport-table td:nth-child(4) {
+  width:7%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(5),
+.RenewalReport-table td:nth-child(5) {
+  width:8%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(6),
+.RenewalReport-table td:nth-child(6) {
+  width: 7%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(7),
+.RenewalReport-table td:nth-child(7) {
+  width:7%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(8),
+.RenewalReport-table td:nth-child(8) {
+  width:3%; /* Fixed width */
+}
+
+.RenewalReport-table th:nth-child(9),
+.RenewalReport-table td:nth-child(9) {
+  width:7%; /* Fixed width */
+}
+
+.RenewalReport-table th:last-child,
+.RenewalReport-table td:last-child {
+  width: 8%; /* Adjust as needed */
+}
+
+.RenewalReport-table tbody tr:hover {
+  background-color: #05afc5; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+/* No Sales */
+.no-renewal-message {
+  font-family: "Shippori MTimesincho B1", " New Roman", serif;
+  font-weight: 900;
+  font-size: 20px;
+  text-align: center;
+  margin-top: 5%;
+  word-spacing: 2px;
+
+  background: linear-gradient(
+    90deg,
+    #d86902ff,
+    #f5b274ff,
+    #d86902ff
+  );
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Pagination Controls */
+.pagination-controls-renewalreport {
+  flex-grow: 1;
+  padding: 20px;
+  max-width: calc(100% - 240px);
+  margin-left: 121px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -5px;
+  gap: 10px;
+  white-space: nowrap;
+  margin-bottom: -40px;
+}
+
+.pagination-controls-renewalreport button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #069696;
+  transition: color 0.3s ease-in-out;
+}
+
+.pagination-controls-renewalreport button:hover {
+  color: #0e7204;
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+.pagination-controls-renewalreport button:disabled {
+  color: gray;
+  cursor: allowed;
+}
+
+.pagination-controls-renewalreport span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #444;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  text-align: center;
+}
+
+/* ================== RESPONSIVE ================== */
+
+/* ========================= */
+/* ===== 1024px ===== */
+/* ========================= */
+@media (max-width: 1024px) {
+
+  .RenewalReport-section {
+    margin-left: 80px;
+    padding: 16px;
+  }
+
+  .filter-form-renewal {
+    max-width: 100%;
+    min-width: unset;
+    padding: 16px;
+  }
+
+  .dates {
+    max-width: 200px;
+  }
+
+  .renewal-filter-row {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 20px;
+  }
+
+  .RenewalReport-table {
+    min-width: 1000px;
+  }
+
+  .pagination-controls-renewalreport {
+    margin-left: 0;
+    max-width: 100%;
+  }
+}
+
+/* ========================= */
+/* ===== 768px (Tablet) ===== */
+/* ========================= */
+@media (max-width: 768px) {
+
+  .RenewalReport-section {
+    margin-left: 0;
+    padding: 14px;
+  }
+
+  .filter-form-renewal {
+    min-width: unset;
+    width: 100%;
+    padding: 14px;
+  }
+
+  /* Stack filters */
+  .renewal-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .renewal-filter-row .col-md-3 {
+    width: 100% !important;
+  }
+
+  .dates {
+    max-width: 100%;
+  }
+
+  .custom-checkbox-renewal {
+    margin-top: 10px;
+  }
+
+  .total-amount-text-renewal {
+    justify-content: space-between;
+    font-size: 13px;
+  }
+
+  /* Table scroll instead of squeezing */
+  .RenewalReport-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    min-width: 900px;
+  }
+
+  .pagination-home-renewalreport {
+    margin-left: auto;
+    margin-right: 10px;
+  }
+
+  .pagination-controls-renewalreport {
+    margin-left: 0;
+    padding: 10px;
+  }
+}
+
+/* ========================= */
+/* ===== 480px (Mobile) ===== */
+/* ========================= */
+@media (max-width: 480px) {
+
+  .RenewalReport-section h3 {
+    font-size: 16px;
+    margin-top: 15px;
+  }
+
+  .filter-form-renewal {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .RenewalReport-section label {
+    font-size: 11px;
+  }
+
+  .filter-form-renewal .form-control,
+  .filter-form-renewal .form-select {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .custom-checkbox-renewal label {
+    font-size: 12px;
+  }
+
+  .total-amount-text-renewal {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .total-amount-text-renewal strong {
+    font-size: 14px;
+  }
+
+  /* Table */
+  .RenewalReport-table {
+    min-width: 850px;
+  }
+
+  .no-renewal-message {
+    font-size: 16px;
+  }
+
+  .pagination-controls-renewalreport span {
+    font-size: 12px;
+  }
+}
+
+/* ================== RESPONSIVE ================== */
+
+/* ========================= */
+/* ===== 1024px ===== */
+/* ========================= */
+
+/* ========================= */
+/* ===== 768px (Tablet) ===== */
+/* ========================= */
+
+/* ========================= */
+/* ===== 480px (Mobile) ===== */
+/* ========================= */
+
+
