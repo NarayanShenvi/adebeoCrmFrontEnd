@@ -16,6 +16,7 @@ import 'react-calendar/dist/Calendar.css';
 import TimePicker from 'react-time-picker';
 import 'react-time-picker/dist/TimePicker.css';
 import 'react-clock/dist/Clock.css';
+import { BiSolidMessageRoundedError } from "react-icons/bi";
 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,7 +26,10 @@ import { ToastContainer } from "react-toastify";
 const FunnelSection = () => {
   const dispatch = useDispatch();
   const [selectedCustomerId, setSelectedCustomerId] = useState(null); // Track selected customer changes made
-  const [searchType, setSearchType] = useState("name"); 
+  const [searchType, setSearchType] = useState("name");
+  const [exactMatch, setExactMatch] = useState(false);
+  const backendExactMatch =
+  searchType === "area" ? exactMatch : false;
 
 //tableref part removed
 const [taskTime, setTaskTime] = useState("12:00");
@@ -239,7 +243,8 @@ const sliderRef = useRef(null); // Create a ref for the slider
         currentPage + 1,
         rowsPerPage,
         debouncedSearchTerm,
-        backendSearchType
+        backendSearchType,
+        backendExactMatch   
       )
     );
   }
@@ -260,7 +265,8 @@ const handlePrevPage = () => {
         currentPage - 1,
         rowsPerPage,
         debouncedSearchTerm,
-        backendSearchType
+        backendSearchType,
+        backendExactMatch   
       )
     );
   }
@@ -280,7 +286,8 @@ const handleHomePage = () => {
       1,
       rowsPerPage,
       debouncedSearchTerm,
-      backendSearchType
+      backendSearchType,
+      backendExactMatch   
     )
   );
 };
@@ -328,12 +335,37 @@ const handleHomePage = () => {
       1,
       rowsPerPage,
       debouncedSearchTerm,
-      backendSearchType
+      backendSearchType,
+      backendExactMatch   
     )
   );
 
 }, [debouncedSearchTerm, searchType, dispatch, rowsPerPage]);
 
+useEffect(() => {
+  if (!debouncedSearchTerm) return;
+
+  setCurrentPage(1);
+
+  const backendSearchType =
+    searchType === "name" ? "company" :
+    searchType === "area" ? "area" :
+    searchType === "email" ? "email" :
+    "phone";
+
+  const backendExactMatch =
+    searchType === "area" ? exactMatch : false;
+
+  dispatch(
+    loadFunneldata(
+      1,
+      rowsPerPage,
+      debouncedSearchTerm,
+      backendSearchType,
+      backendExactMatch
+    )
+  );
+}, [debouncedSearchTerm, searchType, exactMatch]);
 
   // Fetch customer comments only if they haven't been fetched already
   const fetchCommentsIfNeeded = (customerId) => {
@@ -489,15 +521,53 @@ toast.error("Please select a customer and enter a comment!!!.");  }
 
   
   if (loading) return <div className='loading'>Loading funnel data...</div>;//changes made.. classnames were added
-  if (error) return <div className='error'>Error: {error}</div>;//changes made
+  // if (error) return <div className='error'>Error: {error}</div>;//changes made
+// if (error)
+//   return (
+//     <div className="funnel-error-box">
+//       <div className="funnel-error-accent"></div>
+
+//       <div className="funnel-error-content">
+//         <BiSolidMessageRoundedError className="funnel-error-icon" />
+
+//         <div className="funnel-error-text">
+//           <h6>Something went wrong</h6>
+//           <p>
+//             {"We couldn’t load the funnel data. Please refresh or try again later."}
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
 
   return (
     // tableref removed
     <div className="funnel-container"> 
 
       <h3>My Funnel</h3>
-      <br></br>
       
+      {/* Error Block */}
+    {!loading && error && (
+      <div className="funnel-error-box">
+        <div className="funnel-error-accent"></div>
+
+        <div className="funnel-error-content">
+          <BiSolidMessageRoundedError className="funnel-error-icon" />
+
+          <div className="funnel-error-text">
+            <h6 style={{fontFamily: '"Shippori Mincho B1", "Times New Roman", serif'}}>Something went wrong</h6>
+            <p style={{fontFamily: '"Shippori Mincho B1", "Times New Roman", serif'}}>
+              We couldn’t load the funnel data.
+              Please refresh or try again later.
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
+    
+<br></br>
+{!error && (
+      <>
      <div className="search-wrapper">
   <input
     type="text"
@@ -568,6 +638,20 @@ toast.error("Please select a customer and enter a comment!!!.");  }
     </div>
 
 </div>
+
+<div className="exact-match-checkbox">
+    <input
+    type="checkbox"
+    id="exactMatch"
+    checked={exactMatch}
+    disabled={searchType !== "area"}
+    onChange={(e) => setExactMatch(e.target.checked)}
+  />
+  <label htmlFor="exactMatch">
+    Exact match
+  </label>
+</div>
+
 </div>
 
 {/* Home button (top) */}
@@ -878,7 +962,8 @@ toast.error("Please select a customer and enter a comment!!!.");  }
 )}
 
   
-
+</>
+    )}
 
     </div>
   );

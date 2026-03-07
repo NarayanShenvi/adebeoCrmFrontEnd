@@ -667,10 +667,11 @@ useEffect(() => {
         onChange={(e) => setState({...state, companyType: e.target.value})}
       >
         <option value="">Architectural</option>
-        <option value="Interior">Interior</option>
         <option value="Constructions">Constructions</option>
         <option value="Consultants">Consultants</option>
+        <option value="Interior">Interior</option>
         <option value="Manufacturers">Manufacturers</option>
+        <option value="Student">Student</option>
         <option value="Others">Others</option>
 
       </Form.Select>

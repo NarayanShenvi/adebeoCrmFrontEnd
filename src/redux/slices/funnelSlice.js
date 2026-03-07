@@ -356,7 +356,7 @@ export const {
 export default funnelSlice.reducer;
 
 
-export const loadFunneldata = (page = 1, limit = 10, search = "", searchType = "company") => {
+export const loadFunneldata = (page = 1, limit = 10, search = "", searchType = "company", exactMatch = false ) => {
   return async (dispatch) => {
     dispatch(setLoading(true));
 
@@ -371,7 +371,7 @@ export const loadFunneldata = (page = 1, limit = 10, search = "", searchType = "
 
     try {
       const response = await axios.get(`${API}/funnel_users2`, {
-        params: { page, limit, search, searchType },
+        params: { page, limit, search, searchType, exactMatch },
         headers: {
           'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
         }

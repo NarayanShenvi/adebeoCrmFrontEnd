@@ -837,17 +837,85 @@ const formatAmountWithRounded = (amount) => {
   };
 };
 
-    return (
+// ✅ Overall Profit %
+const overallProfitPercentage = useMemo(() => {
+  if (!totalSaleAmount || totalSaleAmount === 0) return 0;
+  return ((totalProfitAmount / totalSaleAmount) * 100);
+}, [totalSaleAmount, totalProfitAmount]);
+
+// ✅ Average Profit % (row-wise average)
+const averageProfitPercentage = useMemo(() => {
+  if (!filteredBusinessReports || filteredBusinessReports.length === 0)
+    return 0;
+
+  const totalPercent = filteredBusinessReports.reduce((sum, row) => {
+    const percent = Number(row["Profit %"] || 0);
+    return sum + (isNaN(percent) ? 0 : percent);
+  }, 0);
+
+  return totalPercent / filteredBusinessReports.length;
+}, [filteredBusinessReports]);
+
+const formattedOverallProfitPercentage =
+  overallProfitPercentage.toFixed(2) + "%";
+
+const formattedAverageProfitPercentage =
+  averageProfitPercentage.toFixed(2) + "%";
+
+useEffect(() => {
+  const profitElements = document.querySelectorAll(".profit-value");
+
+  profitElements.forEach((el) => {
+    const value = parseFloat(el.innerText.replace("%", ""));
+    el.classList.remove("positive", "negative");
+
+    if (!isNaN(value)) {
+      el.classList.add(value >= 0 ? "positive" : "negative");
+    }
+  });
+}, [formattedOverallProfitPercentage, formattedAverageProfitPercentage]);
+
+useEffect(() => {
+  const counters = document.querySelectorAll(".countup");
+
+  counters.forEach((counter) => {
+    const text = counter.innerText.replace(/[₹,]/g, "");
+    const target = parseFloat(text);
+
+    if (isNaN(target)) return;
+
+    let start = 0;
+    const duration = 3000;
+    const stepTime = 16;
+    const increment = target / (duration / stepTime);
+
+    counter.innerText = "₹ 0";
+
+    const interval = setInterval(() => {
+      start += increment;
+      if (start >= target) {
+        counter.innerText = `₹ ${target.toLocaleString()}`;
+        clearInterval(interval);
+      } else {
+        counter.innerText = `₹ ${Math.floor(start).toLocaleString()}`;
+      }
+    }, stepTime);
+  });
+}, [reportGenerated]);
+
+
+
+ return (
       <div className="BusinessReport-section">
         <h3>Business Report</h3>
         <ToastContainer />
 
         <Form onSubmit={handleSubmit} className="filter-form-business">
           {/* Date row */}
-<Row className="g-4 mt-3 business-filter-row">
+<Row className="g-4 mt-3 business-filter-row justify-content-center text-center">
   {/* Start Date */}
-  <Col md={3}>
-    <Form.Label className="required-label">Start Date:</Form.Label>
+  <Col md={3} >
+    <Form.Label className="required-label" style={{ display: "block", textAlign: "left" }}>Start Date:</Form.Label>
     <Form.Control
       type="date"
       value={startDate}
@@ -860,7 +928,7 @@ const formatAmountWithRounded = (amount) => {
 
   {/* End Date */}
   <Col md={3}>
-    <Form.Label className="required-label">End Date:</Form.Label>
+    <Form.Label className="required-label" style={{ display: "block", textAlign: "left" }}>End Date:</Form.Label>
     <Form.Control
       type="date"
       value={endDate}
@@ -883,7 +951,7 @@ const formatAmountWithRounded = (amount) => {
       className="custom-checkbox-business"
     />
     </Col>
-
+{/* 
 <Col md={3}>
     {reportGenerated && (
   <div className="total-amount-text-business">
@@ -899,11 +967,10 @@ const formatAmountWithRounded = (amount) => {
 
   </div>
 )}
-  </Col>
+  </Col> */}
 </Row>
 
-
-          <Row className="g-4 mt-3">
+<Row className="g-4 mt-3">
   
           {/* Product search (single products only) */}
   <Col md={3}>
@@ -1096,13 +1163,51 @@ setSelectedUser(selected ? selected.map(s => s.value) : []);
                 </button>
               </Form.Group>
             </Col>
-          </Row>
+</Row>
+
+{/* 🔥 TOTAL SUMMARY ROW WITH ANIMATION */}
+{reportGenerated && (
+  <Row className="justify-content-center text-center mt-3">
+    <Col md={8}>
+      <div className="total-summary-animated-business-report">
+
+        {/* LEFT SIDE */}
+        <div className="total-left-business-report slide-from-left">
+          <div>
+            <span>Total Sales</span>
+            <strong className="countup">{formattedTotalSaleAmount}</strong>
+          </div>
+
+          <div>
+            <span>Total Profit</span>
+            <strong className="countup">{formattedTotalProfitAmount}</strong>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE */}
+        <div className="total-right-business-report slide-from-right">
+          <div>
+            <span>Overall Profit %</span>
+            <strong className="profit-value-business-report overall-profit-business-report">{formattedOverallProfitPercentage}</strong>
+          </div>
+
+          <div>
+            <span>Average Profit %</span>
+            <strong  className="profit-value-business-report average-profit-business-report">{formattedAverageProfitPercentage}</strong>
+          </div>
+        </div>
+
+      </div>
+    </Col>
+  </Row>
+)}
+
         </Form>
 
         <br />
 
         {/* Loading & Error */}
-      {businessLoading  && (
+    {businessLoading  && (
     <div className="loading-container-report-business">
       <div className="loading-spinner-report-business"></div>
       <p className="loading-message-report-business">Loading business report...</p>

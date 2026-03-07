@@ -821,6 +821,44 @@ const formatAmountWithRounded = (amount) => {
   };
 };
 
+useEffect(() => {
+  if (!reportGenerated) return;
+
+  const counters = document.querySelectorAll(".countup");
+
+  counters.forEach((counter) => {
+    const target = Number(counter.dataset.value);
+
+    if (isNaN(target) || target <= 0) return;
+
+    // prevent unnecessary re-animation
+    const previous = Number(counter.dataset.prev || 0);
+    if (previous === target) return;
+
+    counter.dataset.prev = target;
+
+    let start = 0;
+    const duration = 3000; // smooth & visible
+    const stepTime = 16;
+    const increment = target / (duration / stepTime);
+
+    const interval = setInterval(() => {
+      start += increment;
+
+      if (start >= target) {
+        counter.innerText = target.toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR",
+          minimumFractionDigits: 2,
+        });
+        clearInterval(interval);
+      } else {
+        counter.innerText = `₹ ${Math.round(start).toLocaleString("en-IN")}`;
+      }
+    }, stepTime);
+  });
+}, [reportGenerated, totalAmount]);
+
 
     return (
       <div className="PurchaseReport-section">
@@ -873,7 +911,7 @@ const formatAmountWithRounded = (amount) => {
     {reportGenerated && (
       <div className="total-amount-text-purchase">
         <span>Total Amount:</span>
-        <strong className="wrap-amount">
+        <strong className="wrap-amount countup" data-value={totalAmount}>
         {formattedTotalAmount} {/* This already has ₹ symbol & formatting */}
       </strong>
       </div>

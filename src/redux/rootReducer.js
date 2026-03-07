@@ -14,7 +14,7 @@ import addusers from './slices/adminUserSlice'
 import addProductCategoryreducer from './slices/addProductCategoy'
 import comboSlice from './slices/comboSlice'
 import renewalReducer from './slices/renewalSlice';
-
+import vendorPaymentReducer from './slices/vendorPaymentSlice';
 
 const rootReducer = combineReducers({
     //data: userReducer
@@ -31,7 +31,8 @@ const rootReducer = combineReducers({
     addusers:addusers,
     productCategory:addProductCategoryreducer,
     combo:comboSlice,
-    renewal: renewalReducer
+    renewal: renewalReducer,
+    vendorPayment:vendorPaymentReducer,
 })
 
 export default rootReducer;

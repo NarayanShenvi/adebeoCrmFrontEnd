@@ -9,12 +9,25 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify"; 
 import Select from "react-select";
+import { BiSolidMessageRoundedError } from "react-icons/bi";
 
 const CreatePurchaseOrder = () => {
   const dispatch = useDispatch();
 
   
-  const { proformas = [], recentOrders = [], status, totalPages = 0, totalOrders = 0, isProformasFetched, orderStatus } = useSelector((state) => state.purchaseOrder || {});
+  // const { proformas = [], recentOrders = [], status, totalPages = 0, totalOrders = 0, isProformasFetched, orderStatus } = useSelector((state) => state.purchaseOrder || {});
+  const {
+  proformas = [],
+  recentOrders = [],
+  proformasLoading,
+  ordersLoading,
+  proformasError,
+  ordersError,
+  totalPages = 0,
+  totalOrders = 0,
+  isProformasFetched,
+  orderStatus,
+} = useSelector((state) => state.purchaseOrder || {});
 
   const [selectedProforma, setSelectedProforma] = useState('');
   const [items, setItems] = useState([]);
@@ -226,6 +239,34 @@ const getRenewalOptions = (item) =>
       <h3>Purchase Orders</h3>
 <ToastContainer />
 
+{/* FULL PAGE LOADING */}
+{(proformasLoading || ordersLoading) && (
+  <div className="loading-container-proforma-po">
+    <div className="loading-spinner-proforma-po"></div>
+    <p className="loading-message-proforma-po">
+      Loading Proformas and Purchase Orders...
+    </p>
+  </div>
+)}
+
+{!proformasLoading && !ordersLoading && (proformasError || ordersError) && (
+  <div className="proforma-po-error-box">
+  <div className="proforma-po-error-accent"></div>
+  <div className="proforma-po-error-content">
+    <BiSolidMessageRoundedError className="proforma-po-error-icon" />
+    <div className="proforma-po-error-text">
+      <h6>Something went wrong</h6>
+      <p>
+        We couldn’t load the purchase order data. Please refresh or try again later.
+      </p>
+    </div>
+  </div>
+</div>
+
+)}
+
+{!proformasLoading && !ordersLoading && !proformasError && !ordersError && (
+  <>
       <div className="top-section">
         <div className="select-proforma">
           <select
@@ -247,7 +288,7 @@ const getRenewalOptions = (item) =>
 
       </div>
 
-      {error && <div className="error-message-porder">{error}</div>}
+      {/* {error && <div className="error-message-porder">{error}</div>} */}
 
       {/* Bottom Section: Review Items */}
       {selectedProforma && (
@@ -441,7 +482,7 @@ const getRenewalOptions = (item) =>
       {/* Recent Purchase Orders Section */}
       <div className="recent-orders-section">
         <h5>Recent Purchase Orders</h5>
-
+ 
        {recentOrders && recentOrders.length > 0 && (
   <div className="pagination-and-search">
     <div className="pagination-section">
@@ -554,7 +595,11 @@ const getRenewalOptions = (item) =>
                   <FaChevronRight />
                   </button>
                 </div>
-                )}
+                )}  
+   
+    </>
+)}
+
     </div>
   );
 };

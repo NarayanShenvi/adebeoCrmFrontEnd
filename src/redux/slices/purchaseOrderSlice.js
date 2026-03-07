@@ -102,18 +102,37 @@ export const createPurchaseOrder = createAsyncThunk(
 
 const purchaseOrderSlice = createSlice({
   name: 'purchaseOrder',
+  // initialState: {
+  //   proformas: [],
+  //   recentOrders: [],
+  //   status: 'idle',
+  //   error: null,
+  //   currentPage: 1,
+  //   totalPages: 1,
+  //   totalOrders: 0,
+  //   isProformasFetched: false,
+  //   orderStatus: null, // To store the status of order creation (success or failure)
+  //   searchTerm: "",
+  // },
   initialState: {
-    proformas: [],
-    recentOrders: [],
-    status: 'idle',
-    error: null,
-    currentPage: 1,
-    totalPages: 1,
-    totalOrders: 0,
-    isProformasFetched: false,
-    orderStatus: null, // To store the status of order creation (success or failure)
-    searchTerm: "",
-  },
+  proformas: [],
+  recentOrders: [],
+
+  proformasLoading: false,
+  ordersLoading: false,
+
+  proformasError: null,
+  ordersError: null,
+
+  currentPage: 1,
+  totalPages: 1,
+  totalOrders: 0,
+
+  isProformasFetched: false,
+  orderStatus: null,
+  searchTerm: "",
+},
+
   reducers: {
     setProformasFetched: (state) => {
       state.isProformasFetched = true;
@@ -130,43 +149,97 @@ const purchaseOrderSlice = createSlice({
     state.searchTerm = action.payload;
   },
   },
+  // extraReducers: (builder) => {
+  //   builder
+  //     .addCase(fetchProformas.pending, (state) => {
+  //       state.status = 'loading';
+  //     })
+  //     .addCase(fetchProformas.fulfilled, (state, action) => {
+  //       state.status = 'succeeded';
+  //       state.proformas = action.payload;
+  //       state.isProformasFetched = true;
+  //     })
+  //     .addCase(fetchProformas.rejected, (state, action) => {
+  //       state.status = 'failed';
+  //       state.error = action.error.message;
+  //     })
+  //     .addCase(fetchPurchaseOrders.fulfilled, (state, action) => {
+  //       state.recentOrders = action.payload.orders;
+  //       state.currentPage = action.payload.page;
+  //       state.totalPages = action.payload.total_pages;
+  //       state.totalOrders = action.payload.total_orders;
+  //     });
+  //     builder.addCase(fetchPurchaseOrders.rejected, (state, action) => {
+  //       state.error = action.error.message;
+  //     })
+  //     // Handle createPurchaseOrder API call success
+  //     .addCase(createPurchaseOrder.pending, (state) => {
+  //       state.status = 'loading';
+  //     })
+  //     .addCase(createPurchaseOrder.fulfilled, (state, action) => {
+  //       state.status = 'succeeded';
+  //       state.orderStatus = 'success';  // Store the success status in the state
+  //     })
+  //     .addCase(createPurchaseOrder.rejected, (state, action) => {
+  //       state.status = 'failed';
+  //       state.orderStatus = 'failed';  // Store the failure status in the state
+  //       state.error = action.payload; // Store error message
+  //     });
+  // },  
+
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchProformas.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchProformas.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.proformas = action.payload;
-        state.isProformasFetched = true;
-      })
-      .addCase(fetchProformas.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      })
-      .addCase(fetchPurchaseOrders.fulfilled, (state, action) => {
-        state.recentOrders = action.payload.orders;
-        state.currentPage = action.payload.page;
-        state.totalPages = action.payload.total_pages;
-        state.totalOrders = action.payload.total_orders;
-      });
-      builder.addCase(fetchPurchaseOrders.rejected, (state, action) => {
-        state.error = action.error.message;
-      })
-      // Handle createPurchaseOrder API call success
-      .addCase(createPurchaseOrder.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(createPurchaseOrder.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.orderStatus = 'success';  // Store the success status in the state
-      })
-      .addCase(createPurchaseOrder.rejected, (state, action) => {
-        state.status = 'failed';
-        state.orderStatus = 'failed';  // Store the failure status in the state
-        state.error = action.payload; // Store error message
-      });
-  },
+  builder
+
+    // ----------------------------
+    // FETCH PROFORMAS
+    // ----------------------------
+    .addCase(fetchProformas.pending, (state) => {
+      state.proformasLoading = true;
+      state.proformasError = null;
+    })
+    .addCase(fetchProformas.fulfilled, (state, action) => {
+      state.proformasLoading = false;
+      state.proformas = action.payload;
+      state.isProformasFetched = true;
+    })
+    .addCase(fetchProformas.rejected, (state, action) => {
+      state.proformasLoading = false;
+      state.proformasError = action.error.message;
+    })
+
+    // ----------------------------
+    // FETCH PURCHASE ORDERS
+    // ----------------------------
+    .addCase(fetchPurchaseOrders.pending, (state) => {
+      state.ordersLoading = true;
+      state.ordersError = null;
+    })
+    .addCase(fetchPurchaseOrders.fulfilled, (state, action) => {
+      state.ordersLoading = false;
+      state.recentOrders = action.payload.orders;
+      state.currentPage = action.payload.page;
+      state.totalPages = action.payload.total_pages;
+      state.totalOrders = action.payload.total_orders;
+    })
+    .addCase(fetchPurchaseOrders.rejected, (state, action) => {
+      state.ordersLoading = false;
+      state.ordersError = action.error.message;
+    })
+
+    // ----------------------------
+    // CREATE PURCHASE ORDER
+    // ----------------------------
+    .addCase(createPurchaseOrder.pending, (state) => {
+      state.orderStatus = "loading";
+    })
+    .addCase(createPurchaseOrder.fulfilled, (state) => {
+      state.orderStatus = "success";
+    })
+    .addCase(createPurchaseOrder.rejected, (state, action) => {
+      state.orderStatus = "failed";
+      state.ordersError = action.payload;
+    });
+},
 });
 
 export const { setProformasFetched, resetProformasFetched, setRecentOrders} = purchaseOrderSlice.actions;

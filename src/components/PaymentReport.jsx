@@ -515,6 +515,49 @@ const formattedTotalRemaining = useMemo(() => {
   });
 }, [totalRemaining]);
 
+useEffect(() => {
+  if (!reportGenerated) return;
+
+  const counters = document.querySelectorAll(".countup");
+
+  counters.forEach((counter) => {
+    const target = Number(counter.dataset.value);
+    if (isNaN(target)) return;
+
+    // prevent re-running for same value
+    const prev = Number(counter.dataset.prev || 0);
+    if (prev === target) return;
+
+    counter.dataset.prev = target;
+
+    let start = 0;
+    const duration = 3000; // smooth & readable
+    const stepTime = 16;
+    const steps = duration / stepTime;
+    const increment = target / steps;
+
+    const interval = setInterval(() => {
+      start += increment;
+
+      if (start >= target) {
+        counter.innerText = target.toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR",
+          minimumFractionDigits: 2,
+        });
+        clearInterval(interval);
+      } else {
+        counter.innerText = `₹ ${Math.round(start).toLocaleString("en-IN")}`;
+      }
+    }, stepTime);
+  });
+}, [
+  reportGenerated,
+  totalAmount,
+  totalPaid,
+  totalRemaining,
+]);
+
 
 return (
       <div className="PaymentReport-section">
@@ -649,7 +692,7 @@ return (
   {reportGenerated && (
     <div className="total-amount-text-payment">
       <span>Total Amount:</span>
-      <strong className="wrap-amount">{formattedTotalAmount}</strong>
+      <strong className="wrap-amount countup" data-value={totalAmount}>{formattedTotalAmount}</strong>
     </div>
   )}
 </Col>
@@ -658,7 +701,7 @@ return (
   {reportGenerated && (
     <div className="total-amount-text-payment">
       <span>Total Paid:</span>
-      <strong className="wrap-amount">{formattedTotalPaid}</strong>
+      <strong className="wrap-amount countup" data-value={totalPaid}>{formattedTotalPaid}</strong>
     </div>
   )}
 </Col>
@@ -667,7 +710,7 @@ return (
   {reportGenerated && (
     <div className="total-amount-text-payment">
       <span>Amount Due:</span>
-      <strong className="wrap-amount">{formattedTotalRemaining}</strong>
+      <strong className="wrap-amount countup" data-value={totalRemaining}>{formattedTotalRemaining}</strong>
     </div>
   )}
 </Col>
@@ -783,7 +826,7 @@ return (
         : row["Payment Status"] === "Unpaid"
         ? "status-red"
         : ""
-    }`}
+      }`}
   >{row["Payment Status"] || "-"} </span></td>
     </tr>
   ))}
