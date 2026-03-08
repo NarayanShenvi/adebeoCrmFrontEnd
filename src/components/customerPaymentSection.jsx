@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCustomerPaymentsAsync, processCustomerPaymentAsync, setSearchTerm } from '../redux/slices/customerPaymentSlice';  // Adjust the path as necessary
+import { fetchCustomerPaymentsAsync, processCustomerPaymentAsync, setSearchTerm, resetCustomerPayments } from '../redux/slices/customerPaymentSlice';  // Adjust the path as necessary
 import { FaCheckCircle } from "react-icons/fa"; // changed---Import the check-circle icon 
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { RiInformation2Fill } from "react-icons/ri";
@@ -13,12 +13,27 @@ import { recreateInvoiceAsync } from '../redux/slices/customerPaymentSlice';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { BiSolidMessageRoundedError } from "react-icons/bi";
 
 const CustomerPaymentSection = () => {
-  const dispatch = useDispatch();
-  const { payments, loading, pageLoading, error, pdfGenerating, pdfError, pdfFilePath , totalPages = 1, totalCount = 0 } = useSelector((state) => state.customerPayment);
-  const [searchTerm, setSearchTerm] = useState("");
+const dispatch = useDispatch();
+
+//const { payments, loading, pageLoading, error, pdfGenerating, pdfError, pdfFilePath , totalPages = 1, totalCount = 0 } = useSelector((state) => state.customerPayment);
+const {
+  payments = [],
+  loading,
+  pageLoading,
+  error,
+  totalPages = 1,
+  totalCount = 0,
+  hasFetchedOnce,
+  isInitialLoading,
+} = useSelector((state) => state.customerPayment || {});
+
+
+const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+  const [searchType, setSearchType] = useState("invoice"); 
 
   const [editablePayments, setEditablePayments] = useState([]);  // Store payments with editable 'paid_amount' and comment
   const [currentPage, setCurrentPage] = useState(1); // local state
@@ -26,23 +41,53 @@ const CustomerPaymentSection = () => {
     dispatch(generateInvoicePdfAsync(invoiceNumber));
   };
   
-  // useEffect(() => {
-  //   if (error) {
-  //     console.error('Error fetching payments:', error);  // Log the error to the console
-  //   }
-  // }, [error]);
-  // Dispatch action to fetch payments only when currentPage and totalPages are valid
-  useEffect(() => {
-  if (currentPage > 0 && totalPages > 0) {
-    dispatch(fetchCustomerPaymentsAsync({
-      page: currentPage,
-      per_page: 10,
-      search: searchTerm,   // 🔥 add this
-    }));
-  }
-}, [dispatch, currentPage, totalPages, searchTerm]);
-
   
+
+const [minTimeDone, setMinTimeDone] = useState(false);
+useEffect(() => {
+  if (!hasFetchedOnce) {
+    const t = setTimeout(() => {
+      setMinTimeDone(true);
+    }, 600); // UX-friendly minimum
+
+    return () => clearTimeout(t);
+  } else {
+    setMinTimeDone(true); // future visits → no delay
+  }
+}, [hasFetchedOnce]);
+
+const showLoader =
+  !hasFetchedOnce || pageLoading || !minTimeDone;
+
+// }
+// }, [error]);
+// Dispatch action to fetch payments only when currentPage and totalPages are valid
+//   useEffect(() => {
+//   if (currentPage > 0 && totalPages > 0) {
+//     dispatch(fetchCustomerPaymentsAsync({
+//       page: currentPage,
+//       per_page: 10,
+//       search: searchTerm,   //add this
+//       searchType: searchType
+//     }));
+//   }
+// }, [dispatch, currentPage, totalPages, searchTerm, searchType]);
+
+useEffect(() => {
+  // FIRST LOAD ONLY
+  if (!hasFetchedOnce) {
+    dispatch(resetCustomerPayments());
+  }
+
+  dispatch(fetchCustomerPaymentsAsync({
+    page: currentPage,
+    per_page: 10,
+    search: debouncedSearch,
+    searchType,
+  }));
+}, [dispatch, currentPage, debouncedSearch, searchType, hasFetchedOnce]);
+
+
 // Initialize editablePayments when payments are updated
 useEffect(() => {
   if (payments && payments.length > 0) {
@@ -62,14 +107,15 @@ useEffect(() => {
 useEffect(() => {
   const handler = setTimeout(() => {
     setDebouncedSearch(searchTerm);
-  }, 300); // 300ms debounce
+    setCurrentPage(1); // reset to first page when searching
+  }, 300);
 
   return () => clearTimeout(handler);
 }, [searchTerm]);
 
-useEffect(() => {
-  dispatch(fetchCustomerPaymentsAsync({ page: 1, per_page: 10, search: debouncedSearch }));
-}, [dispatch, debouncedSearch]);
+// useEffect(() => {
+//   dispatch(fetchCustomerPaymentsAsync({ page: 1, per_page: 10, search: debouncedSearch, searchType: searchType, }));
+// }, [dispatch, debouncedSearch, searchType]);
 
   // // Guard to prevent showing errors during loading phase ---- CHANGES MADE
   // if (pageLoading ) {
@@ -83,9 +129,9 @@ useEffect(() => {
   
 
   // Handle errors gracefully only if there's no valid payment data
-  if (error && payments.length === 0 && !loading) {
-    return <div className="error">An error occurred while fetching payment data. Please try again later.</div>;
-  }
+  // if (error && payments.length === 0 && !loading) {
+  //   return <div className="error">An error occurred while fetching payment data. Please try again later.</div>;
+  // }
 
   // Handle Paid Amount change
   const handlePaidAmountChange = (index, value) => {
@@ -149,6 +195,7 @@ useEffect(() => {
   toast.error(errorMessage); // now shows exact backend message
 }
 };
+console.log("pageLoading:", pageLoading, "hasFetchedOnce:", hasFetchedOnce);
 
   // Define handlePageChange for pagination
 const handlePageChange = (newPage) => {
@@ -157,30 +204,101 @@ const handlePageChange = (newPage) => {
   }
 };
 
-  return (
+return (
     <div className="customer-payment-section">
       <h2>Customer Payments</h2>
-      
-  <div className="search-section">
-      <input
-  type="text"
-  placeholder="Search by Invoice Number..."
-  value={searchTerm}
-  onChange={(e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // reset to page 1
-  }}
-  className="search-by-invoice-number"
-/>
-</div>
-
-       {/* Go to First Page button (Top) */}
-{currentPage > 1 && (
-  <div className="pagination-home-cx">
-    <button onClick={() => handlePageChange(1)}>⏮ Home</button>
+  
+{/* FULL PAGE LOADING */}
+{showLoader && (
+      <div className="loading-container-cxpay">
+    <div className="loading-spinner-cxpay"></div>
+    <p className="loading-message-cxpay">
+      Loading Customer Payments...
+    </p>
   </div>
 )}
 
+
+{/* ERROR */}
+{!pageLoading && hasFetchedOnce && error && payments.length === 0 && (
+  <div className="cxpay-error-box">
+      <div className="cxpay-error-accent"></div>
+  
+      <div className="cxpay-error-content">
+        <BiSolidMessageRoundedError className="cxpay-error-icon" />
+  
+        <div className="cxpay-error-text">
+          <h6>Something went wrong</h6>
+          <p>  An error occurred while fetching customer payments.
+               Please try again later. </p>
+        </div>
+      </div>
+    </div>
+)}
+
+
+{!pageLoading && payments.length > 0 && (
+  <>
+  <div className="cxpay-topbar">
+
+  {/* LEFT SIDE — Search */}
+  <div className="search-wrapper-cxpay">
+    <input
+      type="text"
+      placeholder={
+        searchType === "invoice"
+          ? "Search by Invoice Number..."
+          : "Search by Client Name..."
+      }
+      value={searchTerm}
+      onChange={(e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+      }}
+      className="search-by-invoice-number-cxpay"
+    />
+
+    <div className="search-radio-group-cxpay">
+      <div>
+        <input
+          type="radio"
+          id="searchInvoice"
+          name="searchType"
+          value="invoice"
+          checked={searchType === "invoice"}
+          onChange={() => {
+            setSearchType("invoice");
+            setSearchTerm("");
+          }}
+        />
+        <label htmlFor="searchInvoice">Search by Invoice</label>
+      </div>
+
+      <div>
+        <input
+          type="radio"
+          id="searchCustomer"
+          name="searchType"
+          value="customer"
+          checked={searchType === "customer"}
+          onChange={() => {
+            setSearchType("customer");
+            setSearchTerm("");
+          }}
+        />
+        <label htmlFor="searchCustomer">Search by Customer</label>
+      </div>
+    </div>
+  </div>
+
+  {/* RIGHT SIDE — Home Button */}
+  {currentPage > 1 && (
+    <div className="pagination-home-cx">
+      <button onClick={() => handlePageChange(1)}>⏮ Home</button>
+    </div>
+  )}
+
+</div>
 
 <ToastContainer />
 
@@ -227,6 +345,14 @@ editablePayments.length === 0 ? (
         : payment.payment_status === "Disabled"
         ? "cancelled-row"
         : ""}
+        title={
+          payment.payment_status === "Cancelled"
+        ? "This invoice is cancelled."
+        : payment.payment_status === "Regenerated"
+        ? "This invoice is regenerated."
+        : payment.payment_status === "Disabled"
+        ? "This invoice is disabled."
+        : ""} 
   >
 
   <td>
@@ -426,26 +552,56 @@ editablePayments.length === 0 ? (
   </td>
 
 
-  <td>
-    <FaFileInvoiceDollar 
-      title={
-        payment.payment_status === "Cancelled"
-          ? "TDS Generation Disabled — invoice cancelled"
-          : payment.payment_status === "Regenerated"
-          ? "TDS Generation Disabled — invoice regenerated"
-          : payment.payment_status === "Disabled"
-          ? "TDS Generation Disabled — invoice disabled"
-          : "Generate TDS"
+<td>
+  {payment.payment_status === "Cancelled" ? (
+    <FaFileInvoiceDollar
+      className="action-icon-payment is-disabled"
+      title="TDS Disabled — invoice cancelled"
+      onClick={() =>
+        toast.info(
+          `TDS not available. Invoice ${payment.invoice_number} is cancelled.`
+        )
       }
-      className={`action-icon-payment ${
-        payment.payment_status === "Cancelled" ||
-        payment.payment_status === "Regenerated" ||
-        payment.payment_status === "Disabled"
-          ? "is-disabled"
-          : ""
-      }`}
     />
-  </td>
+  ) : payment.payment_status === "Regenerated" ? (
+    <FaFileInvoiceDollar
+      className="action-icon-payment is-disabled"
+      title="TDS Disabled — invoice regenerated"
+      onClick={() =>
+        toast.info(
+          `TDS not available. Invoice ${payment.invoice_number} is regenerated.`
+        )
+      }
+    />
+  ) : payment.payment_status === "Disabled" ? (
+    <FaFileInvoiceDollar
+      className="action-icon-payment is-disabled"
+      title="TDS Disabled — invoice disabled"
+      onClick={() =>
+        toast.info(
+          `TDS not available. Invoice ${payment.invoice_number} is disabled.`
+        )
+      }
+    />
+  ) : (
+    <a
+      href={`${payment.base_url}/generate_tds_pdf/${payment.invoice_number}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() =>
+        toast.info(
+          `Generating and Downloading TDS for Invoice ${payment.invoice_number}`
+        )
+      }
+    >
+      <FaFileInvoiceDollar
+        className="action-icon-payment"
+        title="Generate & Download TDS Certificate"
+      />
+    </a>
+  )}
+</td>
+
 
     <td>
     <RiInformation2Fill
@@ -516,6 +672,9 @@ editablePayments.length === 0 ? (
               </button>
             </div>
         )}
+
+        </>
+)}
       </div>
     );
   };

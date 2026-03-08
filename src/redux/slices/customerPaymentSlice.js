@@ -4,20 +4,74 @@ import axios from "../../config/apiConfig";
 import API from "../../config/config";
 
 // fetchCustomerPaymentsAsync: unchanged
+// export const fetchCustomerPaymentsAsync = createAsyncThunk(
+//   'customerPayment/fetchCustomerPayments',
+//   async ({ page = 1, per_page = 10, search = "", searchType = "invoice" }, { rejectWithValue }) => {
+//     try {
+//       const token = localStorage.getItem('Access_Token');
+//       if (!token) throw new Error("No access token found.");
+
+//       const response = await axios.get(`${API}/get_cxpayment`, {
+//         params: {
+//           page,
+//           per_page,
+//           search, // ✅ invoice number
+//           include_disabled: true,
+//         },
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+
+//       const { payments, total_count, total_pages, current_page } = response.data;
+
+//       return {
+//         payments: payments || [],
+//         totalCount: total_count || 0,
+//         totalPages: total_pages || 1,
+//         currentPage: current_page || 1,
+//       };
+//     } catch (err) {
+//       // ✅ extract backend error from response
+//       if (err.response && err.response.data) {
+//         // the backend returns { error: "..." } instead of message
+//         return rejectWithValue(err.response.data.message || err.response.data.error);
+//       }
+//       return rejectWithValue(err.message); // fallback
+//     }
+//   }
+// ); ----this is older slice before adding new loader and error blocksin cx payment page----
+
 export const fetchCustomerPaymentsAsync = createAsyncThunk(
   'customerPayment/fetchCustomerPayments',
-  async ({ page = 1, per_page = 10, search = "" }, { rejectWithValue }) => {
+  async (
+    { page = 1, per_page = 10, search = "", searchType = "invoice" },
+    { rejectWithValue }
+  ) => {
     try {
       const token = localStorage.getItem('Access_Token');
       if (!token) throw new Error("No access token found.");
+      
+      const params = {
+        page,
+        per_page,
+        include_disabled: true,
+      };
 
+      if (search && search.trim() !== "") {
+      const cleanedSearch = search.trim();
+
+      if (searchType === "invoice") {
+        params.invoice_number = cleanedSearch;
+      }
+
+      if (searchType === "customer") {
+        params.customer_name = cleanedSearch;
+      }
+    }
+
+    console.log("Request Params:", params);
+    
       const response = await axios.get(`${API}/get_cxpayment`, {
-        params: {
-          page,
-          per_page,
-          search, // ✅ invoice number
-          include_disabled: true,
-        },
+        params,
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -30,16 +84,15 @@ export const fetchCustomerPaymentsAsync = createAsyncThunk(
         currentPage: current_page || 1,
       };
     } catch (err) {
-      // ✅ extract backend error from response
       if (err.response && err.response.data) {
-        // the backend returns { error: "..." } instead of message
-        return rejectWithValue(err.response.data.message || err.response.data.error);
+        return rejectWithValue(
+          err.response.data.message || err.response.data.error
+        );
       }
-      return rejectWithValue(err.message); // fallback
+      return rejectWithValue(err.message);
     }
   }
 );
-
 
 
 // generateInvoicePdfAsync, processCustomerPaymentAsync, recreateInvoiceAsync, disableInvoiceAsync:
@@ -135,8 +188,25 @@ const customerPaymentSlice = createSlice({
     pdfFilePath: null,
     // NEW: keep client-created cancelled entries so server fetch won't drop them
     localCancelled: {}, // { [invoice_number]: paymentObj }
+    hasFetchedOnce: false, //added
+    isInitialLoading: true,
   },
   reducers: {
+
+  //----this is added after  adding new loader and error blocksin cx payment page-----
+  resetCustomerPayments: (state) => {
+    state.payments = [];
+    state.pageLoading = false;
+    state.loading = false;
+    state.error = null;
+    state.currentPage = 1;
+    state.totalPages = 1;
+    state.totalCount = 0;
+    state.hasFetchedOnce = false; 
+    state.isInitialLoading = true;
+  },
+
+
     // update status locally
     setPaymentStatus: (state, action) => {
       const { invoice_number, payment_status } = action.payload;
@@ -180,38 +250,68 @@ const customerPaymentSlice = createSlice({
 extraReducers: (builder) => {
     builder
       // fetch
+// .addCase(fetchCustomerPaymentsAsync.pending, (state) => {
+//   if (state.firstLoad) {
+//     state.pageLoading = true; // show loading spinner only for first table load
+//   }
+//   state.error = null;
+// })    ----this is older slice before adding new loader and error blocksin cx payment page----
+
 .addCase(fetchCustomerPaymentsAsync.pending, (state) => {
-  if (state.firstLoad) {
-    state.pageLoading = true; // show loading spinner only for first table load
-  }
+  state.pageLoading = true;
   state.error = null;
 })
+
+// .addCase(fetchCustomerPaymentsAsync.fulfilled, (state, action) => {
+//   state.pageLoading = false;
+//   state.firstLoad = false; // mark first load done
+  
+//   const { payments, totalCount, totalPages, currentPage } = action.payload;
+//   state.payments = payments || [];
+//   state.totalCount = totalCount || 0;
+//   state.totalPages = totalPages || 1;
+//   state.currentPage = currentPage || 1;
+
+//   Object.keys(state.localCancelled).forEach(invNum => {
+//     const local = state.localCancelled[invNum];
+//     const exists = state.payments.some(p => p.invoice_number === invNum);
+//     if (!exists && local) {
+//       state.payments.unshift(local);
+//     }
+//   });
+// })  ----this is older slice before adding new loader and error blocksin cx payment page----
+
 .addCase(fetchCustomerPaymentsAsync.fulfilled, (state, action) => {
   state.pageLoading = false;
-  state.firstLoad = false; // mark first load done
-  
+  state.firstLoad = false;
+  state.hasFetchedOnce = true;
+  state.isInitialLoading = false;
+
   const { payments, totalCount, totalPages, currentPage } = action.payload;
   state.payments = payments || [];
   state.totalCount = totalCount || 0;
   state.totalPages = totalPages || 1;
   state.currentPage = currentPage || 1;
-
-  Object.keys(state.localCancelled).forEach(invNum => {
-    const local = state.localCancelled[invNum];
-    const exists = state.payments.some(p => p.invoice_number === invNum);
-    if (!exists && local) {
-      state.payments.unshift(local);
-    }
-  });
 })
+
+// .addCase(fetchCustomerPaymentsAsync.rejected, (state, action) => {
+//   state.pageLoading = false;
+//   state.firstLoad = false;
+//   state.error = action.payload || "An error occurred while fetching payments.";
+//   state.error = action.error?.message || "An error occurred while fetching payments.";
+// }); ----this is older slice before adding new loader and error blocksin cx payment page----
+
 .addCase(fetchCustomerPaymentsAsync.rejected, (state, action) => {
   state.pageLoading = false;
   state.firstLoad = false;
-  state.error = action.payload || "An error occurred while fetching payments.";
-  state.error = action.error?.message || "An error occurred while fetching payments.";
+  state.hasFetchedOnce = true;
+  state.isInitialLoading = false;
+  state.error =
+    action.payload ||
+    action.error?.message ||
+    "An error occurred while fetching payments.";
 });
 
-      
       // .addCase(fetchCustomerPaymentsAsync.fulfilled, (state, action) => {
       //   state.loading = false;
       //   const { payments, totalCount, totalPages, currentPage } = action.payload;
@@ -335,3 +435,4 @@ builder
 
 export const { setPaymentStatus, upsertPayment, setSearchTerm } = customerPaymentSlice.actions;
 export default customerPaymentSlice.reducer;
+export const { resetCustomerPayments } = customerPaymentSlice.actions;

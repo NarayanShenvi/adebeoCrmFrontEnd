@@ -933,6 +933,45 @@ const productCount = productCombinedChartData?.length || 0;
     );
   };
 
+  
+useEffect(() => {
+  if (!reportGenerated) return;
+
+  const counters = document.querySelectorAll(".countup");
+
+  counters.forEach((counter) => {
+    const target = Number(counter.dataset.value);
+
+    if (isNaN(target) || target <= 0) return;
+
+    // allow re-animation when value changes
+    const previous = Number(counter.dataset.prev || 0);
+    if (previous === target) return;
+
+    counter.dataset.prev = target;
+
+    let start = 0;
+    const duration = 3000;
+    const stepTime = 16;
+    const steps = duration / stepTime;
+    const increment = target / steps;
+
+    const interval = setInterval(() => {
+      start += increment;
+
+      if (start >= target) {
+        counter.innerText = `₹ ${target.toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+        })}`;
+        clearInterval(interval);
+      } else {
+        counter.innerText = `₹ ${Math.round(start).toLocaleString("en-IN")}`;
+      }
+    }, stepTime);
+  });
+}, [reportGenerated, totalAmountBilled]);
+
+
 
     return (
       <div className="SalesReport-section">
@@ -985,14 +1024,14 @@ const productCount = productCombinedChartData?.length || 0;
     {reportGenerated && (
       <div className="total-amount-text">
         <span>Total Amount:</span>
-        <strong className="wrap-amount">
+        <strong className="wrap-amount countup" data-value={totalAmountBilled}>
         {formattedTotalAmount} {/* This already has ₹ symbol & formatting */}
       </strong>
       </div>
     )}
   </Col>
 </Row>
-
+ 
 
           <Row className="g-4 mt-3">
             {/* Customer search */}
