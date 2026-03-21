@@ -36,6 +36,9 @@
     const [page, setPage] = useState(1);
     const [reportGenerated, setReportGenerated] = useState(false);
 
+    // Payment Status filter
+    const [selectedStatuses, setSelectedStatuses] = useState([]);
+    const [appliedStatuses, setAppliedStatuses] = useState([]);
     // Redux slices
   const {
     paymentReports = [],
@@ -52,6 +55,42 @@
     customerObj: [],
   });
 
+  const reportStatusOptions = useMemo(() => {
+    const set = new Set();
+
+    paymentReports.forEach((row) => {
+      if (row["Payment Status"]) {
+        set.add(row["Payment Status"]);
+      }
+    });
+
+    const statuses = Array.from(set);
+
+    return [
+      { value: "All", label: "All" },
+      ...statuses.map((s) => ({ value: s, label: s })),
+    ];
+  }, [paymentReports]);
+
+  const handleStatusChange = (selected) => {
+    if (!selected) {
+      setSelectedStatuses([]);
+      return;
+    }
+
+    const values = selected.map((s) => s.value);
+
+    // If user selects "All"
+    if (values.includes("All")) {
+      setSelectedStatuses(
+        reportStatusOptions
+          .filter(o => o.value !== "All")
+          .map(o => o.value)
+      );
+    } else {
+      setSelectedStatuses(values);
+    }
+  };
 
     // --- Date handlers & validations ---
     const handleStartDateChange = (e) => {
@@ -227,7 +266,7 @@
       customerId: selectedCustomerId,
       customerObj: selectedCustomerObj,
     });
-
+    setAppliedStatuses(selectedStatuses);
     setReportGenerated(true);
 
     // ✅ FETCH PAGE 1
@@ -337,26 +376,33 @@ const handlePageChange = (newPage) => {
   setSelectedCustomerId(id ? [id] : []);
   setSelectedCustomerObj(cust ? [cust] : []);
   };
+   
+ const filteredPaymentReports = useMemo(() => {
+  let data = [...paymentReports];
 
-  const filteredPaymentReports = useMemo(() => {
-    let data = [...paymentReports];
+  // CUSTOMER FILTER
+  if (appliedFilters.customerObj && appliedFilters.customerObj.length > 0) {
+    const customerNames = appliedFilters.customerObj.map(c =>
+      (c.companyName || c.company_name || c.company || "").toLowerCase()
+    );
 
-    // ✅ CUSTOMER FILTER (multi-select)
-if (appliedFilters.customerObj && appliedFilters.customerObj.length > 0) {
-  const customerNames = appliedFilters.customerObj.map(c =>
-    (c.companyName || c.company_name || c.company || "").toLowerCase()
-  );
+    data = data.filter(row =>
+      row["Customer Name"] &&
+      customerNames.some(name =>
+        row["Customer Name"].toLowerCase().includes(name)
+      )
+    );
+  }
 
+  // PAYMENT STATUS FILTER
+  if (appliedStatuses.length > 0 && !appliedStatuses.includes("All")) {
   data = data.filter(row =>
-    row["Customer Name"] &&
-    customerNames.some(name =>
-      row["Customer Name"].toLowerCase().includes(name)
-    )
+    appliedStatuses.includes(row["Payment Status"])
   );
 }
 
-    return data;
-  }, [paymentReports, appliedFilters]);
+  return data;
+}, [paymentReports, appliedFilters, appliedStatuses]);
 
 const perPage = 1000; // max rows per page
 const { paymentCurrentPage, paymentTotalPages } = useSelector((state) => state.report);
@@ -566,7 +612,7 @@ return (
 
         <Form onSubmit={handleSubmit} className="filter-form-payment">
           {/* Date row */}
-<Row className="g-4 mt-3">
+<Row className="g-4 mt-3" style={{marginBottom: "-50px"}}>
   {/* Start Date */}
   <Col md={3}>
     <Form.Label className="required-label">Start Date:</Form.Label>
@@ -688,7 +734,7 @@ return (
 
           <Row className="g-4 mt-3  payment-filter-row">
 
-           <Col md={3}>
+  <Col md={3}>
   {reportGenerated && (
     <div className="total-amount-text-payment">
       <span>Total Amount:</span>
@@ -714,6 +760,32 @@ return (
     </div>
   )}
 </Col>
+
+<Col md={3}>
+  {reportGenerated && (
+    <Form.Group>
+      <Form.Label>Payment Status</Form.Label>
+
+      <Select
+        className="PaymentReport-selectstatus"
+        classNamePrefix="PaymentReportstatus"
+        menuPortalTarget={document.body}
+        menuPosition="fixed"
+        styles={{
+          menuPortal: base => ({ ...base, zIndex: 9999 })
+        }}
+        options={reportStatusOptions}
+        value={reportStatusOptions.filter(option =>
+          selectedStatuses.includes(option.value)
+        )}
+        onChange={handleStatusChange}
+        isMulti
+        placeholder="Select status"
+      />
+    </Form.Group>
+  )}
+</Col>
+
           </Row>
 
         </Form>
@@ -745,7 +817,7 @@ return (
 )}
 
       <div className="PaymentReport-table">
-    {paginatedPaymentReports.length > 0 ? (
+    {filteredPaymentReports.length > 0 ? (
       <table>
         <thead>
   <tr>
@@ -764,7 +836,7 @@ return (
 
 
         <tbody>
-  {paginatedPaymentReports.map((row, idx) => (
+  {filteredPaymentReports.map((row, idx) => (
     <tr key={idx}>
       {/* Customer Name */}
       <td>{row["Customer Name"] || "-"}</td>

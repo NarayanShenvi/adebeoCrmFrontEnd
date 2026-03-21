@@ -36,6 +36,38 @@ export const fetchRenewalReport = createAsyncThunk(
   }
 );
 
+
+/* --------------------------------
+   POST RENEWAL COMMENT
+---------------------------------- */
+export const postRenewalComment = createAsyncThunk(
+  "renewal/postRenewalComment",
+  async ({ renewal_id, comment }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("Access_Token");
+
+      const response = await axios.post(
+        `${API}/add_renewal_comment`,
+        {
+          renewal_id,
+          comment,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to add renewal comment"
+      );
+    }
+  }
+);
+
 /* --------------------------------
    RENEWAL SLICE
 ---------------------------------- */
@@ -86,6 +118,12 @@ const renewalSlice = createSlice({
         state.renewalLoading = false;
         state.renewalError =
           action.payload || action.error.message || "Unknown error";
+      })
+
+      .addCase(postRenewalComment.fulfilled, (state, action) => {
+        if (action.payload?.comment) {
+          state.renewalComments.push(action.payload.comment);
+        }
       });
   },
 });

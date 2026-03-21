@@ -4830,7 +4830,7 @@ a:hover {
 
 .renewalSelect__control {
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 4px; 
   padding: 0px 3px;
   min-height: 32px;          /* ✅ correct */
   height: auto;              /* ✅ allow hover area */
@@ -14067,7 +14067,7 @@ select option {
 
   padding: 6px 14px;
   border-radius: 2px;
-  margin-top: -26px;
+  margin-top: -26px !important;
   background: linear-gradient(
     135deg,
     rgba(39, 142, 170, 0.27),
@@ -14114,32 +14114,63 @@ select option {
 }
 
 /* WHEN TOTAL IS NOT PRESENT & WHEN IT IS PRESENT */
+
 /* Make row flexible */
 .payment-filter-row {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;   /* better alignment with Select */
+  flex-wrap: nowrap;       /* prevents last column moving to next row */
+  gap: 10px;               /* spacing between totals + filter */
 }
 
 /* Default behavior (when total exists) */
 .payment-filter-row > .col-md-3 {
+  flex: 1;
+  min-width: 0;
   transition: all 0.3s ease;
 }
 
 /* 🔹 CENTER FIRST 3 COLS WHEN TOTAL IS NOT PRESENT */
 .payment-filter-row:not(:has(.total-amount-text)) {
   justify-content: center;
+  column-gap: 32px;
 }
 
 /* WHEN TOTAL IS NOT PRESENT → 3 columns only */
-.payment-filter-row:not(:has(.total-amount-text)) {
-  justify-content: center;
-  column-gap: 32px;   /* 👈 space between the 3 columns */
+.payment-filter-row:not(:has(.total-amount-text)) > .col-md-3 {
+  width: 275px;
+  margin-bottom: -20px;
 }
 
-/* Slightly wider columns so they don't squeeze */
-.payment-filter-row:not(:has(.total-amount-text)) > .col-md-3 {
-  width: 275px;       /* adjust: 240–280px */
-  margin-bottom: -20px;
+.PaymentReportstatus__control {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0px 8px;
+  min-height: 32px;          /* ✅ correct */
+  height: auto;              /* ✅ allow hover area */
+  background-color: rgba(134, 195, 238, 0.31) !important;
+  font-family: "Shippori Mincho B1", "Times New Roman", serif;
+  font-size: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  font-weight: 800;
+  pointer-events: auto;
+  color: #555555;
+}
+
+.PaymentReportstatus__control--is-focused {
+  border-color: rgba(6, 41, 66, 0.31) !important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795) !important;
+}
+
+/* Hover when NOT focused */
+.PaymentReportstatus__control:not(.PaymentReportstatus__control--is-focused):hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
+  border-color: #6ac7e0;
+}
+
+/* Hover even when focused */
+.PaymentReportstatus__control--is-focused:hover {
+  background-color: rgba(52, 164, 245, 0.31) !important;
 }
 
 /* Serch Filelds--customer */
@@ -15712,6 +15743,252 @@ select option {
   }
 }
 
+/* Renewal Comments Modals */
+.icon-container-renewal {
+  display: inline-flex;
+  align-items: center;
+  padding-left: 14px ;
+  gap: 15px; /* Adds spacing between icons */
+  cursor: pointer;
+  color: #016969;
+}
+
+.action-icon-renewal {
+  font-size: 13px; /* Adjust icon size */
+  cursor: pointer; /* Make it clickable */
+  transition: transform 0.2s ease-in-out;
+}
+
+.action-icon-renewal:hover {
+  transform: scale(1.4); /* Slight zoom on hover */
+}
+
+/* add coments */
+.comment-edit-modal-renewal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95); /* Light glass effect */
+  backdrop-filter: blur(15px); /* Smooth background blur */
+  box-shadow: 1px 5px 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 5px;
+  transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+  margin-left: 9%;
+  margin-top: 10px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  width: 100%;
+  max-width: 460px;
+  height: 100vh;
+  max-height: 310px; 
+  z-index: 99999;
+}
+ 
+.comment-edit-modal-renewal textarea {
+  width: 100%;
+  max-height: 190px;
+  height: 100vh;
+  border: 1px solid #21bce2c4;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s ease-in-out;
+  color: #302e2e;
+  font-size: 14px;
+  background-color: #d4d8d831;
+  resize: none; /* Disables resizing */
+}
+
+.comment-edit-modal-renewal textarea:focus {
+  border-color: #6fe4e6; /* Change border color on focus */
+  outline: none;
+  box-shadow: 0px 0px 8px rgba(9, 228, 228, 0.8); /* Glowing effect */
+}
+
+.comment-edit-modal-renewal h4 {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #053b42;
+  text-align:left;
+  margin-top: -5px;
+  margin-bottom: 20px;
+}
+
+.comment-edit-modal-renewal .cancelcomment-renewal {
+  width: 100%;
+  color: rgb(156, 3, 3);
+  cursor: pointer;
+  margin-top: -234px;
+  margin-left: 93%;
+  transition: transform 0.2s ease-in-out;
+  font-size: 17px;
+  font-weight: bolder;
+}
+
+.comment-edit-modal-renewal .submitcomment-renewal {
+  width: 100%;
+  color: rgb(4, 121, 4);
+  cursor: pointer;
+  margin-top: 20px;
+  margin-left: -30px;
+  transition: transform 0.2s ease-in-out;
+  font-size: 25px;
+  font-weight: bolder;
+}
+
+.comment-edit-modal-renewal .cancelcomment-renewal:hover {
+  transform: scale(1.3); /* Slight zoom on hover */
+}
+
+.comment-edit-modal-renewal .submitcomment-renewal:hover {
+  transform: scale(1.2); /* Slight zoom on hover */
+}
+
+.comment-edit-modal-renewal div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.no-data-renewal {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #069696;
+  padding: 20px;
+  margin-left: 40%;
+  width: 100%;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+/* Success message initially hidden */
+.alert-box-renewal {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4caf50; /* Green success color */
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s;
+}
+
+/* ✅ Show alert only when Submit button is clicked */
+.comment-edit-modal-renewal:has(.submitcomment-renewal:active) .alert-box-renewal {
+  opacity: 1;
+  visibility: visible;
+  animation: fadeOut 2s ease-in-out 2s forwards; /* Hide after 2s */
+}
+
+/* ✨ Animation to fade out */
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+/* show comments */
+.comments-modal-renewal
+{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgb(255, 255, 255); /* Light glass effect */
+  backdrop-filter: blur(15px); /* Smooth background blur */
+  box-shadow: 1px 5px 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 5px;
+  transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+  margin-left: 9%;
+  margin-top: 10px;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  max-height: 380px; 
+  z-index: 99999;
+}
+
+.cancel-renewal {
+  position: absolute;
+  top: 9px;
+  right: 18px;
+}
+
+.comments-modal-renewal .cancelcomment-renewal {
+  color: rgb(156, 3, 3);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  font-size: 17px;
+  font-weight: bolder;
+}
+
+.comments-modal-renewal .cancelcomment-renewal:hover {
+  transform: scale(1.3); /* Slight zoom on hover */
+}
+
+.comments-modal-renewal h4 {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #053b42;
+  text-align:left;
+  margin-top: -5px;
+  margin-bottom: 20px;
+}
+
+.comments-modal-renewal .displaycomments-renewal {
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #053b42;
+  text-align:left;
+  margin-top: -5px;
+  margin-bottom: 20px;
+}
+
+.comments-modal-renewal textarea
+{
+  width: 100%;
+  max-height: 265px;
+  height: 100vh;
+  border: 1px solid #21bce2c4;
+  border-radius: 2px;
+  padding: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s ease-in-out;
+  color: #1b1818;
+  font-size: 14px;
+  background-color: #d4d8d831;
+  resize: none; /* Disables resizing */
+  white-space: pre-wrap;
+}
+
+.comments-modal-renewal textarea:focus {
+  border-color: #6fe4e6; /* Change border color on focus */
+  outline: none;
+  box-shadow: 0px 0px 8px rgba(87, 126, 126, 0.8); /* Glowing effect */
+}
+
+.comments-modal-renewal .nocomments-renewal
+{
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: #db6c03;
+  text-align:center;
+  margin-top: 33%;
+  margin-bottom: 20px;
+}
+
+
 /* Pagination Controls */
 .pagination-controls-renewalreport {
   flex-grow: 1;
@@ -15906,24 +16183,126 @@ select option {
   }
 }
 
-/* ================== RESPONSIVE ================== */
+/* ================== RESPONSIVE  CSS FOR RENEWAL COMMENT ================== */
 
 /* ========================= */
-/* ===== 1024px ===== */
+/* ===== 1024px (Small Laptop) ===== */
 /* ========================= */
+@media (max-width: 1024px) {
+
+  .comment-edit-modal-renewal,
+  .comments-modal-renewal {
+    max-width: 420px;
+    max-height: 320px;
+    margin-left: 0;
+  }
+
+  .comment-edit-modal-renewal textarea {
+    max-height: 170px;
+  }
+
+  .comments-modal-renewal textarea {
+    max-height: 230px;
+  }
+
+  .no-data-renewal {
+    margin-left: 0;
+  }
+
+}
 
 /* ========================= */
 /* ===== 768px (Tablet) ===== */
 /* ========================= */
+@media (max-width: 768px) {
+
+  .icon-container-renewal {
+    padding-left: 8px;
+    gap: 10px;
+  }
+
+  .action-icon-renewal {
+    font-size: 12px;
+  }
+
+  .comment-edit-modal-renewal,
+  .comments-modal-renewal {
+    width: 90%;
+    max-width: 360px;
+    max-height: 300px;
+    padding: 16px;
+    margin-left: 0;
+  }
+
+  .comment-edit-modal-renewal textarea {
+    max-height: 150px;
+    font-size: 13px;
+  }
+
+  .comments-modal-renewal textarea {
+    max-height: 210px;
+    font-size: 13px;
+  }
+
+  .comment-edit-modal-renewal h4,
+  .comments-modal-renewal h4 {
+    font-size: 14px;
+  }
+
+}
 
 /* ========================= */
 /* ===== 480px (Mobile) ===== */
 /* ========================= */
+@media (max-width: 480px) {
+
+  .icon-container-renewal {
+    gap: 8px;
+    padding-left: 5px;
+  }
+
+  .action-icon-renewal {
+    font-size: 11px;
+  }
+
+  .comment-edit-modal-renewal,
+  .comments-modal-renewal {
+    width: 95%;
+    max-width: 320px;
+    max-height: 280px;
+    padding: 14px;
+  }
+
+  .comment-edit-modal-renewal textarea {
+    max-height: 130px;
+    font-size: 12px;
+  }
+
+  .comments-modal-renewal textarea {
+    max-height: 190px;
+    font-size: 12px;
+  }
+
+  .comment-edit-modal-renewal h4,
+  .comments-modal-renewal h4 {
+    font-size: 13px;
+  }
+
+  .cancel-renewal {
+    right: 10px;
+    top: 6px;
+  }
+
+  .no-data-renewal {
+    font-size: 15px;
+    margin-left: 0;
+  }
+
+}
 
 
 
-
-
+/* =======VXPAYMENT SECTION======== */
 .vxpayment-container {
   flex-grow: 1;
   padding: 20px;
@@ -15942,7 +16321,103 @@ select option {
   font-weight: bold;
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
   margin-top: 4%;
-  margin-bottom: 2%;
+  margin-bottom: -1%;
+}
+
+/* Row alignment */
+.date-row-vxpay {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+
+  gap:10px !important;  
+  width: 100%;
+  max-width: 1200px; /* Adjust as needed */
+  min-width: 900px; /* Ensures form doesn't shrink too much */
+  flex-grow: 1;
+  box-sizing: border-box;
+  display: flex;
+  pointer-events: auto;
+  position: relative;
+  margin-top: 30px !important;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  margin-bottom: -30px;
+}
+
+/* Form label styling */
+.date-row-vxpay .form-label {
+  font-size: 12px!important;   
+  margin-bottom: 5px!important;   
+  color: #1a1919!important;   
+  font-family:"Shippori Mincho B1", "Times New Roman", serif!important;   
+}
+
+.required-label::after {
+  content: " *"; 
+  color: rgb(223, 3, 3);    
+  font-weight: 800;
+}
+
+/* Date input modern style */
+.dates-vxpay {
+  border: 1px solid #ccc !important;         /* Light gray border */
+  border-radius: 4px !important;             /* Slightly rounded corners */
+  padding: 8px 12px !important;              /* Padding inside the input */
+  font-size: 12px !important;               /* Consistent font size */
+  transition: border-color 0.3s, box-shadow 0.3s !important;
+  background-color: rgba(134, 195, 238, 0.31) !important;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif !important;
+  color: #333 !important;
+  font-weight: 800 !important;
+  pointer-events: auto !important;
+  width: 100%;
+}
+
+.dates-vxpay:hover {
+   background-color: rgba(52, 164, 245, 0.31)!important;
+}
+
+/* Focus effect */
+.dates-vxpay:focus {
+  border-color: rgba(6, 41, 66, 0.31)!important;
+  box-shadow: 0 0 5px rgba(83, 176, 243, 0.795)!important;
+}
+
+/* Button column alignment */
+.date-btn-col {
+  display: flex;
+  align-items: flex-end;
+}
+
+.dates-vxpay{
+  max-width: 240px;
+}
+
+.report-button-vxpay {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+  text-align: center;
+  color: #05555f;
+  width: 20px;
+  margin-left: 65%;
+}
+
+.filecheck
+{
+  font-size: 25px !important;
+}
+
+.report-button-vxpay:disabled {
+  opacity: 0.6;
+  cursor: allowed;
+}
+
+.report-button-vxpay:hover:not(:disabled) {
+  transform: scale(1.3); 
+  color: #0e7204;
 }
 
 /*search bar*/
@@ -16887,7 +17362,166 @@ select option {
     0 6px 18px rgba(255, 77, 79, 0.25);
 }
 
+/* ================== RESPONSIVE ================== */
 
+/* ========================= */
+/* ===== 1024px (Small Laptop) ===== */
+/* ========================= */
+@media (max-width: 1024px) {
+
+  .vxpayment-container {
+    margin-left: 200px;
+    max-width: calc(100% - 200px);
+    padding: 15px;
+  }
+
+  .date-row-vxpay {
+    min-width: auto;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 15px !important;
+  }
+
+  .vxpayment-table {
+    min-width: 900px;
+  }
+
+  .vx-payment-popup {
+    width: 90%;
+    right: 5%;
+  }
+
+}
+
+/* ========================= */
+/* ===== 768px (Tablet) ===== */
+/* ========================= */
+@media (max-width: 768px) {
+
+  .vxpayment-container {
+    margin-left: 0;
+    max-width: 100%;
+    padding: 15px;
+  }
+
+  .vxpayment-container h3 {
+    font-size: 18px;
+  }
+
+  .date-row-vxpay {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px !important;
+    min-width: auto;
+  }
+
+  .date-col {
+    width: 100%;
+  }
+
+  .dates-vxpay {
+    max-width: 100%;
+  }
+
+  .report-button-vxpay {
+    margin-left: 0;
+  }
+
+  /* table becomes scrollable */
+  .vxpayment-table {
+    display: block;
+    overflow-x: auto;
+    min-width: 800px;
+  }
+
+  .pagination-controls-vxpay {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .vx-proceed-wrapper {
+    justify-content: center;
+  }
+
+  .vx-proceed-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* popup responsive */
+  .vx-payment-popup {
+    width: 95%;
+    right: 2.5%;
+    height: 90vh;
+  }
+
+}
+
+/* ========================= */
+/* ===== 480px (Mobile) ===== */
+/* ========================= */
+@media (max-width: 480px) {
+
+  .vxpayment-container {
+    padding: 10px;
+  }
+
+  .vxpayment-container h3 {
+    font-size: 16px;
+  }
+
+  .date-row-vxpay {
+    padding: 10px;
+    gap: 10px !important;
+  }
+
+  .date-row-vxpay .form-label {
+    font-size: 11px !important;
+  }
+
+  .dates-vxpay {
+    font-size: 11px !important;
+    padding: 6px 8px !important;
+  }
+
+  .report-button-vxpay {
+    transform: scale(0.9);
+  }
+
+  /* smaller table text */
+  .vxpayment-table th,
+  .vxpayment-table td {
+    font-size: 11px;
+    padding: 6px;
+  }
+
+  .pagination-controls-vxpay span {
+    font-size: 12px;
+  }
+
+  .vx-proceed-btn {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  /* popup mobile full width */
+  .vx-payment-popup {
+    width: 100%;
+    right: 0;
+    border-radius: 0;
+  }
+
+  .vx-popup-table th,
+  .vx-popup-table td {
+    font-size: 12px;
+  }
+
+  .vx-submit-btn {
+    max-width: 100%;
+    font-size: 13px;
+  }
+
+}
 
 
 /* ===== Summary and View  ===== */
@@ -17142,6 +17776,84 @@ select option {
 
 .inner-view-toggle button.active::after {
   width: 0%;
+}
+
+
+/* View--Comapany--Submeny items */
+.company-menu-wrapper{
+ position: relative;
+ display: inline-block;
+}
+
+.company-submenu{
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 40px;
+  width: 100vh;
+  max-width: 135px;
+  background-color: rgb(159, 219, 228);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  border-radius: 1px;
+}
+
+.submenu-item{
+  display: block;
+  padding: 8px 10px;
+  font-weight: bolder;
+  font-size: 12px;
+  color:  rgba(34, 33, 33, 0.785) !important;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+  border-bottom: 2px solid #f8f9fa !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.submenu-item:hover{
+  background-color: rgba(25, 130, 165, 0.5);
+  color: #ffffff !important;
+}
+
+
+/* Show dropdown on hover */
+.company-submenu:hover .submenu-item {
+  display: block;
+}
+
+.company-menu-wrapper:hover .company-submenu {
+  display: block;
+}
+
+.submenu-item.active-submenu{
+  font-weight:700;
+  font-size: 14px;
+  border-left:4px solid #2095a5;
+  border-radius: 5px;
+  padding-left: 20px;
+}
+
+.submenu-item.active-submenu:hover{
+  border-left:4px solid #ffffff;
+  border-radius: 0px;
+}
+
+.view-transition {
+  animation: fadeSlide 0.35s ease;
+}
+
+@keyframes fadeSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  60% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
 }
 
 /* ====== CONTAINER ====== */
@@ -17426,7 +18138,7 @@ select option {
 
 .mini-table th:nth-child(1),
 .mini-table td:nth-child(1) {
-  width: 8%;
+  width: 10%;
   white-space: pre-line;
   word-wrap: break-word;
 }
@@ -17440,6 +18152,13 @@ select option {
 
 .mini-table th:nth-child(3),
 .mini-table td:nth-child(3) {
+  width: 12%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.mini-table th:last-child,
+.mini-table td:last-child  {
   width: 20%;
   white-space: pre-line;
   word-wrap: break-word;
@@ -17457,6 +18176,273 @@ select option {
 
 .mini-table tbody tr:hover {
   background-color: rgb(208, 224, 233);
+}
+
+/* ====== MINI TABLE ====== */
+.mini-table-company {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 8px;
+  font-size: 13px;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.mini-table-company thead {
+  background: rgba(170, 219, 234, 0.78);
+}
+
+.mini-table-company th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  color: rgb(22, 22, 22);
+  border-bottom: 2px solid #ffffff;
+  overflow: hidden;
+  word-wrap: break-word;
+  white-space: nowrap; 
+}
+
+.mini-table-company td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #ffffff;
+  color: #444;
+  font-weight: bold; 
+  text-align: left;
+  white-space: nowrap;  
+  overflow: hidden;
+  font-size: 13px;
+  white-space: normal; 
+  word-wrap: break-word; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+
+.mini-table-company tbody tr:hover {
+  background-color: #1c8991; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+}
+
+.mini-table-company th:nth-child(1),
+.mini-table-company td:nth-child(1) {
+  width: 15%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.mini-table-company th:nth-child(2),
+.mini-table-company td:nth-child(2) {
+  width: 25%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.mini-table-company th:nth-child(3),
+.mini-table-company td:nth-child(3) {
+  width: 16%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.mini-table-company th:last-child,
+.mini-table-company td:last-child  {
+  width: 16%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.mini-table-company tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.mini-table-company tbody tr {
+  background-color: rgb(224, 237, 245);
+  cursor: default;
+  transition: background 0.2s ease;
+}
+
+.mini-table-company tbody tr:hover {
+  background-color: rgb(208, 224, 233);
+}
+
+
+/* ====== COMPANY BASED TABLE ====== */
+.company-view-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 8px;
+  font-size: 13px;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  font-family:"Shippori Mincho B1", "Times New Roman", serif;
+}
+
+.company-view-table thead {
+  background: rgba(170, 219, 234, 0.78);
+}
+
+.company-view-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  color: rgb(22, 22, 22);
+  border-bottom: 2px solid #ffffff;
+  overflow: hidden;
+  word-wrap: break-word;
+  white-space: nowrap; 
+}
+
+.company-view-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #ffffff;
+  color: #444;
+  font-weight: bold; 
+  text-align: left;
+  white-space: nowrap;  
+  overflow: hidden;
+  font-size: 13px;
+  white-space: normal; 
+  word-wrap: break-word; 
+  white-space: pre-line; 
+  word-wrap: break-word; 
+}
+
+
+.company-view-table tbody tr:hover {
+  background-color: #1c8991; /* Light blue background on hover */
+  transition: background-color 0.3s ease-in-out;
+}
+
+.company-view-table th:nth-child(1),
+.company-view-table td:nth-child(1) {
+  width: 16%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.company-view-table th:nth-child(2),
+.company-view-table td:nth-child(2) {
+  width: 20%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.company-view-table th:nth-child(3),
+.company-view-table td:nth-child(3) {
+  width: 20%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.company-view-table th:last-child,
+.company-view-table td:last-child {
+  width: 20%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.company-view-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.company-view-table tbody tr {
+  background-color: rgb(224, 237, 245);
+  cursor: default;
+  transition: background 0.2s ease;
+}
+
+.company-view-table tbody tr:hover {
+  background-color: rgb(208, 224, 233);
+}
+
+/* TAG COLUMN */
+.tag-cell {
+  color: #057a7e !important;
+  vertical-align: top;
+  letter-spacing: 0.4px;
+}
+
+/* DOCUMENT CELL */
+.doc-cell {
+  padding: 4px 0;
+}
+
+/* give space if multiple records exist */
+.doc-cell + .doc-cell {
+  margin-top: 10px;
+}
+
+/* MAIN ID */
+.doc-id {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4b5050;
+  line-height: 1.2;
+  letter-spacing: 0.4px;
+}
+
+/* TAG */
+.doc-tag {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5050;
+
+  /* wrapping */
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  letter-spacing: 0.4px;
+
+  margin-top: 2px;
+}
+
+/* AMOUNT BELOW TAG */
+.doc-price {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1f7a46;
+
+  margin-top: 2px;
+  letter-spacing: 0.4px;
+}
+
+.doc-price::before {
+  content: "₹ ";
+}
+
+/* META INFO (DATE + USER) */
+.doc-meta {
+  letter-spacing: 0.8px;
+  font-size: 11px;
+  color: #464646;
+  margin-top: 8px;   /* small space before meta */
+}
+
+/* DATE → more spacing */
+.meta-date {
+  letter-spacing: 0.8px;
+}
+
+/* USER → less spacing + first letter capital */
+.meta-user {
+  letter-spacing: 0.4px;
+  text-transform: capitalize;
+}
+
+.meta-date::after {
+  content: " | ";
+  margin: 0 6px;
 }
 
 /* clickable indicators */
@@ -17490,31 +18476,9 @@ select option {
   position: absolute;  
   overflow-y: auto; 
   overflow-x: hidden;
+  overflow: hidden;
 }
 
-.floating-info-panel.last-activity-panel {
-  z-index: 9999;
-  max-height: 320px;   
-
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-
-  border-radius: 10px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
-
-  animation: popInFast 0.12s ease-out;
-  transition-delay: 0s !important;
-  position: absolute;  
-  overflow-y: auto; 
-  overflow-x: hidden;
-
-  width: 360px;           
-  max-width: 90vw;  
-  padding-left: 20px;     
-  padding-right: 20px;
-}
 
 .report-section {
   position: relative;   /* ✅ REQUIRED */
@@ -17561,13 +18525,17 @@ select option {
 .info-panel-list li {
   font-size: 13px;
   color: #334155;
-  padding: 6px 0;
+  padding: 6px 10px;
   border-bottom: 1px dashed rgba(15, 23, 42, 0.08);
   font-family:"Shippori Mincho B1", "Times New Roman", serif;
 }
 
 .info-panel-list li:last-child {
   border-bottom: none;
+}
+
+.info-label{
+  padding-right: 10px;
 }
 
 /* HOME button (top center) */
@@ -17821,6 +18789,13 @@ select option {
 
 .second-panel-table-for-activity th:nth-child(3),
 .second-panel-table-for-activity td:nth-child(3) {
+  width:7%;
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.second-panel-table-for-activity th:nth-child(4),
+.second-panel-table-for-activity td:nth-child(4) {
   width:13%;
   white-space: pre-line;
   word-wrap: break-word;
@@ -17846,6 +18821,3 @@ select option {
 .second-panel-table-for-activity tbody tr:hover {
   background-color: rgb(208, 224, 233);
 }
-
-
-/* Top -- Summary Row */

@@ -8,6 +8,7 @@
   import {
   fetchRenewalReport,
   resetRenewalReport,
+  postRenewalComment
 } from "../redux/slices/renewalSlice";
 
   import { fetchUsers } from "../redux/slices/userSlice";
@@ -19,8 +20,11 @@
   import { ToastContainer } from "react-toastify"; 
   import { BiSolidMessageRoundedError } from "react-icons/bi";
   import { IoIosWarning } from "react-icons/io";
-  import { BiSolidCommentCheck } from "react-icons/bi";
-  
+  import { FaEye, FaPlusSquare } from "react-icons/fa";
+  import { MdOutlineCancel } from "react-icons/md";
+  import { HiSave } from "react-icons/hi";
+  import { FaFaceMeh } from "react-icons/fa6";  
+
   const RenewalReport = () => {
     const dispatch = useDispatch();
   
@@ -78,7 +82,113 @@
     user: [],
   });
 
+      const [modalState, setModalState] = useState({
+      showComments: false,
+      addComment: false,
+      selectedRenewalId: null,
+      commentsData: [],
+    });
+
+    const [newComment, setNewComment] = useState("");
+    const commentsRef = useRef(null);
+    const addCommentRef = useRef(null);
+    const { renewalComments = [] } = useSelector((state) => state.renewal);
+
+    const handleShowComments = (renewalId) => {
+
+    const selectedRow = renewalReports.find(
+      (r) => r.renewal_id === renewalId
+    );
+
+    setModalState({
+      showComments: true,
+      addComment: false,
+      selectedRenewalId: renewalId,
+      commentsData: selectedRow?.Comments || [],
+    });
+  };
+
+    const handleAddComment = (renewalId) => {
+    setModalState({
+      showComments: false,
+      addComment: true,
+      selectedRenewalId: renewalId,
+    });
+  };
+
+    const handleCloseCommentsModal = () => {
+    setModalState({
+      showComments: false,
+      addComment: false,
+      selectedRenewalId: null,
+    });
+  };
+
+  const handleCloseAddCommentModal = () => {
+    setModalState({
+      showComments: false,
+      addComment: false,
+      selectedRenewalId: null,
+    });
+  };
+
+  const handleSubmitComment = (e) => {
+  if (e) e.preventDefault();
+
+  console.log("Renewal ID:", modalState.selectedRenewalId);
+  console.log("Comment value:", newComment);
+
+  if (
+    modalState.selectedRenewalId &&
+    newComment &&
+    newComment.trim() !== ""
+  ) {
+
+    dispatch(
+      postRenewalComment({
+        renewal_id: modalState.selectedRenewalId,
+        comment: newComment.trim(),
+      })
+    );
+
+    setNewComment("");
+
+    setModalState({
+      showComments: false,
+      addComment: false,
+      selectedRenewalId: null,
+    });
+
+    toast.success("Comment saved successfully!");
+
+  } else {
+
+    console.log("Validation failed");
+
+    toast.error("Please enter a comment!");
+
+  }
+};
+
+  const handleCommentChange = (e) => {
+    setNewComment(e.target.value);
+  };
   
+  useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (modalState.showComments && commentsRef.current && !commentsRef.current.contains(event.target)) {
+          handleCloseCommentsModal();
+        }
+        if (modalState.addComment && addCommentRef.current && !addCommentRef.current.contains(event.target)) {
+          handleCloseAddCommentModal();
+        }
+      };
+    
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [modalState.showComments, modalState.addComment]);
+    
+
     // Default user selection if not admin
     useEffect(() => {
       dispatch(fetchUsers());
@@ -530,7 +640,7 @@ if (appliedFilters.user && appliedFilters.user.length > 0) {
     return data;
   }, [renewalReports, appliedFilters]);
 
-const perPage = 10; // max rows per page
+const perPage = 3000; // max rows per page
 const frontendTotalPages = Math.ceil(filteredRenewalReports.length / perPage);
 
   const paginatedRenewalReports = useMemo(() => {
@@ -1008,6 +1118,7 @@ const formattedTotalRenewedQty = useMemo(() => {
     <th>Completion %</th>
     <th>Completion Date</th>
     <th>Status</th>
+    <th>Comments</th>
   </tr>
 </thead>
 
@@ -1026,7 +1137,21 @@ const formattedTotalRenewedQty = useMemo(() => {
 <td>{row["Completion %"] ?? "0"}%</td>
 <td>{row["Completion Date"] ?? "-"}</td>
 <td>{row.Status || "-"}</td>
+<td >
+  <span className="icon-container-renewal">
+    <FaEye
+      onClick={() => handleShowComments(row.renewal_id)}
+      title="View Comments"
+      className="action-icon-renewal"
+    />
 
+    <FaPlusSquare
+      onClick={() => handleAddComment(row.renewal_id)}
+      title="Add Comment"
+      className="action-icon-renewal"
+    />
+  </span>
+</td>
 </tr>
 
           ))}
@@ -1063,6 +1188,78 @@ const formattedTotalRenewedQty = useMemo(() => {
     )}
 
   </div>
+
+{/* Show Comments Modal */}
+{modalState.showComments && !modalState.addComment && (
+  <div className="comments-modal-container-renewal" ref={commentsRef}>
+    <div className="comments-modal-renewal">
+      <h4>Customer Comments - Renewal</h4>
+
+      {Array.isArray(modalState.commentsData) && modalState.commentsData.length > 0 ? (
+        <>
+          <p className="displaycomments-renewal">
+            Displaying {renewalComments.length} comments
+          </p>
+
+          <textarea
+            readOnly
+            rows={5}
+            value={modalState.commentsData
+              .map(
+                (comment) =>
+                  `${comment.name}: ${comment.text}\nDate: ${new Date(
+                    comment.date
+                  ).toLocaleString()}`
+              )
+              .join("\n")}
+          />
+        </>
+      ) : (
+        <p className="nocomments-renewal">
+          No comments available... <FaFaceMeh />
+        </p>
+      )}
+
+      <div className="cancel-renewal">
+        <MdOutlineCancel
+          onClick={handleCloseCommentsModal}
+          className="cancelcomment-renewal"
+          title='Cancel'
+        />
+      </div>
+    </div>
+  </div>
+)}
+
+{/* Add Comments Modal */}
+{modalState.addComment && !modalState.showComments && (
+  <div className="comment-edit-modal-container-renewal" ref={addCommentRef}>
+    <div className="comment-edit-modal-renewal">
+      <h4>Add Comment</h4>
+
+      <textarea
+        value={newComment}
+        onChange={handleCommentChange}
+        placeholder="Enter your comment here..."
+        rows="5"
+      />
+
+      <div>
+        <MdOutlineCancel
+          onClick={handleCloseAddCommentModal}
+          className="cancelcomment-renewal"
+          title='Cancel'
+        />
+
+        <HiSave
+          onClick={handleSubmitComment}
+          className="submitcomment-renewal"
+          title="Submit"
+        />
+      </div>
+    </div>
+  </div>
+)}
 
       </div>
     );
