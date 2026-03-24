@@ -23,6 +23,9 @@ import { MdArrowLeft } from "react-icons/md";
 import { MdArrowDropUp, MdArrowDropDown } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward  } from "react-icons/io";
 import { HiHome } from "react-icons/hi";
+import { MdModeComment } from "react-icons/md";
+import { FaUserLarge } from "react-icons/fa6";
+import { MdOutlineAccessTimeFilled } from "react-icons/md";
 
 const ReportSection = () => {
   const dispatch = useDispatch();
@@ -377,8 +380,8 @@ const extractDetailedIds = (activities, mode = "user") => {
       if (text.startsWith("Invoice Number:"))
         invoiceId = text.replace("Invoice Number:", "").trim();
 
-      if (text.startsWith("Invoice Status:"))
-        invoiceTag = text.replace("Invoice Status:", "").trim();
+      if (text.startsWith("Invoice Tag:"))
+        invoiceTag = text.replace("Invoice Tag:", "").trim();
 
       if (text.startsWith("Total Amount:"))
         amount = text.replace("Total Amount:", "").trim();
@@ -424,6 +427,27 @@ const countQuotesAndProformas = (items, mode) => {
     totalProformas: proformas.length,
     totalInvoices: invoices.length
   };
+};
+
+const countComments = (items) => {
+  return items.filter(item =>
+    item.activity_type?.toLowerCase() === "comment"
+  ).length;
+};
+
+const extractComments = (items, mode = "user") => {
+  return items
+    .filter(item =>
+      item.activity_type?.toLowerCase() === "comment"
+    )
+    .map(item => ({
+      message: item.details,
+      timestamp: new Date(item.insertDate).toLocaleString(),
+      meta:
+        mode === "user"
+          ? item.company_name
+          : item.insertBy
+    }));
 };
 
 useEffect(() => {
@@ -482,7 +506,7 @@ const formatDateRange = (start, end) => {
 };
 
 
-const openInfoPanel = (e, title, items) => {
+const openInfoPanel = (e, title, items, contextName = "") => {
   e.stopPropagation();
 
   if (infoPanel.open && infoPanel.title === title) {
@@ -525,7 +549,8 @@ const openInfoPanel = (e, title, items) => {
     x,
     y,
     title,
-    items: normalizedItems
+    items: normalizedItems,
+    contextName
   });
 };
 
@@ -556,6 +581,18 @@ const closeAllPanels = () => {
 useEffect(() => {
   setExpandedGroup(null);
 }, [groupMode]);
+
+const hasNonCommentActivities = (items) => {
+
+  return items.some(item => {
+
+    if (!item.activity_type) return false;
+
+    return item.activity_type.toLowerCase() !== "comment";
+
+  });
+
+};
 
 return (
 <div className='report-section'>
@@ -920,9 +957,15 @@ return (
             <td>{activity.company_name}</td>
             <td>{activity.activity_type}</td>
             <td>
-              {activity.details.split(",").map((item, idx) => (
+             {activity.details
+              .split(",")
+              .filter(item => 
+                !item.trim().startsWith("Invoice Status:")
+              )
+              .map((item, idx) => (
                 <span key={idx}>{item}<br /></span>
-              ))}
+              ))
+            }
             </td>
             <td>{new Date(activity.insertDate).toLocaleString()}</td>
           </tr>
@@ -975,6 +1018,7 @@ return (
       </span>
     </h4>
 
+{hasNonCommentActivities(items) && (
     <span
       className={`toggle-text ${isOpen ? "open" : ""}`}
       onClick={() =>
@@ -992,14 +1036,16 @@ return (
           Show {items.length} activities
         </>
       )}
-    </span>
+    </span>  
+)} 
   </div>
 
   <div className="group-metrics">
   {(() => {
     const { totalQuotes, totalProformas, totalInvoices } =
-      countQuotesAndProformas(items, "user");
+  countQuotesAndProformas(items, "user");
 
+const totalComments = countComments(items);
     return (
       <>
         <div>
@@ -1020,6 +1066,26 @@ return (
         Unique Companies <b>{getUniqueCount(items, "company_name")}</b>
       </div>
 
+      <div
+      title={totalComments === 0 ? "No comments available" : "View comments"}
+          className={`metric-clickable ${
+            totalComments === 0 ? "disabled-metric" : ""
+          }`}
+          onClick={(e) => {
+          const comments =
+            extractComments(items, "user");
+
+          openInfoPanel(
+            e,
+            "Comments",
+            comments,
+            groupName   // ⭐ pass user name
+          );
+        }}
+        >
+          Comments <b>{totalComments}</b>
+       </div>
+        
         {/* ✅ new */}
         <div>
           Quotes <b>{totalQuotes}</b>
@@ -1199,33 +1265,36 @@ return (
       <div key={groupName} className={`group-card ${isOpen ? "active-group glass" : ""}`}>
 
       {/* Header */}
-      <div
-      className="group-header"
-      onClick={() => setExpandedGroup(isOpen ? null : groupName)}
-      >
+      <div className="group-header">
 
-      <h4 className="group-title">
-      {groupName}
-      <span className="group-date-range">
-      {formatDateRange(startDate,endDate)}
-      </span>
-      </h4>
+  <h4 className="group-title">
+    {groupName}
+    <span className="group-date-range">
+      {formatDateRange(startDate, endDate)}
+    </span>
+  </h4>
 
-      <span className={`toggle-text ${isOpen ? "open" : ""}`}>
-      {isOpen ? (
+{hasNonCommentActivities(items) && (
+  <span
+    className={`toggle-text ${isOpen ? "open" : ""}`}
+    onClick={() =>
+      setExpandedGroup(isOpen ? null : groupName)
+    }
+  >
+    {isOpen ? (
       <>
-      <MdArrowDropUp className="toggle-icon"/>
-      Hide activities
+        <MdArrowDropUp className="toggle-icon" />
+        Hide activities
       </>
-      ) : (
+    ) : (
       <>
-      <MdArrowDropDown className="toggle-icon"/>
-      Show {items.length} activities
+        <MdArrowDropDown className="toggle-icon" />
+        Show {items.length} activities
       </>
-      )}
-      </span>
-
-      </div>
+    )}
+  </span>
+)}
+</div>
 
 
       {/* Metrics SAME AS DATE MODE */}
@@ -1235,7 +1304,7 @@ return (
 
       const { totalQuotes,totalProformas, totalInvoices } =
       countQuotesAndProformas(items,"company");
-
+      const totalComments = countComments(items);
       return (
 
       <>
@@ -1254,6 +1323,29 @@ return (
       }
       >
       Unique Users <b>{getUniqueCount(items,"insertBy")}</b>
+      </div>
+     
+     <div
+     title={totalComments === 0 ? "No comments available" : "View comments"}
+        className={`metric-clickable ${
+          totalComments === 0 ? "disabled-metric" : ""
+        }`}
+        onClick={(e) => {
+
+          const comments =
+            extractComments(items,"company");
+
+          openInfoPanel(
+            e,
+            "Comments",
+            comments,
+            groupName   // ⭐ pass company name
+
+          );
+
+        }}
+      >
+        Comments <b>{totalComments}</b>
       </div>
 
       <div>
@@ -1347,15 +1439,15 @@ return (
       if(text.startsWith("Invoice Number:"))
       invoice=text.replace("Invoice Number:","").trim();
 
-      if(text.startsWith("Invoice Status:"))
-      tag=text.replace("Invoice Status:","").trim();
+      if(text.startsWith("Invoice Tag:"))
+      tag=text.replace("Invoice Tag:","").trim();
 
       if(text.startsWith("Total Amount:"))
       amount=text.replace("Total Amount:","").trim();
 
       });
 
-      const safeTag = tag || "NO TAG";
+      const safeTag = tag ? tag : "-";
 
       if(!tagMap[safeTag])
       tagMap[safeTag] = { quotes:[], proformas:[], invoices:[] };
@@ -1478,39 +1570,43 @@ return (
       const isOpen = expandedGroup === groupName; 
       return (
         <div key={groupName}  className={`group-card ${isOpen ? "active-group glass" : ""}`}>
-          <div
-            className="group-header"
-            onClick={() =>
-              setExpandedGroup(isOpen ? null : groupName)
-            }
-          >
-            <h4 className="group-title">
-      {groupName}
-      <span className="group-date-range">
-        {formatDateRange(startDate, endDate)}
-      </span>
-    </h4>
+ <div className="group-header">
 
-           <span className={`toggle-text ${isOpen ? "open" : ""}`}>
-        {isOpen ? (
-          <>
-            <MdArrowDropUp className="toggle-icon" />
-            Hide activities
-          </>
-        ) : (
-          <>
-            <MdArrowDropDown className="toggle-icon" />
-            Show {items.length} activities
-          </>
-        )}
-      </span>
+  <h4 className="group-title">
+    {groupName}
+    <span className="group-date-range">
+      {formatDateRange(startDate, endDate)}
+    </span>
+  </h4>
 
-          </div>
+{hasNonCommentActivities(items) && (
+  <span
+    className={`toggle-text ${isOpen ? "open" : ""}`}
+    onClick={() =>
+      setExpandedGroup(isOpen ? null : groupName)
+    }
+  >
+    {isOpen ? (
+      <>
+        <MdArrowDropUp className="toggle-icon" />
+        Hide activities
+      </>
+    ) : (
+      <>
+        <MdArrowDropDown className="toggle-icon" />
+        Show {items.length} activities
+      </>
+    )}
+  </span>
+)}
+</div>
 
           <div className="group-metrics">
   {(() => {
-    const { totalQuotes, totalProformas, totalInvoices } =
-      countQuotesAndProformas(items, "company");
+    const { totalQuotes,totalProformas, totalInvoices } =
+  countQuotesAndProformas(items,"company");
+
+const totalComments = countComments(items);
 
     return (
       <>
@@ -1529,6 +1625,29 @@ return (
         }
       >
         Unique Users <b>{getUniqueCount(items, "insertBy")}</b>
+      </div>
+
+      <div
+      title={totalComments === 0 ? "No comments available" : "View comments"}
+        className={`metric-clickable ${
+          totalComments === 0 ? "disabled-metric" : ""
+        }`}
+      onClick={(e) => {
+
+        const comments =
+          extractComments(items,"company");
+
+        openInfoPanel(
+          e,
+          "Comments",
+          comments,
+          groupName   // ⭐ pass company name
+
+        );
+
+      }}
+      >
+        Comments <b>{totalComments}</b>
       </div>
           
         <div>
@@ -1693,16 +1812,27 @@ return (
 
 {infoPanel.open && (
   <div
-   className={`floating-info-panel ${
-      infoPanel.title === "Last Activity" ? "" : "wide-panel"
-    }`}
-    style={{
-      top: infoPanel.y,
-      left: infoPanel.x,
-      width: infoPanel.title === "Activity Types" ? "280px" :
-             infoPanel.title === "Last Activity" ? "420px" :
-             "300px"
-    }}
+   className={`floating-info-panel 
+    ${infoPanel.title === "Last Activity" ? "" : "wide-panel"} 
+    ${infoPanel.title === "Comments" ? "comments-wide-panel" : ""}
+  `}
+  style={{
+    top: infoPanel.y,
+    left: infoPanel.x,
+
+    width:
+      infoPanel.title === "Activity Types"
+        ? "280px"
+        : infoPanel.title === "Last Activity"
+        ? "420px"
+        : infoPanel.title === "Comments"
+        ? "620px"   
+        : "300px",
+    maxHeight:
+    infoPanel.title === "Comments"
+      ? "65vh"
+      : "420px"
+  }}
   onClick={(e) => e.stopPropagation()}
 >
     <div className="info-panel-header">
@@ -1710,6 +1840,61 @@ return (
     </div>
 
 {infoPanel.title !== "Activity Records" && (
+
+  infoPanel.title === "Comments" ? (
+
+  <>
+    <div className="comments-context-name">
+
+      <span className="comments-context-label">
+        {groupMode === "company"
+          ? "Company : "
+          : "User : "}
+      </span>
+
+      <span className="comments-context-value">
+        &nbsp; {infoPanel.contextName}
+      </span>
+
+    </div>
+
+    <div className="comment-card-container">
+      {infoPanel.items.map((c, i) => (
+
+        <div
+          key={i}
+          className="comment-card-modern"
+        >
+
+          <div className="comment-header">
+
+            <span className="comment-meta">
+              <FaUserLarge className="comment-icon" />
+              <span>{c.meta}</span>
+            </span>
+
+            <span className="comment-time">
+              <MdOutlineAccessTimeFilled
+                className="comment-icon"
+                style={{ fontSize: "14px" }}
+              />
+              <span>{c.timestamp}</span>
+            </span>
+
+          </div>
+
+          <div className="comment-message">
+            <MdModeComment className="comment-icon" />
+            <span>{c.message}</span>
+          </div>
+
+        </div>
+
+      ))}
+    </div>
+  </>
+
+) : (
     <ul className="info-panel-list">
     {infoPanel.items.map((item, idx) => (
      <li
@@ -1744,6 +1929,16 @@ return (
         );
 
         const detailedRows = matchingRecords.map(a => {
+        
+           if (selectedType.toLowerCase() === "comment") {
+            return {
+              company: a.company_name,
+              user: a.insertBy,
+              message: a.details,
+              timestamp: new Date(a.insertDate).toLocaleString(),
+              isComment: true   // flag
+            };
+          }
 
         let id = "-";
         let tag = "-";
@@ -1773,8 +1968,8 @@ return (
             if (text.startsWith("Invoice Number:"))
               id = text.replace("Invoice Number:", "").trim();
 
-            if (text.startsWith("Invoice Status:"))
-              tag = text.replace("Invoice Status:", "").trim();
+            if (text.startsWith("Invoice Tag:"))
+              tag = text.replace("Invoice Tag:", "").trim();
 
             /* AMOUNT */
             if (text.startsWith("Total Amount:"))
@@ -1783,12 +1978,13 @@ return (
         }
 
         return {
-          id,
-          tag,
-          amount,
-          company: a.company_name,
-          user: a.insertBy
-        };
+                id,
+                tag,
+                amount,
+                company: a.company_name,
+                user: a.insertBy,
+                isComment: false
+              };
       });
 
         setSecondPanel({
@@ -1824,6 +2020,7 @@ return (
     </li>
     ))}
   </ul>
+  )
 )}
 
     {/* ⬅ / ➡ Navigation ONLY for Last Activity */}
@@ -1930,28 +2127,61 @@ return (
     </div>
 
     <div className="activity-records-table">
-      <table className="second-panel-table-for-activity">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Tag</th>
-            <th>Amount</th>
-            <th>Company</th>
-            <th>User</th>
-          </tr>
-        </thead>
-        <tbody>
-          {secondPanel.items.map((row, i) => (
-            <tr key={i}>
-              <td>{row.id}</td>
-              <td>{row.tag}</td>
-              <td>₹ {row.amount}</td>
-              <td>{row.company}</td>
-              <td>{row.user}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+              {secondPanel.items.length > 0 &&
+              secondPanel.items[0].isComment ? (
+
+                /* ⭐ COMMENT TABLE */
+                 <table className="comment-activity-table">
+                  <thead>
+                    <tr>
+                      <th>Company</th>
+                      <th>User</th>
+                      <th>Message</th>
+                      <th>Timestamp</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {secondPanel.items.map((row, i) => (
+                      <tr key={i}>
+                        <td>{row.company}</td>
+                        <td>{row.user}</td>
+                        <td>{row.message}</td>
+                        <td>{row.timestamp}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+              ) : (
+
+                /* ⭐ DEFAULT TABLE */
+                <table className="second-panel-table-for-activity">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Tag</th>
+                      <th>Amount</th>
+                      <th>Company</th>
+                      <th>User</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {secondPanel.items.map((row, i) => (
+                      <tr key={i}>
+                        <td>{row.id}</td>
+                        <td>{row.tag}</td>
+                        <td>₹ {row.amount}</td>
+                        <td>{row.company}</td>
+                        <td>{row.user}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+              )}
     </div>
   </div>
 )}

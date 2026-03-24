@@ -50,11 +50,12 @@
     const [searchResults, setSearchResults] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
     const [selectedSearchValue, setSelectedSearchValue] = useState("");
-
+    const [activeRowId, setActiveRowId] = useState(null);
+    const tableRef = useRef(null);
+    
     // Pagination & report
     const [page, setPage] = useState(1);
     const [reportGenerated, setReportGenerated] = useState(false);
-
     // Redux slices
   const {
   renewalReports = [],
@@ -95,28 +96,34 @@
     const { renewalComments = [] } = useSelector((state) => state.renewal);
 
     const handleShowComments = (renewalId) => {
+      const selectedRow = renewalReports.find(
+        (r) =>
+          `${r["Proforma #"]}_${r["Order #"]}` === renewalId
+      );
 
-    const selectedRow = renewalReports.find(
-      (r) => r.renewal_id === renewalId
-    );
+      setActiveRowId(renewalId); // ⭐ highlight row
 
-    setModalState({
-      showComments: true,
-      addComment: false,
-      selectedRenewalId: renewalId,
-      commentsData: selectedRow?.Comments || [],
-    });
-  };
+      setModalState({
+        showComments: true,
+        addComment: false,
+        selectedRenewalId: renewalId,
+        commentsData: selectedRow?.Comments || [],
+      });
+    };
 
     const handleAddComment = (renewalId) => {
-    setModalState({
-      showComments: false,
-      addComment: true,
-      selectedRenewalId: renewalId,
-    });
-  };
+      setActiveRowId(renewalId); // ⭐ highlight row
+
+      setModalState({
+        showComments: false,
+        addComment: true,
+        selectedRenewalId: renewalId,
+      });
+    };
 
     const handleCloseCommentsModal = () => {
+    setActiveRowId(null); // ⭐ remove highlight
+
     setModalState({
       showComments: false,
       addComment: false,
@@ -125,6 +132,8 @@
   };
 
   const handleCloseAddCommentModal = () => {
+    setActiveRowId(null); // ⭐ remove highlight
+
     setModalState({
       showComments: false,
       addComment: false,
@@ -144,7 +153,7 @@
     newComment.trim() !== ""
   ) {
 
-    dispatch(
+    dispatch( 
       postRenewalComment({
         renewal_id: modalState.selectedRenewalId,
         comment: newComment.trim(),
@@ -792,6 +801,46 @@ const formattedTotalRenewedQty = useMemo(() => {
   return totalRenewedQty.toLocaleString("en-IN");
 }, [totalRenewedQty]);
 
+// Build renewal_id from Proforma # and Order #
+const getRenewalId = (row) => {
+
+  const proforma = row["Proforma #"] || "";
+  const order = row["Order #"] || "";
+
+  const renewalId = `${proforma}_${order}`;
+
+  console.log("Generated renewal_id:", renewalId); // debug
+
+  return renewalId;
+};
+
+useEffect(() => {
+
+  const handleClickOutside = (event) => {
+
+    if (
+      tableRef.current &&
+      !tableRef.current.contains(event.target)
+    ) {
+      setActiveRowId(null);
+    }
+
+  };
+
+  document.addEventListener(
+    "mousedown",
+    handleClickOutside
+  );
+
+  return () => {
+    document.removeEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+  };
+
+}, []);
+
     return (
       <div className="RenewalReport-section">
         <h3>Renewals Report</h3>
@@ -1103,7 +1152,7 @@ const formattedTotalRenewedQty = useMemo(() => {
   </div>
 )}
 
-      <div className="RenewalReport-table">
+      <div className="RenewalReport-table" ref={tableRef}>
     {paginatedRenewalReports.length > 0 ? (
       <table>
         <thead>
@@ -1125,7 +1174,17 @@ const formattedTotalRenewedQty = useMemo(() => {
 
         <tbody>
           {paginatedRenewalReports.map((row, idx) => (
-            <tr key={idx}>
+<tr
+  key={idx}
+  className={
+    activeRowId === getRenewalId(row)
+      ? "active-renewal-row"
+      : ""
+  }
+  onClick={() =>
+    setActiveRowId(getRenewalId(row))
+  }
+>
 
 <td>{row.Customer || "-"}</td>
 <td>{row.Product || "-"}</td>
@@ -1140,15 +1199,21 @@ const formattedTotalRenewedQty = useMemo(() => {
 <td >
   <span className="icon-container-renewal">
     <FaEye
-      onClick={() => handleShowComments(row.renewal_id)}
-      title="View Comments"
       className="action-icon-renewal"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleShowComments(getRenewalId(row));
+      }}
+      title="View Comments"
     />
 
     <FaPlusSquare
-      onClick={() => handleAddComment(row.renewal_id)}
-      title="Add Comment"
       className="action-icon-renewal"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleAddComment(getRenewalId(row));
+      }}
+      title="Add Comment"
     />
   </span>
 </td>
@@ -1198,21 +1263,38 @@ const formattedTotalRenewedQty = useMemo(() => {
       {Array.isArray(modalState.commentsData) && modalState.commentsData.length > 0 ? (
         <>
           <p className="displaycomments-renewal">
-            Displaying {renewalComments.length} comments
+            Displaying {modalState.commentsData.length} comments
           </p>
 
-          <textarea
-            readOnly
-            rows={5}
-            value={modalState.commentsData
-              .map(
-                (comment) =>
-                  `${comment.name}: ${comment.text}\nDate: ${new Date(
-                    comment.date
-                  ).toLocaleString()}`
-              )
-              .join("\n")}
-          />
+      <div className="comments-list-renewal">
+
+          {modalState.commentsData.map((c, i) => (
+
+            <div key={i} className="comment-card-renewal">
+
+              <div className="comment-header-renewal">
+
+                <span className="comment-user-renewal">
+                  {c.insertBy || "Unknown"}
+                </span>
+
+                <span className="comment-date-renewal">
+                  {c.insertDate
+                    ? new Date(c.insertDate).toLocaleString()
+                    : "-"}
+                </span>
+
+              </div>
+
+              <div className="comment-body-renewal">
+                {c.comment}
+              </div>
+
+            </div>
+
+          ))}
+
+     </div>
         </>
       ) : (
         <p className="nocomments-renewal">
