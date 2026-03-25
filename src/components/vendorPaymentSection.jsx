@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaCheckCircle } from "react-icons/fa";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { MdOutlineCancel } from "react-icons/md"; 
-import { FaFileDownload, FaFilePdf } from 'react-icons/fa'; 
-import { CiFileOff } from "react-icons/ci"; 
+import { IoIosWarning } from "react-icons/io";
+import { LuFileCheck2 } from "react-icons/lu";
 import { BiSolidMessageRoundedError } from "react-icons/bi";
 import { BiSolidCommentCheck } from "react-icons/bi";
 import {
@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { Row, Col, Form } from "react-bootstrap";
 import Select from "react-select";
+import { useMemo } from "react";
 
 const VendorPaymentSection = () => {
   const dispatch = useDispatch();
@@ -22,6 +23,12 @@ const VendorPaymentSection = () => {
   const vendorToastRef = useRef(false);
   const [isShaking, setIsShaking] = useState(false);
   const [amountError, setAmountError] = useState("");
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [reportGenerated, setReportGenerated] = useState(false);
 
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
@@ -41,42 +48,46 @@ const VendorPaymentSection = () => {
   totalPages,
 } = useSelector((state) => state.vendorPayment || {});
 
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  useEffect(() => {
-    dispatch(fetchVendorPurchaseOrders({
-      page: currentPage,
-      rows_per_page: rowsPerPage,
-    }));
-  }, [dispatch, currentPage, rowsPerPage]);
+  const [rowsPerPage, setRowsPerPage] = useState(1000);
 
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
 
-    dispatch(fetchVendorPurchaseOrders({
-      page,
-      rows_per_page: rowsPerPage,
-    }));
+   dispatch(fetchVendorPurchaseOrders({
+    page: page,
+    rows_per_page: rowsPerPage,
+    startDate,
+    endDate,
+    vendors: selectedVendor
+  }));
   };
   
-  const reportVendorOptions = [
-  ...new Set(
-    (recentOrders || [])
-      .map(order => order.vendor)
-      .filter(Boolean)
-  )
-].map(vendor => ({
-  label: vendor,
-  value: vendor,
-}));
+const reportVendorOptions = useMemo(() => {
+  const map = new Map();
+
+  recentOrders.forEach((order) => {
+    const name = order.vendor_name;
+    if (name) {
+      map.set(name, { value: name, label: name });
+    }
+  });
+
+  return Array.from(map.values());
+}, [recentOrders]);
 
 useEffect(() => {
-  dispatch(fetchVendorPurchaseOrders({
-    page: currentPage,
-    rows_per_page: rowsPerPage,
-    vendors: selectedVendor,   // ✅ FILTER ADDED
-  }));
-}, [dispatch, currentPage, rowsPerPage, selectedVendor]);
+  if (!reportGenerated) return;
+
+  dispatch(
+    fetchVendorPurchaseOrders({
+      page: currentPage,
+      rows_per_page: rowsPerPage,
+      startDate,
+      endDate,
+      vendors: selectedVendor,
+    })
+  );
+}, [dispatch, currentPage, rowsPerPage, reportGenerated]);
 
 const toggleOrderSelection = (order) => {
   setSelectedOrders((prev) => {
@@ -93,7 +104,7 @@ const toggleOrderSelection = (order) => {
     }
 
     // ❌ If different vendor → show toast ONLY for new selections
-    if (prev[0].vendor !== order.vendor) {
+    if (prev[0].vendor_name !== order.vendor_name) {
       toast.error(
         "Purchase orders from different Vendors cannot be paid together... Please select orders from the same Vendor.",
         { toastId: "vendor-mismatch" } // prevents duplicate toasts
@@ -142,20 +153,38 @@ useEffect(() => {
   );
 }, []);
 
+useEffect(() => {
+  return () => {
+    dispatch({ type: "vendorPayment/resetVendorPayments" });
+  };
+}, [dispatch]);
+
+ const filteredOrders = useMemo(() => {
+  if (!selectedVendor || selectedVendor.length === 0) {
+    return recentOrders;
+  }
+
+  return recentOrders.filter(order =>
+    selectedVendor.some(v =>
+      order.vendor_name?.toLowerCase().includes(v.toLowerCase())
+    )
+  );
+}, [recentOrders, selectedVendor]);
+
 return (
     <div className="vxpayment-container">
       <ToastContainer style={{ zIndex: 99999 }}/>
 
       <h3>Vendor Payments</h3>
 
-{loading && (
+{/* {loading && (
   <div className="loading-container-vxpay">
     <div className="loading-spinner-vxpay"></div>
     <p className="loading-message-vxpay">
       Loading Vendor Purchase Orders for Payment...
     </p>
   </div>
-)}
+)} */}
 
 {!loading && error && recentOrders.length  === 0 && (
   <div className="vxpay-error-box">
@@ -172,13 +201,206 @@ return (
   </div>
 )}
 
+{loading ? (
+  <div className="loading-container-vxpay">
+    <div className="loading-spinner-vxpay"></div>
+    <p className="loading-message-vxpay">
+      Loading Vendor Purchase Orders for Payment...
+    </p>
+  </div>
+) : (
+  <>
+<Row  className="g-4 mt-3 date-row-vxpay justify-content-center">
+
+  {/* Start Date */}
+  <Col md={3}  className="date-col">
+    <Form.Group className="form-group">
+      <Form.Label className="required-label">Start Date</Form.Label>
+      <Form.Control
+        required
+        className="dates-vxpay"
+        type="date"
+        value={startDate}
+        max={today}
+        onChange={(e) => {
+          const selected = e.target.value;
+
+          if (selected > today) {
+            toast.warn("You cannot select a future Date!!", {
+                                                                position: "top-right",
+                                                                toastClassName: "toast-warn-zfix",
+                                                                autoClose: 4000,
+                                                                hideProgressBar: false,
+                                                                closeOnClick: true,
+                                                                pauseOnHover: true,
+                                                                draggable: true,
+                                                                progress: undefined,
+                                                                theme: "colored", // "light", "dark", or "colored"
+                                                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                                  fontSize: "14px",       // ✅ Change font size
+                                                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                                  fontWeight: "bold",    // ✅ Make text bold
+                                                                 },
+                                                                 icon: <IoIosWarning  
+                                                                 style={{ fontSize: '25px', color: 'white' }} />
+                                                            });
+            return;
+          }
+
+          setStartDate(selected);
+          setEndDate("");
+          setReportGenerated(false);
+        }}
+      />
+    </Form.Group>
+  </Col>
+
+  {/* End Date */}
+  <Col md={3}  className="date-col">
+    <Form.Group className="form-group">
+      <Form.Label className="required-label">End Date</Form.Label>
+      <Form.Control
+      required
+      className="dates-vxpay"
+        type="date"
+        value={endDate}
+        max={today}
+        min={startDate || ""}
+        onChange={(e) => {
+          if (!startDate) {
+            toast.warn("Please select Start Date first!", {
+                                                                position: "top-right",
+                                                                toastClassName: "toast-warn-zfix",
+                                                                autoClose: 4000,
+                                                                hideProgressBar: false,
+                                                                closeOnClick: true,
+                                                                pauseOnHover: true,
+                                                                draggable: true,
+                                                                progress: undefined,
+                                                                theme: "colored", // "light", "dark", or "colored"
+                                                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                                  fontSize: "14px",       // ✅ Change font size
+                                                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                                  fontWeight: "bold",    // ✅ Make text bold
+                                                                 },
+                                                                 icon: <IoIosWarning  
+                                                                 style={{ fontSize: '25px', color: 'white' }} />
+                                                            });
+            return;
+          }
+
+          const selected = e.target.value;
+
+          if (selected > today) {
+            toast.warn("You cannot select a future Date!!", {
+                                                                position: "top-right",
+                                                                toastClassName: "toast-warn-zfix",
+                                                                autoClose: 4000,
+                                                                hideProgressBar: false,
+                                                                closeOnClick: true,
+                                                                pauseOnHover: true,
+                                                                draggable: true,
+                                                                progress: undefined,
+                                                                theme: "colored", // "light", "dark", or "colored"
+                                                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                                  fontSize: "14px",       // ✅ Change font size
+                                                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                                  fontWeight: "bold",    // ✅ Make text bold
+                                                                 },
+                                                                 icon: <IoIosWarning  
+                                                                 style={{ fontSize: '25px', color: 'white' }} />
+                                                            });
+            return;
+          }
+
+          if (selected < startDate) {
+            toast.warn("End Date cannot be before Start Date!", {
+                                                                position: "top-right",
+                                                                toastClassName: "toast-warn-zfix",
+                                                                autoClose: 4000,
+                                                                hideProgressBar: false,
+                                                                closeOnClick: true,
+                                                                pauseOnHover: true,
+                                                                draggable: true,
+                                                                progress: undefined,
+                                                                theme: "colored", // "light", "dark", or "colored"
+                                                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                                  fontSize: "14px",       // ✅ Change font size
+                                                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                                  fontWeight: "bold",    // ✅ Make text bold
+                                                                 },
+                                                                 icon: <IoIosWarning  
+                                                                 style={{ fontSize: '25px', color: 'white' }} />
+                                                            });
+            return;
+          }
+
+          setEndDate(selected);
+          setReportGenerated(false);
+        }}
+      />
+    </Form.Group>
+  </Col>
+
+   <Col md="auto" className="date-btn-col">
+        <Form.Group className="form-group">
+            <Form.Label className="invisible">&nbsp;</Form.Label>
+    <button
+     type="submit" 
+     className="report-button-vxpay" 
+     title="Generate Payment Report"
+     onClick={() => {
+        if (!startDate || !endDate) {
+          toast.warn("Please select Start Date and End Date", {
+                                                              position: "top-right",
+                                                              toastClassName: "toast-warn-zfix",
+                                                              autoClose: 4000,
+                                                              hideProgressBar: false,
+                                                              closeOnClick: true,
+                                                              pauseOnHover: true,
+                                                              draggable: true,
+                                                              progress: undefined,
+                                                              theme: "colored", // "light", "dark", or "colored"
+                                                               style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                                fontSize: "14px",       // ✅ Change font size
+                                                                fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                                fontWeight: "bold",    // ✅ Make text bold
+                                                               },
+                                                               icon: <IoIosWarning  
+                                                               style={{ fontSize: '25px', color: 'white' }} />
+                                                          });
+          return;
+        }
+
+        setReportGenerated(true);
+
+        dispatch(
+          fetchVendorPurchaseOrders({
+            page: 1,
+            rows_per_page: rowsPerPage,
+            startDate,
+            endDate,
+            vendors: selectedVendor,
+          })
+        );
+      }}
+    >
+      <LuFileCheck2 className="filecheck" />
+    </button>
+
+  </Form.Group>
+ </Col>
+
+</Row>
 
 {/* Home button + Vendor filter */}
 {!loading && !error && (
   <>
+  {reportGenerated && (
 <Row className="g-4 mt-3 align-items-end">
-  {/* Vendor filter */}
-  <Col md={3}>
+
+  
+<Col md={3}>
     <Form.Group className="form-group">
       <Select
         className="VXPayment-select"
@@ -191,19 +413,42 @@ return (
         options={reportVendorOptions}
         isMulti
         value={selectedVendor.map(v => ({ value: v, label: v }))}
-        onChange={(selectedOptions) => {
-          setSelectedVendor(
-            selectedOptions
-              ? selectedOptions.map(opt => opt.value)
-              : []
-          );
+       onChange={(selectedOptions) => {
+
+          if (!startDate || !endDate) {
+            toast.warn("Please select Start Date and End Date before applying Vendor filter.", {
+                                                                position: "top-right",
+                                                                toastClassName: "toast-warn-zfix",
+                                                                autoClose: 4000,
+                                                                hideProgressBar: false,
+                                                                closeOnClick: true,
+                                                                pauseOnHover: true,
+                                                                draggable: true,
+                                                                progress: undefined,
+                                                                theme: "colored", // "light", "dark", or "colored"
+                                                                 style: { background: "rgba(187, 184, 9, 1)", color: "white", 
+                                                                  fontSize: "14px",       // ✅ Change font size
+                                                                  fontFamily: '"Shippori Mincho B1", "Times New Roman", serif', // ✅ Custom Font
+                                                                  fontWeight: "bold",    // ✅ Make text bold
+                                                                 },
+                                                                 icon: <IoIosWarning  
+                                                                 style={{ fontSize: '25px', color: 'white' }} />
+                                                            });
+            return;
+          }
+
+          const vendors =
+            selectedOptions ? selectedOptions.map(opt => opt.value) : [];
+
+          setSelectedVendor(vendors);
         }}
+        
         isClearable
         placeholder="Select Vendor(s)"
       />
     </Form.Group>
   </Col>
-
+  
   {/* Home button on RIGHT */}
   {recentOrders && recentOrders.length > 0 && currentPage > 1 && (
     <Col md="auto" className="ms-auto">
@@ -213,8 +458,8 @@ return (
     </Col>
   )}
 </Row>
-
-
+  )}
+  
       {recentOrders && recentOrders.length > 0 ? (
         <table className="vxpayment-table">
           <thead>
@@ -226,11 +471,11 @@ return (
               <th>Vendor Name</th>
               <th>Total Amount</th>
               <th>Status</th>
-              <th>Download PDF</th>
+              <th>Purchase Date</th>
             </tr>
           </thead>
           <tbody>
-            {recentOrders.map((order) => {
+            {filteredOrders.map((order) => {
               const isCancelled =
                             order.status === "Cancelled" ||
                             order.status === "Disabled";
@@ -265,57 +510,22 @@ return (
                   <td>{order.po_number}</td>
                   <td>{order.customer_name}</td>
                   <td>{order.product_name}</td>
-                  <td>{order.vendor}</td>
-                  <td>₹&nbsp;{order.total_amount.toFixed(2)}</td>
+                  <td>{order.vendor_name}</td>
+                  <td>₹ {Number(order.total_amount || 0).toFixed(2)}</td>
                   <td>{order.status}</td>
-
-<td>
-  {isCancelled ? (
-    <FaFileDownload
-      className="rowdown is-disabled"
-      title="Download disabled — purchase order is cancelled or disabled"
-      onClick={() =>
-        toast.info(
-          `For PO ${order.po_number}, download is disabled because this purchase order is cancelled or disabled.`
-        )
-      }
-    />
-  ) : order.pdf_link ? (
-    <a
-      href={`${order.base_url}${order.pdf_link}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={() =>
-        toast.info(`Downloading PDF for PO ${order.po_number}`)
-      }
-    >
-      <FaFileDownload
-        className="rowdown"
-        title="Download PDF"
-      />
-    </a>
-  ) : (
-    <CiFileOff
-      className="nopdf"
-      title="No PDF Available"
-      onClick={() =>
-        toast.info(
-          `No PDF available for PO ${order.po_number}.`
-        )
-      }
-    />
-  )}
-</td>
+                  <td>{order.purchase_date}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       ) : (
-        <p className="no-vxpayment">
-          No Recent Purchase Orders Found For Vendor Payment.
-        </p>
-      )}
+  reportGenerated && (
+    <p className="no-vxpayment">
+      No Purchase Orders Found For Selected Date Range.
+    </p>
+  )
+)}
 
       {recentOrders && recentOrders.length > 0 && (
         <div className="pagination-controls-vxpay">
@@ -339,6 +549,7 @@ return (
         </div>
       )}
 
+{reportGenerated && (
 <div className="vx-proceed-wrapper">
   <button
     className={`vx-proceed-btn ${
@@ -356,6 +567,7 @@ return (
     Proceed
   </button>
 </div>
+)}
 
 {showPaymentPopup && (
   <>
@@ -405,9 +617,9 @@ return (
         <tbody>
           {selectedOrders.map(order => (
             <tr key={order._id}>
-              <td>{order.vendor}</td>
+              <td>{order.vendor_name}</td>
               <td>{order.product_name}</td>
-              <td>₹ {order.total_amount}</td>
+              <td>₹&nbsp;{Number(order.total_amount || 0).toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
@@ -592,10 +804,12 @@ return (
 
       // reload table
       dispatch(fetchVendorPurchaseOrders({
-        page: currentPage,
-        rows_per_page: rowsPerPage,
-        vendors: selectedVendor
-      }));
+      page: currentPage,
+      rows_per_page: rowsPerPage,
+      startDate,
+      endDate,
+      vendors: selectedVendor
+    }));
 
     })
     .catch((err) => {
@@ -631,6 +845,9 @@ return (
   </>
 
 )} 
+
+  </>
+)}
     </div>
 
   );

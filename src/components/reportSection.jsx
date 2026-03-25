@@ -23,6 +23,9 @@ import { MdArrowLeft } from "react-icons/md";
 import { MdArrowDropUp, MdArrowDropDown } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward  } from "react-icons/io";
 import { HiHome } from "react-icons/hi";
+import { MdModeComment } from "react-icons/md";
+import { FaUserLarge } from "react-icons/fa6";
+import { MdOutlineAccessTimeFilled } from "react-icons/md";
 
 const ReportSection = () => {
   const dispatch = useDispatch();
@@ -49,6 +52,8 @@ const [secondPanel, setSecondPanel] = useState({
   title: "",
   items: []
 });
+const [companyViewMode, setCompanyViewMode] = useState("company");
+const [showCompanyMenu, setShowCompanyMenu] = useState(false);
 
 const [activeActivityType, setActiveActivityType] = useState(null);
   const today = new Date().toISOString().split("T")[0];
@@ -339,70 +344,110 @@ const getLastActivityGap = (arr) => {
 const extractDetailedIds = (activities, mode = "user") => {
   const quotes = [];
   const proformas = [];
+  const invoices = [];
 
   activities.forEach(activity => {
     if (!activity.details) return;
 
     const parts = activity.details.split(",");
 
-    let currentQuote = null;
-    let currentProforma = null;
+    let quoteId = null;
+    let quoteTag = "-";
+
+    let proformaId = null;
+    let proformaTag = "-";
+
+    let invoiceId = null;
+    let invoiceTag = "-";
+
+    let amount = "-";
 
     parts.forEach(raw => {
       const text = raw.trim();
 
-      /* ================= QUOTE ================= */
-      if (text.startsWith("Quote ID:")) {
-        currentQuote = {
-          id: text.replace("Quote ID:", "").trim(),
-          tag: "-",
-          meta: mode === "user"
-            ? activity.company_name
-            : activity.insertBy
-        };
-      }
+      if (text.startsWith("Quote ID:"))
+        quoteId = text.replace("Quote ID:", "").trim();
 
-      if (text.startsWith("Quote Tag:") && currentQuote) {
-        currentQuote.tag = text.replace("Quote Tag:", "").trim();
-        quotes.push(currentQuote);
-        currentQuote = null;
-      }
+      if (text.startsWith("Quote Tag:"))
+        quoteTag = text.replace("Quote Tag:", "").trim();
 
-      /* =============== PROFORMA =============== */
-      if (
-        text.startsWith("Proforma ID:") ||
-        text.startsWith("Proforma Number:")
-      ) {
-        currentProforma = {
-          id: text
-            .replace("Proforma ID:", "")
-            .replace("Proforma Number:", "")
-            .trim(),
-          tag: "-",
-          meta: mode === "user"
-            ? activity.company_name
-            : activity.insertBy
-        };
-      }
+      if (text.startsWith("Proforma ID:") || text.startsWith("Proforma Number:"))
+        proformaId = text.replace(/Proforma (ID|Number):/, "").trim();
 
-      if (text.startsWith("Proforma Tag:") && currentProforma) {
-        currentProforma.tag =
-          text.replace("Proforma Tag:", "").trim();
-        proformas.push(currentProforma);
-        currentProforma = null;
-      }
+      if (text.startsWith("Proforma Tag:"))
+        proformaTag = text.replace("Proforma Tag:", "").trim();
+
+      if (text.startsWith("Invoice Number:"))
+        invoiceId = text.replace("Invoice Number:", "").trim();
+
+      if (text.startsWith("Invoice Tag:"))
+        invoiceTag = text.replace("Invoice Tag:", "").trim();
+
+      if (text.startsWith("Total Amount:"))
+        amount = text.replace("Total Amount:", "").trim();
     });
+
+    if (quoteId) {
+      quotes.push({
+        id: quoteId,
+        tag: quoteTag,
+        amount,
+        meta: mode === "user" ? activity.company_name : activity.insertBy
+      });
+    }
+
+    if (proformaId) {
+      proformas.push({
+        id: proformaId,
+        tag: proformaTag,
+        amount,
+        meta: mode === "user" ? activity.company_name : activity.insertBy
+      });
+    }
+
+    if (invoiceId) {
+      invoices.push({
+        id: invoiceId,
+        tag: invoiceTag,
+        amount,
+        meta: mode === "user" ? activity.company_name : activity.insertBy
+      });
+    }
   });
 
-  return { quotes, proformas };
+  return { quotes, proformas, invoices };
 };
 
 const countQuotesAndProformas = (items, mode) => {
-  const { quotes, proformas } = extractDetailedIds(items, mode);
+  const { quotes, proformas, invoices } =
+    extractDetailedIds(items, mode);
+
   return {
     totalQuotes: quotes.length,
-    totalProformas: proformas.length
+    totalProformas: proformas.length,
+    totalInvoices: invoices.length
   };
+};
+
+const countComments = (items) => {
+  return items.filter(item =>
+    item.activity_type?.toLowerCase() === "comment"
+  ).length;
+};
+
+const extractComments = (items, mode = "user") => {
+  return items
+    .filter(item =>
+      item.activity_type?.toLowerCase() === "comment"
+    )
+    .map(item => ({
+      message: item.details,
+      timestamp: new Date(item.insertDate).toLocaleString(),
+      meta:
+        mode === "user"
+          ? item.company_name
+          : item.insertBy
+    }));
 };
 
 useEffect(() => {
@@ -461,7 +506,7 @@ const formatDateRange = (start, end) => {
 };
 
 
-const openInfoPanel = (e, title, items) => {
+const openInfoPanel = (e, title, items, contextName = "") => {
   e.stopPropagation();
 
   if (infoPanel.open && infoPanel.title === title) {
@@ -504,7 +549,8 @@ const openInfoPanel = (e, title, items) => {
     x,
     y,
     title,
-    items: normalizedItems
+    items: normalizedItems,
+    contextName
   });
 };
 
@@ -526,11 +572,32 @@ useEffect(() => {
   return () => window.removeEventListener("click", close);
 }, [infoPanel.open, secondPanel.open]);
 
+const closeAllPanels = () => {
+  setInfoPanel(prev => ({ ...prev, open: false }));
+  setSecondPanel(prev => ({ ...prev, open: false }));
+  setActiveActivityType(null);
+};
+
+useEffect(() => {
+  setExpandedGroup(null);
+}, [groupMode]);
+
+const hasNonCommentActivities = (items) => {
+
+  return items.some(item => {
+
+    if (!item.activity_type) return false;
+
+    return item.activity_type.toLowerCase() !== "comment";
+
+  });
+
+};
 
 return (
 <div className='report-section'>
  
-<h3>Activity Report</h3>
+<h3>Activity Report</h3> 
 
 <ToastContainer />
 
@@ -721,7 +788,8 @@ return (
           setActiveActivityType(null);
           return;
         }
-
+        
+        closeAllPanels();
         const typeCountMap = {};
 
         filteredActivities.forEach(a => {
@@ -748,12 +816,14 @@ return (
    <span
       className="summary-item clickable"
       onClick={(e) =>
+        {
+        closeAllPanels();
         openInfoPanel(
           e,
           "Companies",
           [...new Set(filteredActivities.map(a => a.company_name).filter(Boolean))]
         )
-      }
+      }}
     >
       <FaBuilding className="summary-icon float" />
       Companies <b>{summaryData.uniqueCompanies}</b>
@@ -762,12 +832,14 @@ return (
     <span
       className="summary-item clickable"
       onClick={(e) =>
+        {
+        closeAllPanels();
         openInfoPanel(
           e,
           "Users",
           [...new Set(filteredActivities.map(a => a.insertBy).filter(Boolean))]
         )
-      }
+      }}
     >
       <FaUserFriends className="summary-icon pulse-delayed" />
       Users <b>{summaryData.uniqueUsers}</b>
@@ -809,15 +881,49 @@ return (
       >
         User
       </button>
-
-      <button
+<div
+  className="company-menu-wrapper"
+  onMouseEnter={() => setShowCompanyMenu(true)}
+  onMouseLeave={() => {
+    if (!companyViewMode) setShowCompanyMenu(false);
+  }}
+>
+       <button
         className={groupMode === "company" ? "active" : ""}
-        onClick={() => setGroupMode("company")}
+        onClick={() => setShowCompanyMenu(true)}
       >
         Company
       </button>
+
+  {showCompanyMenu && (
+    <div className="company-submenu">
+     <div
+      className={`submenu-item ${
+        groupMode === "company" && companyViewMode === "company" ? "active-submenu" : ""
+      }`}
+      onClick={() => {
+        setGroupMode("company");
+        setCompanyViewMode("company");
+      }}
+    >
+      By Company
     </div>
 
+    <div
+      className={`submenu-item ${
+        groupMode === "company" && companyViewMode === "date" ? "active-submenu" : ""
+      }`}
+      onClick={() => {
+        setGroupMode("company");
+        setCompanyViewMode("date");
+      }}
+    >
+      By Date
+    </div>
+    </div>
+  )}
+  </div>
+  </div>
   </div>
 )}
 
@@ -851,9 +957,15 @@ return (
             <td>{activity.company_name}</td>
             <td>{activity.activity_type}</td>
             <td>
-              {activity.details.split(",").map((item, idx) => (
+             {activity.details
+              .split(",")
+              .filter(item => 
+                !item.trim().startsWith("Invoice Status:")
+              )
+              .map((item, idx) => (
                 <span key={idx}>{item}<br /></span>
-              ))}
+              ))
+            }
             </td>
             <td>{new Date(activity.insertDate).toLocaleString()}</td>
           </tr>
@@ -906,6 +1018,7 @@ return (
       </span>
     </h4>
 
+{hasNonCommentActivities(items) && (
     <span
       className={`toggle-text ${isOpen ? "open" : ""}`}
       onClick={() =>
@@ -923,14 +1036,16 @@ return (
           Show {items.length} activities
         </>
       )}
-    </span>
+    </span>  
+)} 
   </div>
 
   <div className="group-metrics">
   {(() => {
-    const { totalQuotes, totalProformas } =
-      countQuotesAndProformas(items, "user");
+    const { totalQuotes, totalProformas, totalInvoices } =
+  countQuotesAndProformas(items, "user");
 
+const totalComments = countComments(items);
     return (
       <>
         <div>
@@ -951,14 +1066,38 @@ return (
         Unique Companies <b>{getUniqueCount(items, "company_name")}</b>
       </div>
 
+      <div
+      title={totalComments === 0 ? "No comments available" : "View comments"}
+          className={`metric-clickable ${
+            totalComments === 0 ? "disabled-metric" : ""
+          }`}
+          onClick={(e) => {
+          const comments =
+            extractComments(items, "user");
+
+          openInfoPanel(
+            e,
+            "Comments",
+            comments,
+            groupName   // ⭐ pass user name
+          );
+        }}
+        >
+          Comments <b>{totalComments}</b>
+       </div>
+        
         {/* ✅ new */}
         <div>
-         Total Quotations <b>{totalQuotes}</b>
+          Quotes <b>{totalQuotes}</b>
         </div>
 
         {/* ✅ new */}
         <div>
-          Total Proformas <b>{totalProformas}</b>
+           Proformas <b>{totalProformas}</b>
+        </div>
+
+        <div>
+           Invoices <b>{totalInvoices}</b>
         </div>
 
         <div
@@ -997,14 +1136,14 @@ return (
           {isOpen && (
             <div className="group-details">
               {Object.entries(groupByDate(items)).map(([date, dayItems]) => {
-  const { quotes, proformas } =
+  const { quotes, proformas, invoices } =
     extractDetailedIds(dayItems, "user");
 
   return (
     <div key={date} className="day-block">
 
 {(() => {
-  const { quotes, proformas } =
+  const { quotes, proformas, invoices } =
     extractDetailedIds(dayItems, "user");
 
   return (
@@ -1012,7 +1151,8 @@ return (
       {date}
       <span className="day-counts">
         Quotes: <b>{quotes.length}</b> {" "}|{" "} 
-        Proformas: <b>{proformas.length}</b>
+        Proformas: <b>{proformas.length}</b> {" "}|{" "} 
+        Invoices: <b>{invoices.length}</b>
       </span>
     </h5>
   );
@@ -1024,6 +1164,7 @@ return (
             <tr>
               <th>Quote ID</th>
               <th>Tag</th>
+              <th>Amount</th>
               <th>Company</th>
             </tr>
           </thead>
@@ -1032,6 +1173,7 @@ return (
               <tr key={i}>
                 <td>{q.id}</td>
                 <td>{q.tag}</td>
+                <td>₹ {q.amount}</td>
                 <td>{q.meta}</td>
               </tr>
             ))}
@@ -1045,6 +1187,7 @@ return (
             <tr>
               <th>Proforma ID</th>
               <th>Tag</th>
+              <th>Amount</th>
               <th>Company</th>
             </tr>
           </thead>
@@ -1053,12 +1196,36 @@ return (
               <tr key={i}>
                 <td>{p.id}</td>
                 <td>{p.tag}</td>
+                <td>₹ {p.amount}</td>
                 <td>{p.meta}</td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
+
+      {invoices.length > 0 && (
+      <table className="mini-table">
+        <thead>
+          <tr>
+            <th>Invoice Number</th>
+            <th>Tag</th>
+            <th>Amount</th>
+            <th>Company</th>
+          </tr>
+        </thead>
+        <tbody>
+          {invoices.map((inv, i) => (
+            <tr key={i}>
+              <td>{inv.id}</td>
+              <td>{inv.tag}</td>
+              <td>₹ {inv.amount}</td>
+              <td>{inv.meta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
     </div>
   );
 })}
@@ -1080,47 +1247,366 @@ return (
 )}
 
 {/* Company Mode */}
-{reportGenerated && !loading && groupMode === "company" && (
+{reportGenerated && !loading && groupMode === "company" && companyViewMode && (
  filteredActivities.length > 0 ? (
- <div className="company-view-wrapper">
+      <div
+        key={`${groupMode}-${companyViewMode}`}
+        className="company-view-wrapper view-transition"
+      >
+      {groupMode === "company" && companyViewMode === "company" && (
+      <div className="grouped-container">
+
+      {Object.entries(groupedByCompany).map(([groupName, items]) => {
+
+      const isOpen = expandedGroup === groupName;
+
+      return (
+
+      <div key={groupName} className={`group-card ${isOpen ? "active-group glass" : ""}`}>
+
+      {/* Header */}
+      <div className="group-header">
+
+  <h4 className="group-title">
+    {groupName}
+    <span className="group-date-range">
+      {formatDateRange(startDate, endDate)}
+    </span>
+  </h4>
+
+{hasNonCommentActivities(items) && (
+  <span
+    className={`toggle-text ${isOpen ? "open" : ""}`}
+    onClick={() =>
+      setExpandedGroup(isOpen ? null : groupName)
+    }
+  >
+    {isOpen ? (
+      <>
+        <MdArrowDropUp className="toggle-icon" />
+        Hide activities
+      </>
+    ) : (
+      <>
+        <MdArrowDropDown className="toggle-icon" />
+        Show {items.length} activities
+      </>
+    )}
+  </span>
+)}
+</div>
+
+
+      {/* Metrics SAME AS DATE MODE */}
+      <div className="group-metrics">
+
+      {(() => {
+
+      const { totalQuotes,totalProformas, totalInvoices } =
+      countQuotesAndProformas(items,"company");
+      const totalComments = countComments(items);
+      return (
+
+      <>
+      <div>
+      Total Activities <b>{items.length}</b>
+      </div>
+
+      <div
+      className="metric-clickable"
+      onClick={(e)=>
+      openInfoPanel(
+      e,
+      "Users",
+      [...new Set(items.map(i=>i.insertBy).filter(Boolean))]
+      )
+      }
+      >
+      Unique Users <b>{getUniqueCount(items,"insertBy")}</b>
+      </div>
+     
+     <div
+     title={totalComments === 0 ? "No comments available" : "View comments"}
+        className={`metric-clickable ${
+          totalComments === 0 ? "disabled-metric" : ""
+        }`}
+        onClick={(e) => {
+
+          const comments =
+            extractComments(items,"company");
+
+          openInfoPanel(
+            e,
+            "Comments",
+            comments,
+            groupName   // ⭐ pass company name
+
+          );
+
+        }}
+      >
+        Comments <b>{totalComments}</b>
+      </div>
+
+      <div>
+      Quotes <b>{totalQuotes}</b>
+      </div>
+
+      <div>
+      Proformas <b>{totalProformas}</b>
+      </div>
+      
+      <div>
+      Invoices <b>{totalInvoices}</b>
+      </div>
+
+      <div
+      className="metric-clickable"
+      onClick={(e)=>{
+
+      const sortedItems =
+      items.slice().sort((a,b)=> new Date(b.insertDate)-new Date(a.insertDate));
+
+      setPanelActivities(sortedItems);
+      setPanelIndex(0);
+
+      openInfoPanel(
+      e,
+      "Last Activity",
+      [
+      {label:"Activity",value:sortedItems[0].activity_type},
+      {label:"User",value:sortedItems[0].insertBy},
+      {label:"Company",value:sortedItems[0].company_name},
+      {label:"Date",value:new Date(sortedItems[0].insertDate).toLocaleString()},
+      {
+      label:"Details",
+      value:sortedItems[0].details.split(",").map(d=>d.trim())
+      }
+      ]
+      );
+
+      }}
+      >
+      Last Activity <b>{getLastActivityGap(items)}</b>
+      </div>
+
+      </>
+
+      );
+
+      })()}
+
+      </div>
+
+
+      {/* EXPANDED SECTION */}
+      {isOpen && (
+
+      <div className="group-details">
+
+      {(() => {
+
+      const tagMap = {};
+
+      items.forEach(item => {
+
+      if(!item.details) return;
+
+      const parts = item.details.split(",");
+
+      let quote=null;
+      let proforma=null;
+      let invoice=null;
+      let tag=null;
+      let amount=null;
+
+      parts.forEach(p=>{
+
+      const text=p.trim();
+
+      if(text.startsWith("Quote ID:"))
+      quote=text.replace("Quote ID:","").trim();
+
+      if(text.startsWith("Quote Tag:"))
+      tag=text.replace("Quote Tag:","").trim();
+
+      if(text.startsWith("Proforma ID:") || text.startsWith("Proforma Number:"))
+      proforma=text.replace(/Proforma (ID|Number):/,"").trim();
+
+      if(text.startsWith("Proforma Tag:"))
+      tag=text.replace("Proforma Tag:","").trim();
+
+      if(text.startsWith("Invoice Number:"))
+      invoice=text.replace("Invoice Number:","").trim();
+
+      if(text.startsWith("Invoice Tag:"))
+      tag=text.replace("Invoice Tag:","").trim();
+
+      if(text.startsWith("Total Amount:"))
+      amount=text.replace("Total Amount:","").trim();
+
+      });
+
+      const safeTag = tag ? tag : "-";
+
+      if(!tagMap[safeTag])
+      tagMap[safeTag] = { quotes:[], proformas:[], invoices:[] };
+
+      const meta={
+        amount,
+        timestamp:new Date(item.insertDate).toLocaleString(),
+        user:item.insertBy
+      };
+
+      if(quote) tagMap[safeTag].quotes.push({id:quote,...meta});
+      if(proforma) tagMap[safeTag].proformas.push({id:proforma,...meta});
+      if(invoice) tagMap[safeTag].invoices.push({id:invoice,...meta});
+      });
+
+
+      const sortedTags =
+      Object.entries(tagMap).sort((a,b)=>{
+
+      const getLatest=(x)=>
+      Math.max(...[
+      ...x.quotes,
+      ...x.proformas,
+      ...x.invoices
+      ].map(i=>new Date(i.timestamp)));
+
+      return getLatest(b[1])-getLatest(a[1]);
+
+      });
+
+
+      return (
+
+      <table className="company-view-table">
+
+      <thead>
+      <tr>
+      <th>Tag</th>
+      <th>Quote</th>
+      <th>Proforma</th>
+      <th>Invoice</th>
+      </tr>
+      </thead>
+
+      <tbody>
+
+      {sortedTags.map(([tag,data])=>(
+      <tr key={tag}>
+
+      <td className="tag-cell"><strong>{tag}</strong></td>
+
+      <td>
+      {data.quotes.map((q,i)=>(
+      <div key={i} className="doc-cell">
+      <b className="doc-id">{q.id}</b>
+      <div className="doc-tag">{tag}</div>
+      <div className="doc-price">{q.amount}</div>
+      <div className="doc-meta">
+        <span className="meta-date">{q.timestamp}</span>
+        <span className="meta-user">{q.user}</span>
+      </div>
+      </div>
+      ))}
+      </td>
+
+      <td>
+      {data.proformas.map((p,i)=>(
+      <div key={i} className="doc-cell">
+      <b className="doc-id">{p.id}</b>
+      <div className="doc-tag">{tag}</div>
+      <div className="doc-price">{p.amount}</div>
+      <div className="doc-meta">
+        <span className="meta-date">{p.timestamp}</span>
+        <span className="meta-user">{p.user}</span></div>
+      </div>
+      ))}
+      </td>
+
+      <td>
+      {data.invoices.map((inv,i)=>(
+      <div key={i} className="doc-cell">
+      <b className="doc-id">{inv.id}</b>
+      <div className="doc-tag">{tag}</div>
+      <div className="doc-price">{inv.amount}</div>
+      <div className="doc-meta">
+        <span className="meta-date">{inv.timestamp}</span>
+        <span className="meta-user">{inv.user}</span>
+      </div>
+      </div>
+      ))}
+      </td>
+
+      </tr>
+      ))}
+
+      </tbody>
+
+      </table>
+
+      );
+
+      })()}
+
+      </div>
+
+      )}
+
+      </div>
+
+      );
+
+      })}
+
+      </div>
+      )}
+  
+{groupMode === "company" && companyViewMode === "date" && (
     <div className="grouped-container">
     {Object.entries(groupedByCompany).map(([groupName, items]) => {
       const isOpen = expandedGroup === groupName; 
       return (
         <div key={groupName}  className={`group-card ${isOpen ? "active-group glass" : ""}`}>
-          <div
-            className="group-header"
-            onClick={() =>
-              setExpandedGroup(isOpen ? null : groupName)
-            }
-          >
-            <h4 className="group-title">
-      {groupName}
-      <span className="group-date-range">
-        {formatDateRange(startDate, endDate)}
-      </span>
-    </h4>
+ <div className="group-header">
 
-           <span className={`toggle-text ${isOpen ? "open" : ""}`}>
-        {isOpen ? (
-          <>
-            <MdArrowDropUp className="toggle-icon" />
-            Hide activities
-          </>
-        ) : (
-          <>
-            <MdArrowDropDown className="toggle-icon" />
-            Show {items.length} activities
-          </>
-        )}
-      </span>
+  <h4 className="group-title">
+    {groupName}
+    <span className="group-date-range">
+      {formatDateRange(startDate, endDate)}
+    </span>
+  </h4>
 
-          </div>
+{hasNonCommentActivities(items) && (
+  <span
+    className={`toggle-text ${isOpen ? "open" : ""}`}
+    onClick={() =>
+      setExpandedGroup(isOpen ? null : groupName)
+    }
+  >
+    {isOpen ? (
+      <>
+        <MdArrowDropUp className="toggle-icon" />
+        Hide activities
+      </>
+    ) : (
+      <>
+        <MdArrowDropDown className="toggle-icon" />
+        Show {items.length} activities
+      </>
+    )}
+  </span>
+)}
+</div>
 
           <div className="group-metrics">
   {(() => {
-    const { totalQuotes, totalProformas } =
-      countQuotesAndProformas(items, "company");
+    const { totalQuotes,totalProformas, totalInvoices } =
+  countQuotesAndProformas(items,"company");
+
+const totalComments = countComments(items);
 
     return (
       <>
@@ -1140,6 +1626,29 @@ return (
       >
         Unique Users <b>{getUniqueCount(items, "insertBy")}</b>
       </div>
+
+      <div
+      title={totalComments === 0 ? "No comments available" : "View comments"}
+        className={`metric-clickable ${
+          totalComments === 0 ? "disabled-metric" : ""
+        }`}
+      onClick={(e) => {
+
+        const comments =
+          extractComments(items,"company");
+
+        openInfoPanel(
+          e,
+          "Comments",
+          comments,
+          groupName   // ⭐ pass company name
+
+        );
+
+      }}
+      >
+        Comments <b>{totalComments}</b>
+      </div>
           
         <div>
           Quotes <b>{totalQuotes}</b>
@@ -1147,6 +1656,10 @@ return (
 
         <div>
           Proformas <b>{totalProformas}</b>
+        </div>
+  
+        <div>
+        Invoices <b>{totalInvoices}</b>
         </div>
 
         <div
@@ -1185,33 +1698,35 @@ return (
           {isOpen && (
             <div className="group-details">
               {Object.entries(groupByDate(items)).map(([date, dayItems]) => {
-  const { quotes, proformas } =
+  const { quotes, proformas, invoices } =
     extractDetailedIds(dayItems, "company");
 
   return (
     <div key={date} className="day-block">
 
 {(() => {
-  const { quotes, proformas } =
+  const { quotes, proformas, invoices  } =
     extractDetailedIds(dayItems, "company");
 
   return (
     <h5 className="day-title">
       {date}
       <span className="day-counts">
-        Quotes: <b>{quotes.length}</b> | 
-        Proformas: <b>{proformas.length}</b>
+        Quotes: <b>{quotes.length}</b>  {" "}|{" "} 
+        Proformas: <b>{proformas.length}</b>  {" "}|{" "} 
+        Invoices: <b>{invoices.length}</b>
       </span>
     </h5>
   );
 })()}
 
       {quotes.length > 0 && (
-        <table className="mini-table">
+        <table className="mini-table-company">
           <thead>
             <tr>
               <th>Quote ID</th>
               <th>Tag</th>
+              <th>Amount</th>
               <th>User</th>
             </tr>
           </thead>
@@ -1220,6 +1735,7 @@ return (
               <tr key={i}>
                 <td>{q.id}</td>
                 <td>{q.tag}</td>
+                <td>₹ {q.amount}</td>
                 <td>{q.meta}</td>
               </tr>
             ))}
@@ -1228,11 +1744,12 @@ return (
       )}
 
       {proformas.length > 0 && (
-        <table className="mini-table">
+        <table className="mini-table-company">
           <thead>
             <tr>
               <th>Proforma ID</th>
               <th>Tag</th>
+              <th>Amount</th>
               <th>User</th>
             </tr>
           </thead>
@@ -1241,7 +1758,31 @@ return (
               <tr key={i}>
                 <td>{p.id}</td>
                 <td>{p.tag}</td>
+                <td>₹ {p.amount}</td>
                 <td>{p.meta}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {invoices.length > 0 && (
+        <table className="mini-table-company">
+          <thead>
+            <tr>
+              <th>Invoice Number</th>
+              <th>Tag</th>
+              <th>Amount</th>
+              <th>User</th>
+            </tr>
+          </thead>
+          <tbody>
+            {invoices.map((inv, i) => (
+              <tr key={i}>
+                <td>{inv.id}</td>
+                <td>{inv.tag}</td>
+                <td>₹ {inv.amount}</td>
+                <td>{inv.meta}</td>
               </tr>
             ))}
           </tbody>
@@ -1255,7 +1796,9 @@ return (
         </div>
       );
     })}
-  </div> </div>
+  </div> 
+  )}
+  </div>
 ) : totalCount === 0 ? (
     <p className="no-activity-message-panel">
       NO ACTIVITIES FOUND...
@@ -1269,12 +1812,27 @@ return (
 
 {infoPanel.open && (
   <div
-   className={`floating-info-panel ${
-    infoPanel.title === "Last Activity"
-      ? "wide-panel"
-      : ""
-  }`}
-  style={{ top: infoPanel.y, left: infoPanel.x }}
+   className={`floating-info-panel 
+    ${infoPanel.title === "Last Activity" ? "" : "wide-panel"} 
+    ${infoPanel.title === "Comments" ? "comments-wide-panel" : ""}
+  `}
+  style={{
+    top: infoPanel.y,
+    left: infoPanel.x,
+
+    width:
+      infoPanel.title === "Activity Types"
+        ? "280px"
+        : infoPanel.title === "Last Activity"
+        ? "420px"
+        : infoPanel.title === "Comments"
+        ? "620px"   
+        : "300px",
+    maxHeight:
+    infoPanel.title === "Comments"
+      ? "65vh"
+      : "420px"
+  }}
   onClick={(e) => e.stopPropagation()}
 >
     <div className="info-panel-header">
@@ -1282,6 +1840,61 @@ return (
     </div>
 
 {infoPanel.title !== "Activity Records" && (
+
+  infoPanel.title === "Comments" ? (
+
+  <>
+    <div className="comments-context-name">
+
+      <span className="comments-context-label">
+        {groupMode === "company"
+          ? "Company : "
+          : "User : "}
+      </span>
+
+      <span className="comments-context-value">
+        &nbsp; {infoPanel.contextName}
+      </span>
+
+    </div>
+
+    <div className="comment-card-container">
+      {infoPanel.items.map((c, i) => (
+
+        <div
+          key={i}
+          className="comment-card-modern"
+        >
+
+          <div className="comment-header">
+
+            <span className="comment-meta">
+              <FaUserLarge className="comment-icon" />
+              <span>{c.meta}</span>
+            </span>
+
+            <span className="comment-time">
+              <MdOutlineAccessTimeFilled
+                className="comment-icon"
+                style={{ fontSize: "14px" }}
+              />
+              <span>{c.timestamp}</span>
+            </span>
+
+          </div>
+
+          <div className="comment-message">
+            <MdModeComment className="comment-icon" />
+            <span>{c.message}</span>
+          </div>
+
+        </div>
+
+      ))}
+    </div>
+  </>
+
+) : (
     <ul className="info-panel-list">
     {infoPanel.items.map((item, idx) => (
      <li
@@ -1316,32 +1929,63 @@ return (
         );
 
         const detailedRows = matchingRecords.map(a => {
-          let id = "-";
-          let tag = "-";
-
-          if (a.details) {
-            const parts = a.details.split(",");
-
-            parts.forEach(p => {
-              const text = p.trim();
-              if (text.startsWith("Quote ID:"))
-                id = text.replace("Quote ID:", "").trim();
-              if (text.startsWith("Proforma Number:"))
-                id = text.replace("Proforma Number:", "").trim();
-              if (text.startsWith("Quote Tag:"))
-                tag = text.replace("Quote Tag:", "").trim();
-              if (text.startsWith("Proforma Tag:"))
-                tag = text.replace("Proforma Tag:", "").trim();
-            });
+        
+           if (selectedType.toLowerCase() === "comment") {
+            return {
+              company: a.company_name,
+              user: a.insertBy,
+              message: a.details,
+              timestamp: new Date(a.insertDate).toLocaleString(),
+              isComment: true   // flag
+            };
           }
 
-          return {
-            id,
-            tag,
-            company: a.company_name,
-            user: a.insertBy
-          };
-        });
+        let id = "-";
+        let tag = "-";
+        let amount = "-";
+
+        if (a.details) {
+          const parts = a.details.split(",");
+
+          parts.forEach(p => {
+            const text = p.trim();
+
+            /* QUOTE */
+            if (text.startsWith("Quote ID:"))
+              id = text.replace("Quote ID:", "").trim();
+
+            if (text.startsWith("Quote Tag:"))
+              tag = text.replace("Quote Tag:", "").trim();
+
+            /* PROFORMA */
+            if (text.startsWith("Proforma Number:") || text.startsWith("Proforma ID:"))
+              id = text.replace(/Proforma (Number|ID):/, "").trim();
+
+            if (text.startsWith("Proforma Tag:"))
+              tag = text.replace("Proforma Tag:", "").trim();
+
+            /* INVOICE */
+            if (text.startsWith("Invoice Number:"))
+              id = text.replace("Invoice Number:", "").trim();
+
+            if (text.startsWith("Invoice Tag:"))
+              tag = text.replace("Invoice Tag:", "").trim();
+
+            /* AMOUNT */
+            if (text.startsWith("Total Amount:"))
+              amount = text.replace("Total Amount:", "").trim();
+          });
+        }
+
+        return {
+                id,
+                tag,
+                amount,
+                company: a.company_name,
+                user: a.insertBy,
+                isComment: false
+              };
+      });
 
         setSecondPanel({
           open: true,
@@ -1353,15 +1997,30 @@ return (
       }}
     >
       {infoPanel.title === "Activity Types" ? (
-        <>
-          <strong>{item.label}</strong> &nbsp; — &nbsp; {item.value}
-        </>
-      ) : (
-        item.value
-      )}
+  <>
+    <strong>{item.label}</strong> &nbsp; — &nbsp; {item.value}
+  </>
+) : (
+  <>
+    {item.label && (
+      <strong className="info-label">{item.label}:</strong>
+    )}
+
+    {Array.isArray(item.value) ? (
+      <div className="info-multi-lines">
+        {item.value.map((v, i) => (
+          <div key={i}>{v}</div>
+        ))}
+      </div>
+    ) : (
+      <span>{item.value}</span>
+    )}
+  </>
+)}
     </li>
     ))}
   </ul>
+  )
 )}
 
     {/* ⬅ / ➡ Navigation ONLY for Last Activity */}
@@ -1468,26 +2127,61 @@ return (
     </div>
 
     <div className="activity-records-table">
-      <table className="second-panel-table-for-activity">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Tag</th>
-            <th>Company</th>
-            <th>User</th>
-          </tr>
-        </thead>
-        <tbody>
-          {secondPanel.items.map((row, i) => (
-            <tr key={i}>
-              <td>{row.id}</td>
-              <td>{row.tag}</td>
-              <td>{row.company}</td>
-              <td>{row.user}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+              {secondPanel.items.length > 0 &&
+              secondPanel.items[0].isComment ? (
+
+                /* ⭐ COMMENT TABLE */
+                 <table className="comment-activity-table">
+                  <thead>
+                    <tr>
+                      <th>Company</th>
+                      <th>User</th>
+                      <th>Message</th>
+                      <th>Timestamp</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {secondPanel.items.map((row, i) => (
+                      <tr key={i}>
+                        <td>{row.company}</td>
+                        <td>{row.user}</td>
+                        <td>{row.message}</td>
+                        <td>{row.timestamp}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+              ) : (
+
+                /* ⭐ DEFAULT TABLE */
+                <table className="second-panel-table-for-activity">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Tag</th>
+                      <th>Amount</th>
+                      <th>Company</th>
+                      <th>User</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {secondPanel.items.map((row, i) => (
+                      <tr key={i}>
+                        <td>{row.id}</td>
+                        <td>{row.tag}</td>
+                        <td>₹ {row.amount}</td>
+                        <td>{row.company}</td>
+                        <td>{row.user}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+              )}
     </div>
   </div>
 )}
