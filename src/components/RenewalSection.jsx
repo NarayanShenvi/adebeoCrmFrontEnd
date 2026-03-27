@@ -609,30 +609,33 @@
   const filteredRenewalReports = useMemo(() => {
     let data = [...renewalReports];
 
-    // ✅ CUSTOMER FILTER (multi-select)
+// ✅ CUSTOMER FILTER
 if (appliedFilters.customerObj && appliedFilters.customerObj.length > 0) {
+
   const customerNames = appliedFilters.customerObj.map(c =>
-    (c.companyName || c.company_name || c.company || "").toLowerCase()
+    (c.companyName || "").toLowerCase()
   );
 
   data = data.filter(row =>
-    row["Customer Name"] &&
+    row.Customer &&
     customerNames.some(name =>
-      row["Customer Name"].toLowerCase().includes(name)
+      row.Customer.toLowerCase().includes(name)
     )
   );
 }
 
-// ✅ PRODUCT FILTER (multi-select)
+
+// ✅ PRODUCT FILTER
 if (appliedFilters.productObj && appliedFilters.productObj.length > 0) {
+
   const productNames = appliedFilters.productObj.map(p =>
-    p.productName.toLowerCase()
+    (p.productName || "").toLowerCase()
   );
 
   data = data.filter(row =>
-    row["Description"] &&
+    row.Product &&
     productNames.some(name =>
-      row["Description"].toLowerCase().includes(name)
+      row.Product.toLowerCase().includes(name)
     )
   );
 }
@@ -848,10 +851,13 @@ useEffect(() => {
 
         <Form onSubmit={handleSubmit} className="filter-form-renewal">
           {/* Date row */}
-<Row className="g-4 mt-3 renewal-filter-row align-items-end">
+<Row className="g-4 mt-3 renewal-filter-row align-items-center">
+  
   {/* Start Date */}
-  <Col md={3}>
-    <Form.Label className="required-label">Start Date:</Form.Label>
+  <Col md={3} className="d-flex flex-column justify-content-center">
+    <Form.Label className="required-label">
+      Start Date:
+    </Form.Label>
     <Form.Control
       type="date"
       value={startDate}
@@ -862,8 +868,10 @@ useEffect(() => {
   </Col>
 
   {/* End Date */}
-  <Col md={3}>
-    <Form.Label className="required-label">End Date:</Form.Label>
+  <Col md={3} className="d-flex flex-column justify-content-center">
+    <Form.Label className="required-label">
+      End Date:
+    </Form.Label>
     <Form.Control
       type="date"
       value={endDate}
@@ -874,7 +882,33 @@ useEffect(() => {
     />
   </Col>
 
-  {/* Checkbox + Amount */}
+  {/* Totals */}
+<Col md={6} className="d-flex align-items-center justify-content-center">
+  {reportGenerated && (
+    <div className="total-amount-text-renewal d-flex">
+
+      <div className="total-box total-original">
+        <span>Total Original Qty:&nbsp;</span>
+        <strong className="wrap-amount">
+          {formattedTotalOriginalQty}
+        </strong>
+      </div>
+
+      <div className="total-box total-renewed">
+        <span>Total Renewed Qty:&nbsp;</span>
+        <strong className="wrap-amount">
+          {formattedTotalRenewedQty}
+        </strong>
+      </div>
+
+    </div>
+  )}
+</Col>
+</Row>
+
+<Row className="g-4 mt-3">
+
+{/* Checkbox + Amount */}
   <Col md={3}>
     <Form.Check
       type="checkbox"
@@ -886,29 +920,7 @@ useEffect(() => {
     />
     </Col>
 
-<Col md={3} >
-  {reportGenerated && (
-    <div className="total-amount-text-renewal d-flex gap-1">
-      <div>
-        <span>Total Original Qty:&nbsp;</span>
-        <strong className="wrap-amount">
-          {formattedTotalOriginalQty}
-        </strong>
-      </div>
 
-      <div>
-        <span>Total Renewed Qty:&nbsp;</span>
-        <strong className="wrap-amount">
-          {formattedTotalRenewedQty}
-        </strong>
-      </div>
-    </div>
-  )}
-</Col>
-</Row>
-
-
-          <Row className="g-4 mt-3">
             {/* Customer search */}
             {<Col md={4}>
               <Form.Group className="form-group">
@@ -1059,8 +1071,8 @@ useEffect(() => {
   </Col>
 
             {/* User select */}
-          <Col md={3}>
-  <Form.Group className="form-group">
+          {/* <Col md={3}> 
+  <Form.Group className="form-group"> 
     <Form.Label>User</Form.Label>
 
     <Select
@@ -1112,7 +1124,7 @@ useEffect(() => {
 
   </Form.Group>
 
-  </Col>
+  </Col> */}
 
             {/* Submit button */}
             <Col md={1}>

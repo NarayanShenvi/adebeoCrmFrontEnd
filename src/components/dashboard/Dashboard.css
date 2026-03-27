@@ -15076,7 +15076,7 @@ select option {
 .custom-checkbox-renewal {
   display: flex;
   transition: transform 0.3s ease-in-out;
-  margin-top: 30px;
+  margin-top: 5px; 
 }
 
 /* Custom Checkbox Styling */
@@ -15150,9 +15150,9 @@ select option {
   display: flex;
   align-items: center;
   
-  padding: 6px 14px;
+  padding: 9px 0px;
   border-radius: 2px;
-  margin-top: 12px;
+  margin-top: 19px;
   background: linear-gradient(
     135deg,
     rgba(39, 142, 170, 0.27),
@@ -15187,7 +15187,7 @@ select option {
 }
 
 .wrap-amount {
-  max-width: 180px;          /* adjust based on layout */
+  max-width: 150px;          /* adjust based on layout */
   word-break: break-word;    /* break long numbers */
   overflow-wrap: anywhere;   /* allow wrapping anywhere */
   white-space: normal;       /* allow multi-line */
@@ -15205,12 +15205,24 @@ select option {
   }
 }
 
+.total-amount-text-renewal {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Wrapper */
+.total-amount-text-renewal {
+  gap: 60px !important;   /* 🔥 controls space between totals */
+  max-width: 450px;
+}
 
 /* WHEN TOTAL IS NOT PRESENT & WHEN IT IS PRESENT */
 /* Make row flexible */
 .renewal-filter-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
 }
 
 /* Default behavior (when total exists) */
