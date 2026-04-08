@@ -12938,35 +12938,6 @@ select option {
   }
 }
 
-/* WHEN TOTAL IS NOT PRESENT & WHEN IT IS PRESENT */
-/* Make row flexible */
-.business-filter-row {
-  display: flex;
-  align-items: flex-start;
-}
-
-/* Default behavior (when total exists) */
-.business-filter-row > .col-md-3 {
-  transition: all 0.3s ease;
-}
-
-/* 🔹 CENTER FIRST 3 COLS WHEN TOTAL IS NOT PRESENT */
-.business-filter-row:not(:has(.total-amount-text-business)) {
-  justify-content: center;
-}
-
-/* WHEN TOTAL IS NOT PRESENT → 3 columns only */
-.business-filter-row:not(:has(.total-amount-text-business)) {
-  justify-content: center;
-  column-gap: 32px;   /* 👈 space between the 3 columns */
-}
-
-/* Slightly wider columns so they don't squeeze */
-.business-filter-row:not(:has(.total-amount-text-business)) > .col-md-3 {
-  width: 275px;       /* adjust: 240–280px */
-  margin-bottom: -20px;
-}
-
 /* ===== SUMMARY BAR CONTAINER ===== */
 .total-summary-animated-business-report {
   display: flex;

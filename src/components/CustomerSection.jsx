@@ -255,6 +255,11 @@ useEffect(() => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+     if (!state.gstin || !state.gstin.trim()) {
+      toast.error("GSTIN is required to proceed");
+      return; // ⛔ stop submit
+    }
 
     const customerData = { ...state, products: selectedProducts };
 

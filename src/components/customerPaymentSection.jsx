@@ -204,6 +204,32 @@ const handlePageChange = (newPage) => {
   }
 };
 
+const formatCurrency = (value) => {
+  if (value === null || value === undefined) return "0";
+
+  const num = Number(value);
+
+  if (Number.isNaN(num)) return value;
+
+  const str = num.toString();
+
+  // If decimal exists
+  if (str.includes(".")) {
+    const [intPart, decimalPart] = str.split(".");
+
+    // If more than 2 digits → truncate
+    if (decimalPart.length > 2) {
+      return `${intPart}.${decimalPart.slice(0, 2)}`;
+    }
+
+    // else show as-is
+    return str;
+  }
+
+  // No decimal
+  return str;
+};
+
 return (
     <div className="customer-payment-section">
       <h2>Customer Payments</h2>
@@ -395,8 +421,8 @@ editablePayments.length === 0 ? (
     </td>
     <td>{payment.invoice_number}</td>
     <td>{payment.customer_name}</td>
-    <td>₹&nbsp;{payment.total_amount}</td>
-    <td>₹&nbsp;{payment.amount_due}</td>
+    <td>₹&nbsp;{formatCurrency(payment.total_amount)}</td>
+    <td>₹&nbsp;{formatCurrency(payment.amount_due)}</td>
     <td>{new Date(payment.invoice_date).toLocaleDateString()}</td>
     <td>{payment.payment_status}</td>
 

@@ -12,7 +12,7 @@ const InvoiceSlider = ({ customerId, companyName, onClose }) => {
   const allOrders = activeTab && orders[activeTab] ? orders[activeTab] : [];
 const [currentPage, setCurrentPage] = useState(1);
 
-const itemsPerPage = 5; // adjust as needed
+const itemsPerPage = 3000; // adjust as needed
 const totalPages = Math.ceil(allOrders.length / itemsPerPage);
 const currentOrders = allOrders.slice(
   (currentPage - 1) * itemsPerPage,

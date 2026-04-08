@@ -35,6 +35,16 @@ import {
 } from "recharts";
 import { PieChart, Pie, Cell } from "recharts";
 import { Collapse, Button } from "react-bootstrap";
+import {
+  createCustomerAsync,
+  setSelectedCustomer,
+  fetchCustomerAsync,
+  clearSuccessMessage,
+  updateCustomerAsync,
+  resetSelectedCustomer,
+  clearCustomers,
+  clearError 
+} from '../redux/slices/customerSlice'; 
 
     const BusinessReport = () => {
       const dispatch = useDispatch();
@@ -58,6 +68,15 @@ import { Collapse, Button } from "react-bootstrap";
       const [searchResults, setSearchResults] = useState([]);
       const [searchLoading, setSearchLoading] = useState(false);
       const [selectedSearchValue, setSelectedSearchValue] = useState("");
+
+      // Customer search state
+      const [customerSearchTerm, setCustomerSearchTerm] = useState("");
+      const [customerSearchResults, setCustomerSearchResults] = useState([]);
+      const [customerSearchLoading, setCustomerSearchLoading] = useState(false);
+      const [selectedCustomerValue, setSelectedCustomerValue] = useState("");
+
+      const [selectedCustomerId, setSelectedCustomerId] = useState([]);
+      const [selectedCustomerObj, setSelectedCustomerObj] = useState([]);
 
       // Pagination & report
       const [page, setPage] = useState(1);
@@ -85,6 +104,7 @@ import { Collapse, Button } from "react-bootstrap";
       user: [],
       mode: [],
       businessType: [],
+      customer: [] 
     });
 
     
@@ -273,6 +293,9 @@ import { Collapse, Button } from "react-bootstrap";
     user: selectedUser,
     mode: selectedMode,
     businessType: selectedBusinessType,
+    customer: selectedCustomerObj.map(
+    c => c.customerName
+  )
   });
 
 
@@ -392,7 +415,86 @@ const handlePageChange = (newPage) => {
       return () => clearTimeout(debounceProd);
     }, [searchTerm, allProducts]);
 
+    const { customers: allCustomers = [] } = useSelector(
+      (state) => state.customers
+    );
 
+    useEffect(() => {
+      dispatch(fetchCustomerAsync());
+    }, [dispatch]);
+
+    useEffect(() => {
+      if (customerSearchTerm.length < 3) {
+        setCustomerSearchResults([]);
+        return;
+      }
+
+      setCustomerSearchLoading(true);
+
+      const debounce = setTimeout(() => {
+        const filtered = allCustomers.filter(c =>
+          c.customerName &&
+          c.customerName
+            .toLowerCase()
+            .includes(customerSearchTerm.toLowerCase())
+        );
+
+        setCustomerSearchResults(filtered);
+        setCustomerSearchLoading(false);
+      }, 450);
+
+      return () => clearTimeout(debounce);
+
+    }, [customerSearchTerm, allCustomers]);
+
+    const handleSelectCustomer = (e) => {
+      const value = e.target.value;
+
+      const cust =
+        customerSearchResults.find(c => c._id === value) || null;
+
+      if (!startDate || !endDate) {
+
+        toast.warn(
+          "Please select Start Date and End Date before applying Customer filter."
+        );
+
+        setSelectedCustomerValue("");
+        setSelectedCustomerId([]);
+        setSelectedCustomerObj([]);
+        setCustomerSearchTerm("");
+
+        return;
+      }
+
+      setSelectedCustomerValue(value);
+
+      setSelectedCustomerId(
+        cust ? [cust._id] : []
+      );
+
+      setSelectedCustomerObj(
+        cust ? [cust] : []
+      );
+    };
+
+    const reportCustomerOptions = useMemo(() => {
+    const map = new Map();
+
+    businessReports.forEach((row) => {
+      const customer = row["Customer"];
+
+      if (customer) {
+        map.set(customer, {
+          value: customer,
+          label: customer
+        });
+      }
+    });
+
+    return Array.from(map.values());
+
+  }, [businessReports]);
       // -----------------------
       // Derived username list for any UI needs
       // -----------------------
@@ -410,6 +512,19 @@ if (appliedFilters.productObj && appliedFilters.productObj.length > 0) {
 
   data = data.filter(row => 
     row["Product Description"] && productNames.some(name => row["Product Description"].toLowerCase().includes(name))
+  );
+}
+
+// ✅ CUSTOMER FILTER
+if (
+  appliedFilters.customer &&
+  appliedFilters.customer.length > 0       
+) {
+  data = data.filter(row =>
+    row["Customer"] &&
+    appliedFilters.customer.includes(
+      row["Customer"]
+    )
   );
 }
 
@@ -912,7 +1027,7 @@ useEffect(() => {
 
         <Form onSubmit={handleSubmit} className="filter-form-business">
           {/* Date row */}
-<Row className="g-4 mt-3 business-filter-row justify-content-center text-center">
+<Row className="g-4 mt-3 business-filter-row justify-content-center">
   {/* Start Date */}
   <Col md={3} >
     <Form.Label className="required-label" style={{ display: "block", textAlign: "left" }}>Start Date:</Form.Label>
@@ -951,29 +1066,9 @@ useEffect(() => {
       className="custom-checkbox-business"
     />
     </Col>
-{/* 
-<Col md={3}>
-    {reportGenerated && (
-  <div className="total-amount-text-business">
-<div>
-  <span>Total Sales:</span>
-  <strong className="wrap-amount">{formattedTotalSaleAmount}</strong>
-</div>
 
-<div>
-  <span>Total Profit:</span>
-  <strong className="wrap-amount">{formattedTotalProfitAmount}</strong>
-</div>
-
-  </div>
-)}
-  </Col> */}
-</Row>
-
-<Row className="g-4 mt-3">
-  
-          {/* Product search (single products only) */}
-  <Col md={3}>
+  {/* Product search (single products only) */}
+  <Col md={3} style={{ marginTop: "50px" }}>
     <Form.Group className="form-group">
     <Form.Label>
       Product {useReportFilters ? "(from report)" : "(search)"}
@@ -1054,9 +1149,160 @@ useEffect(() => {
   </Form.Group>
 
   </Col>
+  
+{/* 
+<Col md={3}>
+    {reportGenerated && (
+  <div className="total-amount-text-business">
+<div>
+  <span>Total Sales:</span>
+  <strong className="wrap-amount">{formattedTotalSaleAmount}</strong>
+</div>
 
-            {/* User select */}
-          <Col md={2}>
+<div>
+  <span>Total Profit:</span>
+  <strong className="wrap-amount">{formattedTotalProfitAmount}</strong>
+</div>
+
+  </div>
+)}
+  </Col> */}
+</Row>
+
+<Row className="g-4 mt-3">
+  
+ {/* Customer Search */}
+<Col md={3}>
+  <Form.Group className="form-group">
+
+    <Form.Label>
+      Customer {useReportFilters
+        ? "(from report)"
+        : "(search)"}
+    </Form.Label>
+
+    {useReportFilters ? (
+
+      // ✅ FROM REPORT
+      <Select
+        className="BusinessReport-select"
+        classNamePrefix="BusinessReport"
+        menuPortalTarget={document.body}
+        menuPosition="fixed"
+        styles={{
+          menuPortal: base => ({
+            ...base,
+            zIndex: 9999
+          })
+        }}
+
+        options={reportCustomerOptions}
+
+        value={selectedCustomerObj.map(c => ({
+          value: c.customerName,
+          label: c.customerName
+        }))}
+
+        onChange={(selected) => {
+
+          if (!selected) {
+            setSelectedCustomerObj([]);
+            return;
+          }
+
+          setSelectedCustomerObj(
+            selected.map(c => ({
+              customerName: c.value
+            }))
+          );
+        }}
+
+        isClearable
+        isMulti
+        placeholder="Select Customer(s)"
+      />
+
+    ) : (
+
+      // 🔴 SEARCH MODE
+      <>
+        <input
+          className="form-control"
+          type="text"
+          placeholder="Search by Customer Name"
+          value={customerSearchTerm}
+
+          onChange={(e) => {
+
+            const value = e.target.value;
+
+            setCustomerSearchTerm(value);
+
+            if (value.trim() === "") {
+              setSelectedCustomerValue("");
+              setSelectedCustomerId([]);
+              setSelectedCustomerObj([]);
+            }
+
+          }}
+        />
+
+        <div className="mt-1">
+
+          {customerSearchTerm.length >= 3 ? (
+
+            customerSearchLoading ? (
+
+              <p>Loading...</p>
+
+            ) : customerSearchResults.length > 0 ? (
+
+              <select
+                onChange={handleSelectCustomer}
+                value={selectedCustomerValue}
+              >
+
+                <option value="">
+                  Select a customer
+                </option>
+
+                {customerSearchResults.map(c => (
+
+                  <option
+                    key={c._id}
+                    value={c._id}
+                  >
+                    {c.customerName}
+                  </option>
+
+                ))}
+
+              </select>
+
+            ) : (
+
+              <p>No customers found...</p>
+
+            )
+
+          ) : customerSearchTerm.length > 0 &&
+            customerSearchTerm.length < 3 ? (
+
+            <p>
+              Type at least 3 characters to search
+            </p>
+
+          ) : null}
+
+        </div>
+      </>
+    )}
+
+  </Form.Group>
+</Col>
+
+  {/* User select */}
+  <Col md={2}>
   <Form.Group className="form-group">
     <Form.Label>User</Form.Label>
 
